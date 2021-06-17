@@ -1,0 +1,8 @@
+# Stack specific files
+.stack-work
+stack.yaml.lock
+# A directory for the tblgen executables
+.bin
+# Generated files
+src/MLIR/AST/Dialect/Generated
+test/MLIR/AST/Dialect/Generated

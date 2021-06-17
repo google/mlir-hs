@@ -1,0 +1,110 @@
+cabal-version: 3.0
+
+name:           mlir-hs
+version:        0.1.0.0
+description:    Haskell bindings to MLIR
+homepage:       https://github.com/google/mlir-hs#readme
+bug-reports:    https://github.com/google/mlir-hs/issues
+author:         Adam Paszke
+maintainer:     apaszke@google.com
+copyright:      2021 Google
+license:        Apache-2.0
+license-file:   LICENSE
+build-type:     Custom
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/google/mlir-hs
+
+common defaults
+  default-language: Haskell2010
+  default-extensions:
+      BlockArguments
+    , DeriveGeneric
+    , DerivingVia
+    , FlexibleContexts
+    , FlexibleInstances
+    , FunctionalDependencies
+    , GADTs
+    , GeneralizedNewtypeDeriving
+    , LambdaCase
+    , OverloadedStrings
+    , PatternSynonyms
+    , QuasiQuotes
+    , RecordWildCards
+    , RecursiveDo
+    , ScopedTypeVariables
+    , StandaloneDeriving
+    , TemplateHaskell
+    , TupleSections
+    , TypeApplications
+    , TypeSynonymInstances
+    , ViewPatterns
+
+custom-setup
+  setup-depends:
+      base
+    , Cabal
+    , lens
+    , directory
+    , filepath
+
+library
+  import: defaults
+  hs-source-dirs: src
+  exposed-modules:
+      MLIR.AST
+    , MLIR.AST.Builder
+    , MLIR.AST.Dialect.Affine
+    , MLIR.AST.Dialect.Linalg
+    , MLIR.AST.Dialect.MemRef
+    , MLIR.AST.Dialect.Shape
+    , MLIR.AST.Dialect.Std
+    , MLIR.AST.Dialect.Vector
+    , MLIR.AST.Dialect.X86Vector
+    , MLIR.AST.PatternUtil
+    , MLIR.AST.Rewrite
+    , MLIR.AST.Serialize
+    , MLIR.Native
+    , MLIR.Native.ExecutionEngine
+    , MLIR.Native.FFI
+    , MLIR.Native.Pass
+  build-depends:
+      base >=4.7 && <5
+    , inline-c
+    , mtl
+    , raw-strings-qq
+    , vector
+    , containers
+    , bytestring
+    , transformers
+  extra-libraries:
+    MLIRPublicAPI
+
+test-suite spec
+  import: defaults
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  ghc-options: -Wall
+  hs-source-dirs: test
+  build-depends:
+      base >=4.7 && <5
+    , mlir-hs
+    , hspec
+    , transformers
+    , bytestring
+    , raw-strings-qq
+    , vector
+    , mtl
+    , QuickCheck
+    , generic-random
+    , containers
+  other-modules:
+      MLIR.ASTSpec
+    , MLIR.BuilderSpec
+    , MLIR.NativeSpec
+    , MLIR.RewriteSpec
+    , MLIR.Test.Generators
+  build-tool-depends: hspec-discover:hspec-discover
