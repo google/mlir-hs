@@ -190,8 +190,10 @@ showModule = moduleAsOperation >=> showOperation
 
 data StringRef = StringRef (Ptr C.CChar) C.CSize
 
+-- MLIR sometimes expects null-terminated StringRefs, so we can't use
+-- unsafeUseAsCStringLen, because ByteStrings are not guaranteed to have a terminator
 withStringRef :: BS.ByteString -> (StringRef -> IO a) -> IO a
-withStringRef s f = BS.unsafeUseAsCStringLen s \(ptr, len) -> f $ StringRef ptr $ fromIntegral len
+withStringRef s f = BS.useAsCString s \ptr -> f $ StringRef ptr $ fromIntegral $ BS.length s
 
 peekStringRef :: StringRef -> IO BS.ByteString
 peekStringRef (StringRef ref size) = BS.packCStringLen (ref, fromIntegral size)
