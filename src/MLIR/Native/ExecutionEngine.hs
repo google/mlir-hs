@@ -37,9 +37,10 @@ C.include "mlir-c/ExecutionEngine.h"
 -- Execution engine
 
 -- TODO(apaszke): Make the opt level configurable
+-- TODO(apaszke): Allow loading shared libraries
 createExecutionEngine :: Module -> IO (Maybe ExecutionEngine)
 createExecutionEngine m = nullable <$>
-  [C.exp| MlirExecutionEngine { mlirExecutionEngineCreate($(MlirModule m), 3) } |]
+  [C.exp| MlirExecutionEngine { mlirExecutionEngineCreate($(MlirModule m), 3, 0, NULL) } |]
 
 destroyExecutionEngine :: ExecutionEngine -> IO ()
 destroyExecutionEngine eng =
