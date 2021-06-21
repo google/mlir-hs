@@ -3,6 +3,11 @@ name: Haskell CI
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Always regenerate once every 4 hour
+    - cron:  '15 */4 * * *'
 
 jobs:
   build:
@@ -39,17 +44,29 @@ jobs:
         repository: llvm/llvm-project
         ref: 'main'
         path: 'llvm_src'
-    - name: Install dependencies
+    - name: Ccache for C++ compilation
+      uses: hendrikmuhs/ccache-action@v1.0.4
+    - name: Install dependencies (Haskell)
       run: |
         cabal update
         cabal build --only-dependencies --enable-tests --enable-benchmarks
-        mkdir llvm_src/build
-        cd llvm_src/build
-        CXX=clang++ CC=clang cmake ../llvm -G Ninja -DLLVM_ENABLE_PROJECTS=mlir -DLLVM_TARGETS_TO_BUILD="host" -DLLVM_BUILD_LLVM_DYLIB=ON -DCMAKE_BUILD_TYPE=Release -DLLVM_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=../../mlir_shared
-        ninja -j4 install
-    - name: Run test
+    - name: Install dependencies (LLVM & MLIR)
       run: |
-        export PATH=$PATH:mlir_shared/bin
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:mlir_shared/lib
+        export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+        cmake -S llvm_src/llvm -B llvm_src/build -DLLVM_CCACHE_BUILD=ON -DLLVM_ENABLE_PROJECTS=mlir \
+          -DLLVM_TARGETS_TO_BUILD="host" -DLLVM_BUILD_LLVM_DYLIB=ON -DCMAKE_BUILD_TYPE=Release \
+          -DLLVM_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=$HOME/mlir_shared
+        cd llvm_src/build && ninja -j4 install
+        echo "$HOME/mlir_shared/bin" >> $GITHUB_PATH
+      env:
+        CC: clang
+        CXX: clang++
+        CMAKE_GENERATOR: Ninja
+    - name: Build mlir-hs
+      run: |
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/mlir_shared/lib
         cabal build --enable-tests --enable-benchmarks all
+    - name: Run mlir-hs tests
+      run: |
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/mlir_shared/lib
         cabal test all
