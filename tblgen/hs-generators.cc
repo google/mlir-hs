@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <functional>
+#include <regex>
 
 #include "llvm/ADT/Optional.h"
 #include "llvm/ADT/STLExtras.h"
@@ -358,6 +359,12 @@ std::string legalizeBuilderName(std::string name) {
   return name;
 }
 
+std::string stripDialect(std::string name) {
+  size_t dialect_sep_loc = name.find('.');
+  assert(dialect_sep_loc != std::string::npos);
+  return name.substr(dialect_sep_loc + 1);
+}
+
 void emitBuilderMethod(mlir::tblgen::Operator& op,
                        const AttrPattern& attr_pattern, llvm::raw_ostream& os) {
   auto fail = [&op](std::string reason) {
@@ -388,8 +395,7 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
 
   size_t dialect_sep_loc = op.getOperationName().find('.');
   assert(dialect_sep_loc != std::string::npos);
-  std::string builder_name =
-      legalizeBuilderName(op.getOperationName().substr(dialect_sep_loc + 1));
+  std::string builder_name = legalizeBuilderName(stripDialect(op.getOperationName()));
 
   std::vector<std::string> builder_arg_types;
 
@@ -451,6 +457,7 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
   if (!operation) return;
 
   const char* kBuilder = R"(
+-- | A builder for @{9}@.
 {0} :: MonadBlockBuilder m => {1:$[ -> ]}m {2}
 {0} {3:$[ ]} {4:$[ ]} {5:$[ ]} = do
   {6} (emitOp ({7})){8}
@@ -464,7 +471,8 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
                       make_range(attr_pattern.binders),  // 5
                       projection,                        // 6
                       *operation,                        // 7
-                      continuation);                     // 8
+                      continuation,                      // 8
+                      op.getOperationName());            // 9
 }
 
 void emitPattern(const llvm::Record* def, const AttrPattern& attr_pattern,
@@ -527,6 +535,7 @@ void emitPattern(const llvm::Record* def, const AttrPattern& attr_pattern,
   if (!operation) return;
 
   const char* kPatternExplicitType = R"(
+-- | A pattern for @{6}@.
 pattern {0} :: {1:$[ -> ]} -> AbstractOperation operand
 pattern {0} loc {2:$[ ]} {3:$[ ]} {4:$[ ]} = {5}
 )";
@@ -536,7 +545,30 @@ pattern {0} loc {2:$[ ]} {3:$[ ]} {4:$[ ]} = {5}
                       make_range(type_binders),          // 2
                       make_range(operand_binders),       // 3
                       make_range(attr_pattern.binders),  // 4
-                      *operation);                       // 5
+                      *operation,                        // 5
+                      op.getOperationName());            // 6
+
+}
+
+std::string formatDescription(mlir::tblgen::Operator op) {
+  std::string description;
+  description = "\n" + op.getDescription().str();
+  size_t pos = 0;
+  while (description[pos] == '\n') ++pos;
+  size_t leading_spaces = 0;
+  while (description[pos++] == ' ') ++leading_spaces;
+  if (leading_spaces) {
+    std::string leading_spaces_str;
+    for (size_t i = 0; i < leading_spaces; ++i) leading_spaces_str += "[ ]";
+    description = std::regex_replace(description, std::regex("\n" + leading_spaces_str), "\n");
+  }
+  description = std::regex_replace(description, std::regex("\\[(.*)\\]\\(.*\\)"), "$1");
+  description = std::regex_replace(description, std::regex("(['\"@<$#])"), "\\$1");
+  description = std::regex_replace(description, std::regex("```mlir"), "@");
+  description = std::regex_replace(description, std::regex("```"), "@");
+  description = std::regex_replace(description, std::regex("`"), "@");
+  description = std::regex_replace(description, std::regex("\n"), "\n-- ");
+  return description;
 }
 
 }  // namespace
@@ -548,7 +580,8 @@ bool emitOpTableDefs(const llvm::RecordKeeper& recordKeeper,
   if (defs.empty()) return true;
   // TODO(apaszke): Emit a module header to avoid leaking internal definitions.
   auto dialect_name = getDialectName(defs);
-  os << "{-# OPTIONS_GHC -Wno-unused-imports #-}\n\n";
+  os << "{-# OPTIONS_GHC -Wno-unused-imports #-}\n";
+  os << "{-# OPTIONS_HADDOCK hide, prune, not-home #-}\n\n";
   os << "module MLIR.AST.Dialect.Generated." << dialect_name << " where\n";
   os << R"(
 import Prelude hiding (return, min, max)
@@ -564,6 +597,11 @@ import qualified MLIR.AST.Dialect.Affine as Affine
 
   for (const auto* def : defs) {
     mlir::tblgen::Operator op(*def);
+    if (op.hasDescription()) {
+      os << llvm::formatv("\n-- * {0}\n-- ${0}", stripDialect(op.getOperationName()));
+      os << formatDescription(op);
+      os << "\n";
+    }
     llvm::Optional<AttrPattern> attr_pattern = buildAttrPattern(op);
     if (!attr_pattern) continue;
     attr_pattern->print(os);
