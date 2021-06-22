@@ -1,0 +1,836 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>MLIR.AST.Dialect.Vector</title><link href="linuwial.css" rel="stylesheet" type="text/css" title="Linuwial" /><link rel="stylesheet" type="text/css" href="quick-jump.css" /><link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700" /><script src="haddock-bundle.min.js" async="async" type="text/javascript"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({ tex2jax: { processClass: "mathjax", ignoreClass: ".*" } });</script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script></head><body><div id="package-header"><span class="caption">mlir-hs-0.1.0.0</span><ul class="links" id="page-menu"><li><a href="src/MLIR.AST.Dialect.Vector.html">Source</a></li><li><a href="index.html">Contents</a></li><li><a href="doc-index.html">Index</a></li></ul></div><div id="content"><div id="module-header"><table class="info"><tr><th>Safe Haskell</th><td>None</td></tr><tr><th>Language</th><td>Haskell2010</td></tr></table><p class="caption">MLIR.AST.Dialect.Vector</p></div><div id="table-of-contents"><div id="contents-list"><p class="caption" onclick="window.scrollTo(0,0)">Contents</p><ul><li><a href="#g:1">bitcast</a></li><li><a href="#g:2">broadcast</a></li><li><a href="#g:3">compressstore</a></li><li><a href="#g:4">constant_mask</a></li><li><a href="#g:5">contract</a></li><li><a href="#g:6">create_mask</a></li><li><a href="#g:7">expandload</a></li><li><a href="#g:8">extractelement</a></li><li><a href="#g:9">extract_map</a></li><li><a href="#g:10">extract</a></li><li><a href="#g:11">extract_slices</a></li><li><a href="#g:12">extract_strided_slice</a></li><li><a href="#g:13">fma</a></li><li><a href="#g:14">flat_transpose</a></li><li><a href="#g:15">gather</a></li><li><a href="#g:16">insertelement</a></li><li><a href="#g:17">insert_map</a></li><li><a href="#g:18">insert</a></li><li><a href="#g:19">insert_slices</a></li><li><a href="#g:20">insert_strided_slice</a></li><li><a href="#g:21">load</a></li><li><a href="#g:22">maskedload</a></li><li><a href="#g:23">maskedstore</a></li><li><a href="#g:24">matrix_multiply</a></li><li><a href="#g:25">multi_reduction</a></li><li><a href="#g:26">outerproduct</a></li><li><a href="#g:27">print</a></li><li><a href="#g:28">reduction</a></li><li><a href="#g:29">reshape</a></li><li><a href="#g:30">scatter</a></li><li><a href="#g:31">shape_cast</a></li><li><a href="#g:32">shuffle</a></li><li><a href="#g:33">store</a></li><li><a href="#g:34">transfer_read</a></li><li><a href="#g:35">transfer_write</a></li><li><a href="#g:36">transpose</a></li><li><a href="#g:37">tuple_get</a></li><li><a href="#g:38">tuple</a></li><li><a href="#g:39">type_cast</a></li></ul></div></div><div id="synopsis"><details id="syn"><summary>Synopsis</summary><ul class="details-toggle" data-details-id="syn"><li class="src short"><span class="keyword">data</span> <a href="#t:IteratorType">IteratorType</a><ul class="subs"><li>= <a href="#v:Parallel">Parallel</a></li><li>| <a href="#v:Reduction">Reduction</a></li></ul></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Contract">Contract</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST.html#t:Name" title="MLIR.AST">Name</a> -&gt; <a href="MLIR-AST.html#t:Name" title="MLIR.AST">Name</a> -&gt; <a href="MLIR-AST.html#t:Name" title="MLIR.AST">Name</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; [<a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a>] -&gt; <a href="MLIR-AST.html#t:Operation" title="MLIR.AST">Operation</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:ContractAttrs">ContractAttrs</a> :: <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; [<a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a>] -&gt; <a href="MLIR-AST.html#t:NamedAttributes" title="MLIR.AST">NamedAttributes</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:IteratorAttrs">IteratorAttrs</a> :: [<a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a>] -&gt; <a href="MLIR-AST.html#t:Attribute" title="MLIR.AST">Attribute</a></li><li class="src short"><a href="#v:showIterator">showIterator</a> :: <a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a> -&gt; <a href="../bytestring-0.10.12.0/Data-ByteString.html#t:ByteString" title="Data.ByteString">ByteString</a></li><li class="src short"><a href="#v:itersFromAttribute">itersFromAttribute</a> :: <a href="MLIR-AST.html#t:Attribute" title="MLIR.AST">Attribute</a> -&gt; <a href="../base-4.14.1.0/Data-Maybe.html#t:Maybe" title="Data.Maybe">Maybe</a> [<a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a>]</li><li class="src short"><span class="keyword">pattern</span> <a href="#v:BitCast">BitCast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:bitcast">bitcast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Broadcast">Broadcast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:broadcast">broadcast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:compressstore">compressstore</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m ()</li><li class="src short"><span class="keyword">pattern</span> <a href="#v:ConstantMask">ConstantMask</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:constant_mask">constant_mask</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:contract">contract</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; [<a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a>] -&gt; [<a href="MLIR-AST.html#t:Attribute" title="MLIR.AST">Attribute</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:CreateMask">CreateMask</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [operand] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:create_mask">create_mask</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:expandload">expandload</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:ExtractElement">ExtractElement</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:extractelement">extractelement</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:extract_map">extract_map</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Extract">Extract</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:extract">extract</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:ExtractSlices">ExtractSlices</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:extract_slices">extract_slices</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:ExtractStridedSlice">ExtractStridedSlice</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:extract_strided_slice">extract_strided_slice</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:FMA">FMA</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:fma">fma</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:FlatTranspose">FlatTranspose</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:flat_transpose">flat_transpose</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:gather">gather</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:InsertElement">InsertElement</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:insertelement">insertelement</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:insert_map">insert_map</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Insert">Insert</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:insert">insert</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:InsertSlices">InsertSlices</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:insert_slices">insert_slices</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:InsertStridedSlice">InsertStridedSlice</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:insert_strided_slice">insert_strided_slice</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:load">load</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:maskedload">maskedload</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:maskedstore">maskedstore</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m ()</li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Matmul">Matmul</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:matrix_multiply">matrix_multiply</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:outerproduct">outerproduct</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Print">Print</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:print">print</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m ()</li><li class="src short"><a href="#v:reduction">reduction</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="../bytestring-0.10.12.0/Data-ByteString.html#t:ByteString" title="Data.ByteString">ByteString</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:scatter">scatter</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m ()</li><li class="src short"><span class="keyword">pattern</span> <a href="#v:ShapeCast">ShapeCast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:shape_cast">shape_cast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Shuffle">Shuffle</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:shuffle">shuffle</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><a href="#v:store">store</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m ()</li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Transpose">Transpose</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:transpose">transpose</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Tuple">Tuple</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [operand] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:tuple">tuple</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:TypeCast">TypeCast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:type_cast">type_cast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li></ul></details></div><div id="interface"><h1>Documentation</h1><div class="top"><p class="src"><span class="keyword">data</span> <a id="t:IteratorType" class="def">IteratorType</a> <a href="src/MLIR.AST.Dialect.Vector.html#IteratorType" class="link">Source</a> <a href="#t:IteratorType" class="selflink">#</a></p><div class="subs constructors"><p class="caption">Constructors</p><table><tr><td class="src"><a id="v:Parallel" class="def">Parallel</a></td><td class="doc empty">&nbsp;</td></tr><tr><td class="src"><a id="v:Reduction" class="def">Reduction</a></td><td class="doc empty">&nbsp;</td></tr></table></div></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Contract" class="def">Contract</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST.html#t:Name" title="MLIR.AST">Name</a> -&gt; <a href="MLIR-AST.html#t:Name" title="MLIR.AST">Name</a> -&gt; <a href="MLIR-AST.html#t:Name" title="MLIR.AST">Name</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; [<a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a>] -&gt; <a href="MLIR-AST.html#t:Operation" title="MLIR.AST">Operation</a> <a href="src/MLIR.AST.Dialect.Vector.html#Contract" class="link">Source</a> <a href="#v:Contract" class="selflink">#</a></p></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:ContractAttrs" class="def">ContractAttrs</a> :: <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; <a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a> -&gt; [<a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a>] -&gt; <a href="MLIR-AST.html#t:NamedAttributes" title="MLIR.AST">NamedAttributes</a> <a href="src/MLIR.AST.Dialect.Vector.html#ContractAttrs" class="link">Source</a> <a href="#v:ContractAttrs" class="selflink">#</a></p></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:IteratorAttrs" class="def">IteratorAttrs</a> :: [<a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a>] -&gt; <a href="MLIR-AST.html#t:Attribute" title="MLIR.AST">Attribute</a> <a href="src/MLIR.AST.Dialect.Vector.html#IteratorAttrs" class="link">Source</a> <a href="#v:IteratorAttrs" class="selflink">#</a></p></div><div class="top"><p class="src"><a id="v:showIterator" class="def">showIterator</a> :: <a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a> -&gt; <a href="../bytestring-0.10.12.0/Data-ByteString.html#t:ByteString" title="Data.ByteString">ByteString</a> <a href="src/MLIR.AST.Dialect.Vector.html#showIterator" class="link">Source</a> <a href="#v:showIterator" class="selflink">#</a></p></div><div class="top"><p class="src"><a id="v:itersFromAttribute" class="def">itersFromAttribute</a> :: <a href="MLIR-AST.html#t:Attribute" title="MLIR.AST">Attribute</a> -&gt; <a href="../base-4.14.1.0/Data-Maybe.html#t:Maybe" title="Data.Maybe">Maybe</a> [<a href="MLIR-AST-Dialect-Vector.html#t:IteratorType" title="MLIR.AST.Dialect.Vector">IteratorType</a>] <a href="src/MLIR.AST.Dialect.Vector.html#itersFromAttribute" class="link">Source</a> <a href="#v:itersFromAttribute" class="selflink">#</a></p></div><a href="#g:1" id="g:1"><h1>bitcast</h1></a><div class="doc"><p>The bitcast operation casts between vectors of the same rank, the minor 1-D
+ vector size is casted to a vector with a different element type but same
+ bitwidth.</p><p>Example:</p><pre>// Example casting to a smaller element type.
+%1 = vector.bitcast %0 : vector&lt;5x1x4x3xf32&gt; to vector&lt;5x1x4x6xi16&gt;
+
+// Example casting to a bigger element type.
+%3 = vector.bitcast %2 : vector&lt;10x12x8xi8&gt; to vector&lt;10x12x2xi32&gt;
+
+// Example casting to an element type of the same size.
+%5 = vector.bitcast %4 : vector&lt;5x1x4x3xf32&gt; to vector&lt;5x1x4x3xi32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:BitCast" class="def">BitCast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#BitCast" class="link">Source</a> <a href="#v:BitCast" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.bitcast</code>.</p></div></div><div class="top"><p class="src"><a id="v:bitcast" class="def">bitcast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#bitcast" class="link">Source</a> <a href="#v:bitcast" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.bitcast</code>.</p></div></div><a href="#g:2" id="g:2"><h1>broadcast</h1></a><div class="doc"><p>Broadcasts the scalar or k-D vector value in the source operand
+ to a n-D result vector such that the broadcast makes sense, i.e.,
+ the source operand is duplicated to match the given rank and sizes
+ in the result vector. The legality rules are:
+ * the source operand must have the same element type as the result type
+ * a k-D vector &lt;s_1 x .. x s_k x type&gt; can be broadcast to
+   a n-D vector &lt;t_1 x .. x t_n x type&gt; if
+    * k &lt;= n, and
+    * the sizes in the trailing dimensions n-k &lt; i &lt;= n with j=i+k-n
+       match exactly as s_j = t_i or s_j = 1:
+    <code>
+        t_1 x   ..  t_n-k x t_n-k+1 x .. x t_i x .. x t_n
+                            s_1     x .. x s_j x .. x s_k
+            &lt;duplication&gt;         &lt;potential stretch&gt;
+    </code>
+ The source operand is duplicated over all the missing leading dimensions
+ and stretched over the trailing dimensions where the source has a non-equal
+ dimension of 1. These rules imply that any scalar broadcast (k=0) to any
+ shaped vector with the same element type is always legal.</p><p>Example:</p><pre>%0 = constant 0.0 : f32
+%1 = vector.broadcast %0 : f32 to vector&lt;16xf32&gt;
+%2 = vector.broadcast %1 : vector&lt;16xf32&gt; to vector&lt;4x16xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Broadcast" class="def">Broadcast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#Broadcast" class="link">Source</a> <a href="#v:Broadcast" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.broadcast</code>.</p></div></div><div class="top"><p class="src"><a id="v:broadcast" class="def">broadcast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#broadcast" class="link">Source</a> <a href="#v:broadcast" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.broadcast</code>.</p></div></div><a href="#g:3" id="g:3"><h1>compressstore</h1></a><div class="doc"><p>The compress store operation writes elements from a 1-D vector into memory
+ as defined by a base with indices and a 1-D mask vector. When the mask is
+ set, the corresponding element from the vector is written next to memory.
+ Otherwise, no action is taken for the element. Informally the semantics are:
+ <code>
+ index = i
+ if (mask[0]) base[index++] = value[0]
+ if (mask[1]) base[index++] = value[1]
+ etc.
+ </code>
+ Note that the index increment is done conditionally.</p><p>The compress store can be used directly where applicable, or can be used
+ during progressively lowering to bring other memory operations closer to
+ hardware ISA support for a compress. The semantics of the operation closely
+ correspond to those of the <code>llvm.masked.compressstore</code>
+ intrinsic.</p><p>Examples:</p><pre>vector.compressstore %base[%i], %mask, %value
+  : memref&lt;?xf32&gt;, vector&lt;8xi1&gt;, vector&lt;8xf32&gt;
+
+vector.compressstore %base[%i, %j], %mask, %value
+  : memref&lt;?x?xf32&gt;, vector&lt;16xi1&gt;, vector&lt;16xf32&gt;
+</pre></div><div class="top"><p class="src"><a id="v:compressstore" class="def">compressstore</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m () <a href="src/MLIR.AST.Dialect.Generated.Vector.html#compressstore" class="link">Source</a> <a href="#v:compressstore" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.compressstore</code>.</p></div></div><a href="#g:4" id="g:4"><h1>constant_mask</h1></a><div class="doc"><p>Creates and returns a vector mask where elements of the result vector
+ are set to '0' or '1', based on whether the element indices are contained
+ within a hyper-rectangular region specified by the 'mask_dim_sizes'
+ array attribute argument. Each element of the 'mask_dim_sizes' array,
+ specifies an exclusive upper bound [0, mask-dim-size-element-value)
+ for a unique dimension in the vector result. The conjunction of the ranges
+ define a hyper-rectangular region within which elements values are set to 1
+ (otherwise element values are set to 0).</p><p>Example:</p><pre>// create a constant vector mask of size 4x3xi1 with elements in range
+// 0 &lt;= row &lt;= 2 and 0 &lt;= col &lt;= 1 are set to 1 (others to 0).
+%1 = vector.constant_mask [3, 2] : vector&lt;4x3xi1&gt;
+
+print %1
+              columns
+            0    1    2
+          |------------
+        0 | 1    1    0
+  rows  1 | 1    1    0
+        2 | 1    1    0
+        3 | 0    0    0
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:ConstantMask" class="def">ConstantMask</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#ConstantMask" class="link">Source</a> <a href="#v:ConstantMask" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.constant_mask</code>.</p></div></div><div class="top"><p class="src"><a id="v:constant_mask" class="def">constant_mask</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#constant_mask" class="link">Source</a> <a href="#v:constant_mask" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.constant_mask</code>.</p></div></div><a href="#g:5" id="g:5"><h1>contract</h1></a><div class="doc"><p>Computes the sum of products of vector elements along contracting
+ dimension pairs from 2 vectors of rank M and N respectively, adds this
+ intermediate result to the accumulator argument of rank K, and returns a
+ vector result of rank K (where K = num_lhs_free_dims + num_rhs_free_dims +
+ num_batch_dims (see dimension type descriptions below)). For K = 0 (no
+ free or batch dimensions), the accumulator and output are a scalar.</p><p>Optional vector mask arguments (produced by CreateMaskOp or ConstantMaskOp)
+ specify the dynamic dimension sizes of valid data within the lhs/rhs vector
+ arguments.</p><p>An iterator type attribute list must be specified, where each element of
+ the list represents an iterator with one of the following types:</p><ul><li>) &quot;reduction&quot;: reduction dimensions are present in the lhs and rhs
+                 arguments but not in the output (and accumulator
+                 argument). These are the dimensions along which the vector
+                 contraction op computes the sum of products, and
+                 contracting dimension pair dimension sizes must match
+                 between lhs/rhs.</li><li>) &quot;parallel&quot;: Batch dimensions are iterator type &quot;parallel&quot;, and
+                are non-contracting dimensions present in the lhs, rhs and
+                output. The lhs/rhs co-iterate along the batch dimensions,
+                which should be expressed in their indexing maps.</li></ul><p>Free dimensions are iterator type &quot;parallel&quot;, and are
+                non-contraction, non-batch dimensions accessed by either the
+                lhs or rhs (but not both). The lhs and rhs free dimensions
+                are unrelated to each other and do not co-iterate, which
+                should be expressed in their indexing maps.</p><p>An indexing map attribute list must be specified with an entry for lhs, rhs
+ and acc arguments. An indexing map attribute specifies a mapping from each
+ iterator in the iterator type list, to each dimension of an N-D vector.</p><p>An optional kind attribute may be used to specify the combining function
+ between the intermediate result and accumulator argument of rank K. This
+ attribute can take the values add<em>mul</em>min<em>max for int</em>fp, and<em>or</em>xor for
+ int only. The default is &quot;add&quot;.</p><p>Example:</p><pre>// Simple DOT product (K = 0).
+#contraction_accesses = [
+ affine_map&lt;(i) -&gt; (i)&gt;,
+ affine_map&lt;(i) -&gt; (i)&gt;,
+ affine_map&lt;(i) -&gt; ()&gt;
+]
+#contraction_trait = {
+  indexing_maps = #contraction_accesses,
+  iterator_types = [&quot;reduction&quot;]
+}
+%3 = vector.contract #contraction_trait %0, %1, %2
+  : vector&lt;10xf32&gt;, vector&lt;10xf32&gt; into f32
+
+// 2D vector contraction with one contracting dimension (matmul, K = 2).
+#contraction_accesses = [
+  affine_map&lt;(i, j, k) -&gt; (i, k)&gt;,
+  affine_map&lt;(i, j, k) -&gt; (k, j)&gt;,
+  affine_map&lt;(i, j, k) -&gt; (i, j)&gt;
+]
+#contraction_trait = {
+  indexing_maps = #contraction_accesses,
+  iterator_types = [&quot;parallel&quot;, &quot;parallel&quot;, &quot;reduction&quot;]
+}
+
+%3 = vector.contract #contraction_trait %0, %1, %2
+  : vector&lt;4x3xf32&gt;, vector&lt;3x7xf32&gt; into vector&lt;4x7xf32&gt;
+
+// 4D to 3D vector contraction with two contracting dimensions and
+// one batch dimension (K = 3).
+#contraction_accesses = [
+  affine_map&lt;(b0, f0, f1, c0, c1) -&gt; (c0, b0, c1, f0)&gt;,
+  affine_map&lt;(b0, f0, f1, c0, c1) -&gt; (b0, c1, c0, f1)&gt;,
+  affine_map&lt;(b0, f0, f1, c0, c1) -&gt; (b0, f0, f1)&gt;
+]
+#contraction_trait = {
+  indexing_maps = #contraction_accesses,
+  iterator_types = [&quot;parallel&quot;, &quot;parallel&quot;, &quot;parallel&quot;,
+                    &quot;reduction&quot;, &quot;reduction&quot;]
+}
+
+%4 = vector.contract #contraction_trait %0, %1, %2
+    : vector&lt;7x8x16x15xf32&gt;, vector&lt;8x16x7x5xf32&gt; into vector&lt;8x15x5xf32&gt;
+
+// 4D vector contraction with two contracting dimensions and optional
+// vector mask arguments.
+%lhs_mask = vector.constant_mask [7, 8, 16, 15] : vector&lt;7x8x16x15xi1&gt;
+%rhs_mask = vector.constant_mask [8, 16, 7, 5] : vector&lt;8x16x7x5xi1&gt;
+
+%5 = vector.contract #contraction_trait %0, %1, %2, %lhs_mask, %rhs_mask
+   : vector&lt;7x8x16x15xf32&gt;, vector&lt;8x16x7x5xf32&gt; into vector&lt;8x15x8x5xf32&gt;
+
+/<em> Vector contraction with mixed typed. lhs</em>rhs have different element
+/<em> types than accumulator</em>result.
+%6 = vector.contract #contraction_trait %0, %1, %2
+  : vector&lt;10xf16&gt;, vector&lt;10xf16&gt; into f32
+
+// Contract with max (K = 0).
+#contraction_accesses = [
+ affine_map&lt;(i) -&gt; (i)&gt;,
+ affine_map&lt;(i) -&gt; (i)&gt;,
+ affine_map&lt;(i) -&gt; ()&gt;
+]
+#contraction_trait = {
+  indexing_maps = #contraction_accesses,
+  iterator_types = [&quot;reduction&quot;],
+  kind = #vector.kind&lt;max&gt;
+}
+%7 = vector.contract #contraction_trait %0, %1, %2
+  : vector&lt;10xf32&gt;, vector&lt;10xf32&gt; into f32
+</pre></div><div class="top"><p class="src"><a id="v:contract" class="def">contract</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; [<a href="MLIR-AST-Dialect-Affine.html#t:Map" title="MLIR.AST.Dialect.Affine">Map</a>] -&gt; [<a href="MLIR-AST.html#t:Attribute" title="MLIR.AST">Attribute</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#contract" class="link">Source</a> <a href="#v:contract" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.contract</code>.</p></div></div><a href="#g:6" id="g:6"><h1>create_mask</h1></a><div class="doc"><p>Creates and returns a vector mask where elements of the result vector
+ are set to '0' or '1', based on whether the element indices are contained
+ within a hyper-rectangular region specified by the operands. Specifically,
+ each operand specifies a range [0, operand-value) for a unique dimension in
+ the vector result. The conjunction of the operand ranges define a
+ hyper-rectangular region within which elements values are set to 1
+ (otherwise element values are set to 0).</p><p>Example:</p><pre>// create a vector mask of size 4x3xi1 where elements in range
+// 0 &lt;= row &lt;= 2 and 0 &lt;= col &lt;= 1 are set to 1 (others to 0).
+%1 = vector.create_mask %c3, %c2 : vector&lt;4x3xi1&gt;
+
+print %1
+              columns
+            0    1    2
+          |------------
+        0 | 1    1    0
+  rows  1 | 1    1    0
+        2 | 1    1    0
+        3 | 0    0    0
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:CreateMask" class="def">CreateMask</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [operand] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#CreateMask" class="link">Source</a> <a href="#v:CreateMask" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.create_mask</code>.</p></div></div><div class="top"><p class="src"><a id="v:create_mask" class="def">create_mask</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#create_mask" class="link">Source</a> <a href="#v:create_mask" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.create_mask</code>.</p></div></div><a href="#g:7" id="g:7"><h1>expandload</h1></a><div class="doc"><p>The expand load reads elements from memory into a 1-D vector as defined
+ by a base with indices and a 1-D mask vector. When the mask is set, the
+ next element is read from memory. Otherwise, the corresponding element
+ is taken from a 1-D pass-through vector. Informally the semantics are:
+ <code>
+ index = i
+ result[0] := mask[0] ? base[index++] : pass_thru[0]
+ result[1] := mask[1] ? base[index++] : pass_thru[1]
+ etc.
+ </code>
+ Note that the index increment is done conditionally.</p><p>The expand load can be used directly where applicable, or can be used
+ during progressively lowering to bring other memory operations closer to
+ hardware ISA support for an expand. The semantics of the operation closely
+ correspond to those of the <code>llvm.masked.expandload</code>
+ intrinsic.</p><p>Examples:</p><pre>%0 = vector.expandload %base[%i], %mask, %pass_thru
+   : memref&lt;?xf32&gt;, vector&lt;8xi1&gt;, vector&lt;8xf32&gt; into vector&lt;8xf32&gt;
+
+%1 = vector.expandload %base[%i, %j], %mask, %pass_thru
+   : memref&lt;?x?xf32&gt;, vector&lt;16xi1&gt;, vector&lt;16xf32&gt; into vector&lt;16xf32&gt;
+</pre></div><div class="top"><p class="src"><a id="v:expandload" class="def">expandload</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#expandload" class="link">Source</a> <a href="#v:expandload" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.expandload</code>.</p></div></div><a href="#g:8" id="g:8"><h1>extractelement</h1></a><div class="doc"><p>Takes an 1-D vector and a dynamic index position and extracts the
+ scalar at that position. Note that this instruction resembles
+ vector.extract, but is restricted to 1-D vectors and relaxed
+ to dynamic indices. It is meant to be closer to LLVM's version:
+ <a href="https://llvm.org/docs/LangRef.html\#extractelement-instruction">https://llvm.org/docs/LangRef.html\#extractelement-instruction</a></p><p>Example:</p><pre>%c = constant 15 : i32
+%1 = vector.extractelement %0[%c : i32]: vector&lt;16xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:ExtractElement" class="def">ExtractElement</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#ExtractElement" class="link">Source</a> <a href="#v:ExtractElement" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.extractelement</code>.</p></div></div><div class="top"><p class="src"><a id="v:extractelement" class="def">extractelement</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#extractelement" class="link">Source</a> <a href="#v:extractelement" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.extractelement</code>.</p></div></div><a href="#g:9" id="g:9"><h1>extract_map</h1></a><div class="doc"><p>Takes an N-D vector and extracts a sub-part of the vector starting at id
+ along each dimension.</p><p>The dimension associated to each element of <code>ids</code> used to extract are
+ implicitly deduced from the destination type. For each dimension the
+ multiplicity is the destination dimension size divided by the source
+ dimension size, each dimension with a multiplicity greater than 1 is
+ associated to the next id, following ids order.
+ For example if the source type is <code>vector&lt;64x4x32xf32&gt;</code> and the destination
+ type is <code>vector&lt;4x4x2xf32&gt;</code>, the first id maps to dimension 0 and the second
+ id to dimension 2.</p><p>Similarly to vector.tuple_get, this operation is used for progressive
+ lowering and should be folded away before converting to LLVM.</p><p>It is different than <code>vector.extract_slice</code> and
+ <code>vector.extract_strided_slice</code> as it takes a Value as index instead of an
+ attribute. Also in the future it is meant to support extracting along any
+ dimensions and not only the most major ones.</p><p>For instance:
+ <code>
+ // dynamic computation producing the value 0 of index type
+ %idx0 = ... : index
+ // dynamic computation producing the value 1 of index type
+ %idx1 = ... : index
+ %0 = constant dense&lt;0, 1, 2, 3&gt;: vector&lt;4xi32&gt;
+ // extracts values [0, 1]
+ %1 = vector.extract_map %0[%idx0] : vector&lt;4xi32&gt; to vector&lt;2xi32&gt;
+ // extracts values [1, 2]
+ %2 = vector.extract_map %0[%idx1] : vector&lt;4xi32&gt; to vector&lt;2xi32&gt;
+ </code></p><p>Example:</p><pre>%ev = vector.extract_map %v[%id] : vector&lt;32xf32&gt; to vector&lt;1xf32&gt;
+%ev1 = vector.extract_map %v1[%id1, %id2] : vector&lt;64x4x32xf32&gt;
+  to vector&lt;4x4x2xf32&gt;
+</pre></div><div class="top"><p class="src"><a id="v:extract_map" class="def">extract_map</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#extract_map" class="link">Source</a> <a href="#v:extract_map" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.extract_map</code>.</p></div></div><a href="#g:10" id="g:10"><h1>extract</h1></a><div class="doc"><p>Takes an n-D vector and a k-D position and extracts the (n-k)-D vector at
+ the proper position. Degenerates to an element type in the 0-D case.</p><p>Example:</p><pre>%1 = vector.extract %0[3]: vector&lt;4x8x16xf32&gt;
+%2 = vector.extract %0[3, 3, 3]: vector&lt;4x8x16xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Extract" class="def">Extract</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#Extract" class="link">Source</a> <a href="#v:Extract" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.extract</code>.</p></div></div><div class="top"><p class="src"><a id="v:extract" class="def">extract</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#extract" class="link">Source</a> <a href="#v:extract" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.extract</code>.</p></div></div><a href="#g:11" id="g:11"><h1>extract_slices</h1></a><div class="doc"><p>Takes an N-d vector and returns a tuple of vector slices of 'vector',
+ based on 'sizes' and 'strides' parameters.</p><p>The arguments 'sizes' and 'strides' represent a specification for
+ generating the unrolling of 'vector' shape, which has all slices of shape
+ 'sizes' except for slices at dimension boundaries when 'vector' dimension
+ sizes are not a multiple of 'sizes'.</p><p>Each slice is returned at the tuple element index corresponding to the
+ linear index of the slice w.r.t the unrolling scheme represented by 'sizes'.
+ Currently, only unit strides are supported.</p><p>Example:</p><pre>%0 = vector.transfer_read ...: vector&lt;4x2xf32&gt;
+
+%1 = vector.extract_slices %0, [2, 2], [1, 1]
+  : vector&lt;4x2xf32&gt; into tuple&lt;vector&lt;2x2xf32&gt;, vector&lt;2x2xf32&gt;&gt;
+
+// Example with partial slices at dimension boundaries.
+%2 = vector.transfer_read ...: vector&lt;4x3xf32&gt;
+
+%3 = vector.extract_slices %2, [2, 2], [1, 1]
+  : vector&lt;4x3xf32&gt; into tuple&lt;vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;,
+                               vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:ExtractSlices" class="def">ExtractSlices</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#ExtractSlices" class="link">Source</a> <a href="#v:ExtractSlices" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.extract_slices</code>.</p></div></div><div class="top"><p class="src"><a id="v:extract_slices" class="def">extract_slices</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#extract_slices" class="link">Source</a> <a href="#v:extract_slices" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.extract_slices</code>.</p></div></div><a href="#g:12" id="g:12"><h1>extract_strided_slice</h1></a><div class="doc"><p>Takes an n-D vector, k-D <code>offsets</code> integer array attribute, a k-sized
+ <code>sizes</code> integer array attribute, a k-sized <code>strides</code> integer array
+ attribute and extracts the n-D subvector at the proper offset.</p><p>At the moment strides must contain only 1s.
+ // TODO: support non-1 strides.</p><p>Returns an n-D vector where the first k-D dimensions match the <code>sizes</code>
+ attribute. The returned subvector contains the elements starting at offset
+ <code>offsets</code> and ending at <code>offsets + sizes</code>.</p><p>Example:</p><pre>%1 = vector.extract_strided_slice %0
+    {offsets = [0, 2], sizes = [2, 4], strides = [1, 1]}:
+  vector&lt;4x8x16xf32&gt; to vector&lt;2x4x16xf32&gt;
+
+// TODO: Evolve to a range form syntax similar to:
+%1 = vector.extract_strided_slice %0[0:2:1][2:4:1]
+  vector&lt;4x8x16xf32&gt; to vector&lt;2x4x16xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:ExtractStridedSlice" class="def">ExtractStridedSlice</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#ExtractStridedSlice" class="link">Source</a> <a href="#v:ExtractStridedSlice" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.extract_strided_slice</code>.</p></div></div><div class="top"><p class="src"><a id="v:extract_strided_slice" class="def">extract_strided_slice</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#extract_strided_slice" class="link">Source</a> <a href="#v:extract_strided_slice" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.extract_strided_slice</code>.</p></div></div><a href="#g:13" id="g:13"><h1>fma</h1></a><div class="doc"><p>Multiply-add expressions operate on n-D vectors and compute a fused
+ pointwise multiply-and-accumulate: <code>$result = </code>$lhs * $rhs + $acc<code>.
+ All operands and result have the same vector type. The semantics
+ of the operation correspond to those of the </code>llvm.fma<code>
+ intrinsic. In the
+ particular case of lowering to LLVM, this is guaranteed to lower
+ to the </code>llvm.fma.*@ intrinsic.</p><p>Example:</p><pre>%3 = vector.fma %0, %1, %2: vector&lt;8x16xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:FMA" class="def">FMA</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#FMA" class="link">Source</a> <a href="#v:FMA" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.fma</code>.</p></div></div><div class="top"><p class="src"><a id="v:fma" class="def">fma</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#fma" class="link">Source</a> <a href="#v:fma" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.fma</code>.</p></div></div><a href="#g:14" id="g:14"><h1>flat_transpose</h1></a><div class="doc"><p>This is the counterpart of llvm.matrix.transpose in MLIR. It serves
+ the purposes of more progressive lowering and localized type conversion.
+ Higher levels typically lower matrix tranpositions into 'vector.transpose'
+ operations. Subsequent rewriting rule progressively lower these operations
+ into 'vector.flat_transpose' operations to bring the operations closer
+ to the hardware ISA.</p><p>The &#8216;vector.flat_transpose&#8217; op treats the 1-D input <code>matrix</code> as
+ a 2-D matrix with &lt;rows&gt; rows and &lt;columns&gt; columns, and returns the
+ transposed matrix in flattened form in 'res'.</p><p>Also see:</p><p><a href="http://llvm.org/docs/LangRef.html\#llvm-matrix-transpose-intrinsic">http://llvm.org/docs/LangRef.html\#llvm-matrix-transpose-intrinsic</a></p><p>Example:</p><pre>%1 = vector.flat_transpose %0 { rows = 4: i32, columns = 4: i32 }
+   : (vector&lt;16xf32&gt;) -&gt; vector&lt;16xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:FlatTranspose" class="def">FlatTranspose</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#FlatTranspose" class="link">Source</a> <a href="#v:FlatTranspose" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.flat_transpose</code>.</p></div></div><div class="top"><p class="src"><a id="v:flat_transpose" class="def">flat_transpose</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#flat_transpose" class="link">Source</a> <a href="#v:flat_transpose" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.flat_transpose</code>.</p></div></div><a href="#g:15" id="g:15"><h1>gather</h1></a><div class="doc"><p>The gather operation gathers elements from memory into a 1-D vector as
+ defined by a base with indices and an additional 1-D index vector, but
+ only if the corresponding bit is set in a 1-D mask vector. Otherwise, the
+ element is taken from a 1-D pass-through vector. Informally the semantics
+ are:
+ <code>
+ result[0] := mask[0] ? base[index[0]] : pass_thru[0]
+ result[1] := mask[1] ? base[index[1]] : pass_thru[1]
+ etc.
+ </code>
+ The vector dialect leaves out-of-bounds behavior undefined.</p><p>The gather operation can be used directly where applicable, or can be used
+ during progressively lowering to bring other memory operations closer to
+ hardware ISA support for a gather. The semantics of the operation closely
+ correspond to those of the <code>llvm.masked.gather</code>
+ intrinsic.</p><p>Examples:</p><pre>%0 = vector.gather %base[%c0][%v], %mask, %pass_thru
+   : memref&lt;?xf32&gt;, vector&lt;16xi32&gt;, vector&lt;16xi1&gt;, vector&lt;16xf32&gt; into vector&lt;16xf32&gt;
+
+%1 = vector.gather %base[%i, %j][%v], %mask, %pass_thru
+   : memref&lt;16x16xf32&gt;, vector&lt;16xi32&gt;, vector&lt;16xi1&gt;, vector&lt;16xf32&gt; into vector&lt;16xf32&gt;
+</pre></div><div class="top"><p class="src"><a id="v:gather" class="def">gather</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#gather" class="link">Source</a> <a href="#v:gather" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.gather</code>.</p></div></div><a href="#g:16" id="g:16"><h1>insertelement</h1></a><div class="doc"><p>Takes a scalar source, an 1-D destination vector and a dynamic index
+ position and inserts the source into the destination at the proper
+ position.  Note that this instruction resembles vector.insert, but
+ is restricted to 1-D vectors and relaxed to dynamic indices. It is
+ meant to be closer to LLVM's version:
+ <a href="https://llvm.org/docs/LangRef.html\#insertelement-instruction">https://llvm.org/docs/LangRef.html\#insertelement-instruction</a></p><p>Example:</p><pre>%c = constant 15 : i32
+%f = constant 0.0f : f32
+%1 = vector.insertelement %f, %0[%c : i32]: vector&lt;16xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:InsertElement" class="def">InsertElement</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#InsertElement" class="link">Source</a> <a href="#v:InsertElement" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.insertelement</code>.</p></div></div><div class="top"><p class="src"><a id="v:insertelement" class="def">insertelement</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#insertelement" class="link">Source</a> <a href="#v:insertelement" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.insertelement</code>.</p></div></div><a href="#g:17" id="g:17"><h1>insert_map</h1></a><div class="doc"><p>Inserts a N-D vector and within a larger vector starting at id. The new
+ vector created will have the same size as the destination operand vector.</p><p>The dimension associated to each element of <code>ids</code> used to insert is
+ implicitly deduced from the source type (see <code>ExtractMapOp</code> for details).
+ For example if source type is <code>vector&lt;4x4x2xf32&gt;</code> and the destination type
+ is <code>vector&lt;64x4x32xf32&gt;</code>, the first id maps to dimension 0 and the second id
+ to dimension 2.</p><p>Similarly to vector.tuple_get, this operation is used for progressive
+ lowering and should be folded away before converting to LLVM.</p><p>It is different than <code>vector.insert</code> and <code>vector.insert_strided_slice</code> as it
+ takes a Value as index instead of an attribute. Also in the future it is
+ meant to support inserting along any dimensions and not only the most major
+ ones.</p><p>This operations is meant to be used in combination with vector.extract_map.</p><p>For instance:
+ <code>
+ // dynamic computation producing the value 0 of index type
+ %idx0 = ... : index
+ // dynamic computation producing the value 1 of index type
+ %idx1 = ... : index /
+ %0 = constant dense&lt;0, 1, 2, 3&gt;: vector&lt;4xi32&gt;
+ // extracts values [0, 1]
+ %1 = vector.extract_map %0[%idx0] : vector&lt;4xi32&gt; to vector&lt;2xi32&gt;
+ // extracts values [1, 2]
+ %2 = vector.extract_map %0[%idx1] : vector&lt;4xi32&gt; to vector&lt;2xi32&gt;
+ // insert [0, 1] into [x, x, x, x] and produce [0, 1, x, x]
+ %3 = vector.insert_map %1, %0[%idx0] : vector&lt;2xi32&gt; into vector&lt;4xi32&gt;
+ // insert [1, 2] into [x, x, x, x] and produce [x, 1, 2, x]
+ %4 = vector.insert_map %2, %0[%idx1] : vector&lt;2xi32&gt; into vector&lt;4xi32&gt;
+ </code>
+ Example:</p><pre>%v = vector.insert_map %ev %v[%id] : vector&lt;1xf32&gt; into vector&lt;32xf32&gt;
+%v1 = vector.insert_map %ev1, %v1[%arg0, %arg1] : vector&lt;2x4x1xf32&gt;
+  into vector&lt;64x4x32xf32&gt;
+</pre></div><div class="top"><p class="src"><a id="v:insert_map" class="def">insert_map</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#insert_map" class="link">Source</a> <a href="#v:insert_map" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.insert_map</code>.</p></div></div><a href="#g:18" id="g:18"><h1>insert</h1></a><div class="doc"><p>Takes an n-D source vector, an (n+k)-D destination vector and a k-D position
+ and inserts the n-D source into the (n+k)-D destination at the proper
+ position. Degenerates to a scalar source type when n = 0.</p><p>Example:</p><pre>%2 = vector.insert %0, %1[3] : vector&lt;8x16xf32&gt; into vector&lt;4x8x16xf32&gt;
+%5 = vector.insert %3, %4[3, 3, 3] : f32 into vector&lt;4x8x16xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Insert" class="def">Insert</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#Insert" class="link">Source</a> <a href="#v:Insert" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.insert</code>.</p></div></div><div class="top"><p class="src"><a id="v:insert" class="def">insert</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#insert" class="link">Source</a> <a href="#v:insert" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.insert</code>.</p></div></div><a href="#g:19" id="g:19"><h1>insert_slices</h1></a><div class="doc"><p>Takes a tuple of vector slices and inserts them into the vector result
+ according to the 'sizes' and 'strides' parameters.</p><p>The arguments 'sizes' and 'strides' represent a specification for
+ generating the unrolling of 'vector' shape, which has all slices of shape
+ 'sizes' except for slices at dimension boundaries when 'vector' dimension
+ sizes are not a multiple of 'sizes'.</p><p>Each slice in 'vectors' is at the tuple element index corresponding to the
+ linear index of the slice w.r.t the unrolling scheme represented by 'sizes'.
+ Currently, only unit strides are supported.</p><p>Example:</p><pre>%0 = vector.extract_slices %0, [2, 2], [1, 1]
+  : vector&lt;4x2xf32&gt; into tuple&lt;vector&lt;2x2xf32&gt;, vector&lt;2x2xf32&gt;&gt;
+
+%1 = vector.insert_slices %0, [2, 2], [1, 1]
+  : tuple&lt;vector&lt;2x2xf32&gt;, vector&lt;2x2xf32&gt;&gt; into vector&lt;4x2xf32&gt;
+
+// Example with partial slices at dimension boundaries.
+%3 = vector.extract_slices %2, [2, 2], [1, 1]
+  : vector&lt;4x3xf32&gt; into tuple&lt;vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;,
+                               vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;&gt;
+
+%4 = vector.insert_slices %3, [2, 2], [1, 1]
+  : tuple&lt;vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;,
+          vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;&gt; into vector&lt;4x3xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:InsertSlices" class="def">InsertSlices</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#InsertSlices" class="link">Source</a> <a href="#v:InsertSlices" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.insert_slices</code>.</p></div></div><div class="top"><p class="src"><a id="v:insert_slices" class="def">insert_slices</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#insert_slices" class="link">Source</a> <a href="#v:insert_slices" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.insert_slices</code>.</p></div></div><a href="#g:20" id="g:20"><h1>insert_strided_slice</h1></a><div class="doc"><p>Takes a k-D source vector, an n-D destination vector (n &gt;= k), n-sized
+ <code>offsets</code> integer array attribute, a k-sized <code>strides</code> integer array attribute
+ and inserts the k-D source vector as a strided subvector at the proper offset
+ into the n-D destination vector.</p><p>At the moment strides must contain only 1s.</p><p>Returns an n-D vector that is a copy of the n-D destination vector in which
+ the last k-D dimensions contain the k-D source vector elements strided at
+ the proper location as specified by the offsets.</p><p>Example:</p><pre>%2 = vector.insert_strided_slice %0, %1
+    {offsets = [0, 0, 2], strides = [1, 1]}:
+  vector&lt;2x4xf32&gt; into vector&lt;16x4x8xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:InsertStridedSlice" class="def">InsertStridedSlice</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#InsertStridedSlice" class="link">Source</a> <a href="#v:InsertStridedSlice" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.insert_strided_slice</code>.</p></div></div><div class="top"><p class="src"><a id="v:insert_strided_slice" class="def">insert_strided_slice</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#insert_strided_slice" class="link">Source</a> <a href="#v:insert_strided_slice" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.insert_strided_slice</code>.</p></div></div><a href="#g:21" id="g:21"><h1>load</h1></a><div class="doc"><p>The 'vector.load' operation reads an n-D slice of memory into an n-D
+ vector. It takes a 'base' memref, an index for each memref dimension and a
+ result vector type as arguments. It returns a value of the result vector
+ type. The 'base' memref and indices determine the start memory address from
+ which to read. Each index provides an offset for each memref dimension
+ based on the element type of the memref. The shape of the result vector
+ type determines the shape of the slice read from the start memory address.
+ The elements along each dimension of the slice are strided by the memref
+ strides. Only memref with default strides are allowed. These constraints
+ guarantee that elements read along the first dimension of the slice are
+ contiguous in memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
+ element type is a scalar, it should match the element type of the result
+ vector. If the memref element type is vector, it should match the result
+ vector type.</p><p>Example 1: 1-D vector load on a scalar memref.
+ <code>
+ %result = vector.load %base[%i, %j] : memref&lt;100x100xf32&gt;, vector&lt;8xf32&gt;
+ </code></p><p>Example 2: 1-D vector load on a vector memref.
+ <code>
+ %result = vector.load %memref[%i, %j] : memref&lt;200x100xvector&lt;8xf32&gt;&gt;, vector&lt;8xf32&gt;
+ </code></p><p>Example 3:  2-D vector load on a scalar memref.
+ <code>
+ %result = vector.load %memref[%i, %j] : memref&lt;200x100xf32&gt;, vector&lt;4x8xf32&gt;
+ </code></p><p>Example 4:  2-D vector load on a vector memref.
+ <code>
+ %result = vector.load %memref[%i, %j] : memref&lt;200x100xvector&lt;4x8xf32&gt;&gt;, vector&lt;4x8xf32&gt;
+ </code></p><p>Representation-wise, the 'vector.load' operation permits out-of-bounds
+ reads. Support and implementation of out-of-bounds vector loads is
+ target-specific. No assumptions should be made on the value of elements
+ loaded out of bounds. Not all targets may support out-of-bounds vector
+ loads.</p><p>Example 5:  Potential out-of-bound vector load.
+ <code>
+ %result = vector.load %memref[%index] : memref&lt;?xf32&gt;, vector&lt;8xf32&gt;
+ </code></p><p>Example 6:  Explicit out-of-bound vector load.
+ <code>
+ %result = vector.load %memref[%c0] : memref&lt;7xf32&gt;, vector&lt;8xf32&gt;
+ </code></p></div><div class="top"><p class="src"><a id="v:load" class="def">load</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#load" class="link">Source</a> <a href="#v:load" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.load</code>.</p></div></div><a href="#g:22" id="g:22"><h1>maskedload</h1></a><div class="doc"><p>The masked load reads elements from memory into a 1-D vector as defined
+ by a base with indices and a 1-D mask vector. When the mask is set, the
+ element is read from memory. Otherwise, the corresponding element is taken
+ from a 1-D pass-through vector. Informally the semantics are:
+ <code>
+ result[0] := mask[0] ? base[i+0] : pass_thru[0]
+ result[1] := mask[1] ? base[i+1] : pass_thru[1]
+ etc.
+ </code>
+ The masked load can be used directly where applicable, or can be used
+ during progressively lowering to bring other memory operations closer to
+ hardware ISA support for a masked load. The semantics of the operation
+ closely correspond to those of the <code>llvm.masked.load</code>
+ intrinsic.</p><p>Examples:</p><pre>%0 = vector.maskedload %base[%i], %mask, %pass_thru
+   : memref&lt;?xf32&gt;, vector&lt;8xi1&gt;, vector&lt;8xf32&gt; into vector&lt;8xf32&gt;
+
+%1 = vector.maskedload %base[%i, %j], %mask, %pass_thru
+   : memref&lt;?x?xf32&gt;, vector&lt;16xi1&gt;, vector&lt;16xf32&gt; into vector&lt;16xf32&gt;
+</pre></div><div class="top"><p class="src"><a id="v:maskedload" class="def">maskedload</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#maskedload" class="link">Source</a> <a href="#v:maskedload" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.maskedload</code>.</p></div></div><a href="#g:23" id="g:23"><h1>maskedstore</h1></a><div class="doc"><p>The masked store operation writes elements from a 1-D vector into memory
+ as defined by a base with indices and a 1-D mask vector. When the mask is
+ set, the corresponding element from the vector is written to memory. Otherwise,
+ no action is taken for the element. Informally the semantics are:
+ <code>
+ if (mask[0]) base[i+0] = value[0]
+ if (mask[1]) base[i+1] = value[1]
+ etc.
+ </code>
+ The masked store can be used directly where applicable, or can be used
+ during progressively lowering to bring other memory operations closer to
+ hardware ISA support for a masked store. The semantics of the operation
+ closely correspond to those of the <code>llvm.masked.store</code>
+ intrinsic.</p><p>Examples:</p><pre>vector.maskedstore %base[%i], %mask, %value
+  : memref&lt;?xf32&gt;, vector&lt;8xi1&gt;, vector&lt;8xf32&gt;
+
+vector.maskedstore %base[%i, %j], %mask, %value
+  : memref&lt;?x?xf32&gt;, vector&lt;16xi1&gt;, vector&lt;16xf32&gt;
+</pre></div><div class="top"><p class="src"><a id="v:maskedstore" class="def">maskedstore</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m () <a href="src/MLIR.AST.Dialect.Generated.Vector.html#maskedstore" class="link">Source</a> <a href="#v:maskedstore" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.maskedstore</code>.</p></div></div><a href="#g:24" id="g:24"><h1>matrix_multiply</h1></a><div class="doc"><p>This is the counterpart of llvm.matrix.multiply in MLIR. It serves the
+ purposes of more progressive lowering and localized type conversion.
+ Higher levels typically lower matrix multiplications into 'vector.contract'
+ operations. Subsequent rewriting rule progressively lower these operations
+ into 'vector.matrix_multiply' operations to bring the operations closer
+ to the hardware ISA.</p><p>The &#8216;vector.matrix_multiply&#8217; op treats <code>lhs</code> as matrix with &lt;lhs_rows&gt; rows
+ and &lt;lhs_columns&gt; columns, <code>rhs</code> as matrix with &lt;lhs_columns&gt; rows and
+ &lt;rhs_columns&gt; and multiplies them. The result matrix is returned embedded in
+ the result vector.</p><p>Also see:</p><p><a href="http://llvm.org/docs/LangRef.html\#llvm-matrix-multiply-intrinsic">http://llvm.org/docs/LangRef.html\#llvm-matrix-multiply-intrinsic</a></p><p>Example:</p><pre>%C = vector.matrix_multiply %A, %B
+  { lhs_rows = 4: i32, lhs_columns = 16: i32 , rhs_columns = 3: i32 } :
+  (vector&lt;64xf64&gt;, vector&lt;48xf64&gt;) -&gt; vector&lt;12xf64&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Matmul" class="def">Matmul</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#Matmul" class="link">Source</a> <a href="#v:Matmul" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.matrix_multiply</code>.</p></div></div><div class="top"><p class="src"><a id="v:matrix_multiply" class="def">matrix_multiply</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; <a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#matrix_multiply" class="link">Source</a> <a href="#v:matrix_multiply" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.matrix_multiply</code>.</p></div></div><a href="#g:25" id="g:25"><h1>multi_reduction</h1></a><div class="doc"><p>Reduces an n-D vector into an (n-k)-D vector using the given operation
+ (add<em>mul</em>min<em>max for int</em>fp and and<em>or</em>xor for int only).</p><p>Example:</p><pre>%1 = vector.multi_reduction &quot;add&quot;, %0 [1, 3] :
+  vector&lt;4x8x16x32xf32&gt; into vector&lt;4x16xf32&gt;
+</pre></div><a href="#g:26" id="g:26"><h1>outerproduct</h1></a><div class="doc"><p>Takes 2 1-D vectors and returns the 2-D vector containing the outer-product,
+ as illustrated below:
+ <code>
+  outer |   [c, d]
+  ------+------------
+    [a, | [ [a*c, a*d],
+     b] |   [b*c, b*d] ]
+ </code>
+ This operation also accepts a 1-D vector lhs and a scalar rhs. In this
+ case a simple AXPY operation is performed, which returns a 1-D vector.
+ <code>
+     [a, b] * c = [a*c, b*c]
+ </code></p><p>An optional extra vector argument with the same shape as the output
+ vector may be specified in which case the operation returns the sum of
+ the outer-product and the extra vector. In this multiply-accumulate
+ scenario for floating-point arguments, the rounding mode is enforced
+ by guaranteeing that a fused-multiply add operation is emitted. When
+ lowered to the LLVMIR dialect, this form emits <code>llvm.intr.fma</code>, which
+ is guaranteed to lower to actual <code>fma</code> instructions on x86.</p><p>An optional kind attribute may be specified to be add<em>mul</em>min/max
+ for int<em>fp, and and</em>or/xor for int only. The default is &quot;add&quot;, in which
+ case the operation returns a fused multiply-add. In other cases it returns
+ a multiply followed by the appropriate operation (for example, a compare and
+ select for &quot;max&quot;).</p><p>Example:</p><pre>%2 = vector.outerproduct %0, %1: vector&lt;4xf32&gt;, vector&lt;8xf32&gt;
+return %2: vector&lt;4x8xf32&gt;
+
+%3 = vector.outerproduct %0, %1, %2:
+  vector&lt;4xf32&gt;, vector&lt;8xf32&gt;, vector&lt;4x8xf32&gt;
+return %3: vector&lt;4x8xf32&gt;
+
+%4 = vector.outerproduct %0, %1, %2 {kind = #vector.kind&lt;max&gt;}:
+  vector&lt;4xf32&gt;, vector&lt;8xf32&gt;, vector&lt;4x8xf32&gt;
+return %3: vector&lt;4x8xf32&gt;
+
+%6 = vector.outerproduct %4, %5: vector&lt;10xf32&gt;, f32
+return %6: vector&lt;10xf32&gt;
+
+</pre></div><div class="top"><p class="src"><a id="v:outerproduct" class="def">outerproduct</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#outerproduct" class="link">Source</a> <a href="#v:outerproduct" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.outerproduct</code>.</p></div></div><a href="#g:27" id="g:27"><h1>print</h1></a><div class="doc"><p>Prints the source vector (or scalar) to stdout in human readable
+ format (for testing and debugging). No return value.</p><p>Example:</p><pre>%0 = constant 0.0 : f32
+%1 = vector.broadcast %0 : f32 to vector&lt;4xf32&gt;
+vector.print %1 : vector&lt;4xf32&gt;
+
+when lowered to LLVM, the vector print is unrolled into
+elementary printing method calls that at runtime will yield
+
+( 0.0, 0.0, 0.0, 0.0 )
+
+on stdout when linked with a small runtime support library,
+which only needs to provide a few printing methods (single
+value for all data types, opening/closing bracket, comma,
+newline).
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Print" class="def">Print</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#Print" class="link">Source</a> <a href="#v:Print" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.print</code>.</p></div></div><div class="top"><p class="src"><a id="v:print" class="def">print</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m () <a href="src/MLIR.AST.Dialect.Generated.Vector.html#print" class="link">Source</a> <a href="#v:print" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.print</code>.</p></div></div><a href="#g:28" id="g:28"><h1>reduction</h1></a><div class="doc"><p>Reduces an 1-D vector &quot;horizontally&quot; into a scalar using the given
+ operation (add<em>mul</em>min<em>max for int</em>fp and and<em>or</em>xor for int only).
+ Some reductions (add/mul for fp) also allow an optional fused
+ accumulator.</p><p>Note that these operations are restricted to 1-D vectors to remain
+ close to the corresponding LLVM intrinsics:</p><p><a href="http://llvm.org/docs/LangRef.html\#vector-reduction-intrinsics">http://llvm.org/docs/LangRef.html\#vector-reduction-intrinsics</a></p><p>Example:</p><pre>%1 = vector.reduction &quot;add&quot;, %0 : vector&lt;16xf32&gt; into f32
+
+%3 = vector.reduction &quot;xor&quot;, %2 : vector&lt;4xi32&gt; into i32
+
+%4 = vector.reduction &quot;mul&quot;, %0, %1 : vector&lt;16xf32&gt; into f32
+</pre></div><div class="top"><p class="src"><a id="v:reduction" class="def">reduction</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="../bytestring-0.10.12.0/Data-ByteString.html#t:ByteString" title="Data.ByteString">ByteString</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#reduction" class="link">Source</a> <a href="#v:reduction" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.reduction</code>.</p></div></div><a href="#g:29" id="g:29"><h1>reshape</h1></a><div class="doc"><p>Reshapes its vector operand from 'input_shape' to 'output_shape' maintaining
+ fixed vector dimension 'fixed_vector_sizes' on the innermost vector
+ dimensions.</p><p>The parameters 'input_shape' and 'output_shape' represent valid data shapes
+ across fixed vector shapes. For example, if a vector has a valid data
+ shape [6] with fixed vector size [8], then the valid data elements are
+ assumed to be stored at the beginning of the vector with the remaining
+ vector elements undefined.</p><p>In the examples below, valid data elements are represented by an alphabetic
+ character, and undefined data elements are represented by '-'.</p><p>Example</p><p>vector&lt;1x8xf32&gt; with valid data shape [6], fixed vector sizes [8]</p><p>input: [a, b, c, d, e, f]</p><p>layout map: (d0) -&gt; (d0 floordiv 8, d0 mod 8)</p><p>vector layout: [a, b, c, d, e, f, -, -]</p><p>Example</p><p>vector&lt;2x8xf32&gt; with valid data shape [10], fixed vector sizes [8]</p><p>input: [a, b, c, d, e, f, g, h, i, j]</p><p>layout map: (d0) -&gt; (d0 floordiv 8, d0 mod 8)</p><p>vector layout: [[a, b, c, d, e, f, g, h],
+                     [i, j, -, -, -, -, -, -]]</p><p>Example</p><p>vector&lt;2x2x2x3xf32&gt; with valid data shape [3, 5], fixed vector sizes
+   [2, 3]</p><p>input: [[a, b, c, d, e],
+                     [f, g, h, i, j],
+                     [k, l, m, n, o]]</p><p>layout map: (d0, d1) -&gt; (d0 floordiv 3, d1 floordiv 5,
+                                 d0 mod 3, d1 mod 5)</p><p>vector layout: [[[[a, b, c],
+                       [f, g, h]]
+                      [[d, e, -],
+                       [i, j, -]]],
+                     [[[k, l, m],
+                       [-, -, -]]
+                      [[n, o, -],
+                       [-, -, -]]]]</p><p>Example</p><p>%1 = vector.reshape %0, [%c3, %c6], [%c2, %c9], [4]
+     : vector&lt;3x2x4xf32&gt; to vector&lt;2x3x4xf32&gt;</p><p>input: [[a, b, c, d, e, f],
+                  [g, h, i, j, k, l],
+                  [m, n, o, p, q, r]]</p><p>layout map: (d0, d1) -&gt; (d0, d1 floordiv 4, d1 mod 4)</p><p>Input vector:  [[[a, b, c, d],
+                    [e, f, -, -]],
+                   [[g, h, i, j],
+                    [k, l, -, -]],
+                   [[m, n, o, p],
+                    [q, r, -, -]]]</p><p>Output vector:  [[[a, b, c, d],
+                     [e, f, g, h],
+                     [i, -, -, -]],
+                    [[j, k, l, m],
+                     [n, o, p, q],
+                     [r, -, -, -]]]</p></div><a href="#g:30" id="g:30"><h1>scatter</h1></a><div class="doc"><p>The scatter operation scatters elements from a 1-D vector into memory as
+ defined by a base with indices and an additional 1-D index vector, but
+ only if the corresponding bit in a 1-D mask vector is set. Otherwise, no
+ action is taken for that element. Informally the semantics are:
+ <code>
+ if (mask[0]) base[index[0]] = value[0]
+ if (mask[1]) base[index[1]] = value[1]
+ etc.
+ </code>
+ The vector dialect leaves out-of-bounds and repeated index behavior
+ undefined. Underlying implementations may enforce strict sequential
+ semantics for the latter, though.
+ TODO: enforce the latter always?</p><p>The scatter operation can be used directly where applicable, or can be used
+ during progressively lowering to bring other memory operations closer to
+ hardware ISA support for a scatter. The semantics of the operation closely
+ correspond to those of the <code>llvm.masked.scatter</code>
+ intrinsic.</p><p>Examples:</p><pre>vector.scatter %base[%c0][%v], %mask, %value
+    : memref&lt;?xf32&gt;, vector&lt;16xi32&gt;, vector&lt;16xi1&gt;, vector&lt;16xf32&gt;
+
+vector.scatter %base[%i, %j][%v], %mask, %value
+    : memref&lt;16x16xf32&gt;, vector&lt;16xi32&gt;, vector&lt;16xi1&gt;, vector&lt;16xf32&gt;
+</pre></div><div class="top"><p class="src"><a id="v:scatter" class="def">scatter</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m () <a href="src/MLIR.AST.Dialect.Generated.Vector.html#scatter" class="link">Source</a> <a href="#v:scatter" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.scatter</code>.</p></div></div><a href="#g:31" id="g:31"><h1>shape_cast</h1></a><div class="doc"><p>The shape_cast operation casts between an n-D source vector shape and
+ a k-D result vector shape (the element type remains the same).</p><p>If reducing rank (n &gt; k), result dimension sizes must be a product
+ of contiguous source dimension sizes.
+ If expanding rank (n &lt; k), source dimensions must factor into a
+ contiguous sequence of destination dimension sizes.
+ Each source dim is expanded (or contiguous sequence of source dims combined)
+ in source dimension list order (i.e. 0 &lt;= i &lt; n), to produce a contiguous
+ sequence of result dims (or a single result dim), in result dimension list
+ order (i.e. 0 &lt;= j &lt; k). The product of all source dimension sizes and all
+ result dimension sizes must match.</p><p>If the source/result types are a tuple of vectors, the casting operation
+ described above is applied to each source/result tuple element pair.</p><p>It is currently assumed that this operation does not require moving data,
+ and that it will be folded away before lowering vector operations.</p><p>There is an exception to the folding expectation when targeting
+ llvm.intr.matrix operations. We need a type conversion back and forth from a
+ 2-D MLIR vector to a 1-D flattened LLVM vector.shape_cast lowering to LLVM
+ is supported in that particular case, for now.</p><p>Example:</p><pre>// Example casting to a lower vector rank.
+%1 = vector.shape_cast %0 : vector&lt;5x1x4x3xf32&gt; to vector&lt;20x3xf32&gt;
+
+// Example casting to a higher vector rank.
+%3 = vector.shape_cast %2 : vector&lt;10x12x8xf32&gt; to vector&lt;5x2x3x4x8xf32&gt;
+
+// Example casting a tuple of vectors of same rank, where tuple elements
+// may have different shapes.
+%5 = vector.shape_cast %4 : tuple&lt;vector&lt;3x4x2xf32&gt;, vector&lt;3x3x2xf32&gt;&gt; to
+                            tuple&lt;vector&lt;12x2xf32&gt;, vector&lt;9x2xf32&gt;&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:ShapeCast" class="def">ShapeCast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#ShapeCast" class="link">Source</a> <a href="#v:ShapeCast" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.shape_cast</code>.</p></div></div><div class="top"><p class="src"><a id="v:shape_cast" class="def">shape_cast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#shape_cast" class="link">Source</a> <a href="#v:shape_cast" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.shape_cast</code>.</p></div></div><a href="#g:32" id="g:32"><h1>shuffle</h1></a><div class="doc"><p>The shuffle operation constructs a permutation (or duplication) of elements
+ from two input vectors, returning a vector with the same element type as
+ the input and a length that is the same as the shuffle mask. The two input
+ vectors must have the same element type, rank, and trailing dimension sizes
+ and shuffles their values in the leading dimension (which may differ in size)
+ according to the given mask. The legality rules are:
+ * the two operands must have the same element type as the result
+ * the two operands and the result must have the same rank and trailing
+   dimension sizes, viz. given two k-D operands
+           v1 : &lt;s_1 x s_2 x .. x s_k x type&gt; and
+           v2 : &lt;t_1 x t_2 x .. x t_k x type&gt;
+   we have s_i = t_i for all 1 &lt; i &lt;= k
+ * the mask length equals the leading dimension size of the result
+ * numbering the input vector indices left to right across the operands, all
+   mask values must be within range, viz. given two k-D operands v1 and v2
+   above, all mask values are in the range [0,s_1+t_1)</p><p>Example:</p><pre>%0 = vector.shuffle %a, %b[0, 3]
+           : vector&lt;2xf32&gt;, vector&lt;2xf32&gt;       ; yields vector&lt;2xf32&gt;
+%1 = vector.shuffle %c, %b[0, 1, 2]
+           : vector&lt;2x16xf32&gt;, vector&lt;1x16xf32&gt; ; yields vector&lt;3x16xf32&gt;
+%2 = vector.shuffle %a, %b[3, 2, 1, 0]
+           : vector&lt;2xf32&gt;, vector&lt;2xf32&gt;       ; yields vector&lt;4xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Shuffle" class="def">Shuffle</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#Shuffle" class="link">Source</a> <a href="#v:Shuffle" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.shuffle</code>.</p></div></div><div class="top"><p class="src"><a id="v:shuffle" class="def">shuffle</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#shuffle" class="link">Source</a> <a href="#v:shuffle" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.shuffle</code>.</p></div></div><a href="#g:33" id="g:33"><h1>store</h1></a><div class="doc"><p>The 'vector.store' operation writes an n-D vector to an n-D slice of memory.
+ It takes the vector value to be stored, a 'base' memref and an index for
+ each memref dimension. The 'base' memref and indices determine the start
+ memory address from which to write. Each index provides an offset for each
+ memref dimension based on the element type of the memref. The shape of the
+ vector value to store determines the shape of the slice written from the
+ start memory address. The elements along each dimension of the slice are
+ strided by the memref strides. Only memref with default strides are allowed.
+ These constraints guarantee that elements written along the first dimension
+ of the slice are contiguous in memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
+ element type is a scalar, it should match the element type of the value
+ to store. If the memref element type is vector, it should match the type
+ of the value to store.</p><p>Example 1: 1-D vector store on a scalar memref.
+ <code>
+ vector.store %valueToStore, %memref[%i, %j] : memref&lt;200x100xf32&gt;, vector&lt;8xf32&gt;
+ </code></p><p>Example 2: 1-D vector store on a vector memref.
+ <code>
+ vector.store %valueToStore, %memref[%i, %j] : memref&lt;200x100xvector&lt;8xf32&gt;&gt;, vector&lt;8xf32&gt;
+ </code></p><p>Example 3:  2-D vector store on a scalar memref.
+ <code>
+ vector.store %valueToStore, %memref[%i, %j] : memref&lt;200x100xf32&gt;, vector&lt;4x8xf32&gt;
+ </code></p><p>Example 4:  2-D vector store on a vector memref.
+ <code>
+ vector.store %valueToStore, %memref[%i, %j] : memref&lt;200x100xvector&lt;4x8xf32&gt;&gt;, vector&lt;4x8xf32&gt;
+ </code></p><p>Representation-wise, the 'vector.store' operation permits out-of-bounds
+ writes. Support and implementation of out-of-bounds vector stores are
+ target-specific. No assumptions should be made on the memory written out of
+ bounds. Not all targets may support out-of-bounds vector stores.</p><p>Example 5:  Potential out-of-bounds vector store.
+ <code>
+ vector.store %valueToStore, %memref[%index] : memref&lt;?xf32&gt;, vector&lt;8xf32&gt;
+ </code></p><p>Example 6:  Explicit out-of-bounds vector store.
+ <code>
+ vector.store %valueToStore, %memref[%c0] : memref&lt;7xf32&gt;, vector&lt;8xf32&gt;
+ </code></p></div><div class="top"><p class="src"><a id="v:store" class="def">store</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m () <a href="src/MLIR.AST.Dialect.Generated.Vector.html#store" class="link">Source</a> <a href="#v:store" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.store</code>.</p></div></div><a href="#g:34" id="g:34"><h1>transfer_read</h1></a><div class="doc"><p>The <code>vector.transfer_read</code> op performs a read from a slice within a
+ MemRef or a Ranked
+ Tensor supplied as its first operand into a
+ vector of the same base elemental type.</p><p>A memref/tensor operand with vector element type, must have its vector
+ element type match a suffix (shape and element type) of the vector (e.g.
+ memref&lt;3x2x6x4x3xf32&gt;, vector&lt;1x1x4x3xf32&gt;).</p><p>The slice is further defined by a full-rank index within the MemRef/Tensor,
+ supplied as the operands <code>2 .. 1 + rank(memref/tensor)</code>.</p><p>The permutation_map attribute is an
+ affine-map which specifies the transposition on the
+ slice to match the vector shape. The permutation map may be implicit and
+ omitted from parsing and printing if it is the canonical minor identity map
+ (i.e. if it does not permute or broadcast any dimension).</p><p>The size of the slice is specified by the size of the vector, given as the
+ return type.</p><p>An SSA value <code>padding</code> of the same elemental type as the MemRef/Tensor is
+ provided to specify a fallback value in the case of out-of-bounds accesses
+ and/or masking.</p><p>An optional SSA value <code>mask</code> of the same shape as the vector type may be
+ specified to mask out elements. Such elements will be replaces with
+ <code>padding</code>. Elements whose corresponding mask element is <code>0</code> are masked out.</p><p>An optional boolean array attribute is provided to specify which dimensions
+ of the transfer are guaranteed to be within bounds. The length of the array
+ must equal the rank of the vector type. Broadcast dimensions must always be
+ in-bounds. The absence of this optional <code>in_bounds</code> attribute signifies that
+ any dimension of the transfer (except for broadcasts) may be out-of-bounds.
+ A <code>vector.transfer_read</code> can be lowered to a simple load if all dimensions
+ are specified to be within bounds and no <code>mask</code> was specified.</p><p>Note that <code>in_bounds</code> is specified for result dimensions and not input
+ dimensions. The starting point of the transfer, i.e.,
+ <code>%A[%expr1, %expr2, %expr3, %expr4]</code> in the example below, is expected to
+ be in-bounds and as indices are increasing, accesses may run out-of-bounds.</p><p>This operation is called 'read' by opposition to 'load' because the
+ super-vector granularity is generally not representable with a single
+ hardware register. A <code>vector.transfer_read</code> is thus a mid-level abstraction
+ that supports super-vectorization with non-effecting padding for full-tile
+ only operations.</p><p>More precisely, let's dive deeper into the permutation_map for the following
+ MLIR:</p><pre>vector.transfer_read %A[%expr1, %expr2, %expr3, %expr4]
+  { permutation_map : (d0,d1,d2,d3) -&gt; (d2,0,d0) } :
+  memref&lt;?x?x?x?xf32&gt;, vector&lt;3x4x5xf32&gt;
+</pre><p>This operation always reads a slice starting at <code>%A[%expr1, %expr2, %expr3,
+ %expr4]</code>. The size of the slice is 3 along d2 and 5 along d0, so the slice
+ is: <code>%A[%expr1 : %expr1 + 5, %expr2, %expr3:%expr3 + 3, %expr4]</code></p><p>That slice needs to be read into a <code>vector&lt;3x4x5xf32&gt;</code>. Since the
+ permutation map is not full rank, there must be a broadcast along vector
+ dimension <code>1</code>.</p><p>A notional lowering of vector.transfer_read could generate code resembling:</p><pre>// %expr1, %expr2, %expr3, %expr4 defined before this point
+%tmp = alloc() : vector&lt;3x4x5xf32&gt;
+%view_in_tmp = &quot;element_type_cast&quot;(%tmp) : memref&lt;1xvector&lt;3x4x5xf32&gt;&gt;
+for %i = 0 to 3 {
+  affine.for %j = 0 to 4 {
+    affine.for %k = 0 to 5 {
+      %a = load %A[%expr1 + %k, %expr2, %expr3 + %i, %expr4] :
+        memref&lt;?x?x?x?xf32&gt;
+      store %tmp[%i, %j, %k] : vector&lt;3x4x5xf32&gt;
+}}}
+%c0 = constant 0 : index
+%vec = load %view_in_tmp[%c0] : vector&lt;3x4x5xf32&gt;
+</pre><p>On a GPU one could then map <code>i</code>, <code>j</code>, <code>k</code> to blocks and threads. Notice that
+ the temporary storage footprint is <code>3 * 5</code> values but <code>3 * 4 * 5</code> values are
+ actually transferred between <code>%A</code> and <code>%tmp</code>.</p><p>Alternatively, if a notional vector broadcast operation were available, the
+ lowered code would resemble:</p><pre>// %expr1, %expr2, %expr3, %expr4 defined before this point
+%tmp = alloc() : vector&lt;3x4x5xf32&gt;
+%view_in_tmp = &quot;element_type_cast&quot;(%tmp) : memref&lt;1xvector&lt;3x4x5xf32&gt;&gt;
+for %i = 0 to 3 {
+  affine.for %k = 0 to 5 {
+    %a = load %A[%expr1 + %k, %expr2, %expr3 + %i, %expr4] :
+      memref&lt;?x?x?x?xf32&gt;
+    store %tmp[%i, 0, %k] : vector&lt;3x4x5xf32&gt;
+}}
+%c0 = constant 0 : index
+%tmpvec = load %view_in_tmp[%c0] : vector&lt;3x4x5xf32&gt;
+%vec = broadcast %tmpvec, 1 : vector&lt;3x4x5xf32&gt;
+</pre><p>where <code>broadcast</code> broadcasts from element 0 to all others along the
+ specified dimension. This time, the temporary storage footprint is <code>3 * 5</code>
+ values which is the same amount of data as the <code>3 * 5</code> values transferred.
+ An additional <code>1</code> broadcast is required. On a GPU this broadcast could be
+ implemented using a warp-shuffle if loop <code>j</code> were mapped to <code>threadIdx.x</code>.</p><p>Syntax
+ <code>
+ operation ::= ssa-id </code>=<code> </code>vector.transfer_read<code> ssa-use-list
+   </code>{<code> attribute-entry </code>} :<code> memref-type </code>,<code> vector-type
+ </code></p><p>Example:</p><pre>// Read the slice <code>%A[%i0, %i1:%i1+256, %i2:%i2+32]</code> into vector&lt;32x256xf32&gt;
+// and pad with %f0 to handle the boundary case:
+%f0 = constant 0.0f : f32
+for %i0 = 0 to %0 {
+  affine.for %i1 = 0 to %1 step 256 {
+    affine.for %i2 = 0 to %2 step 32 {
+      %v = vector.transfer_read %A[%i0, %i1, %i2], (%f0)
+           {permutation_map: (d0, d1, d2) -&gt; (d2, d1)} :
+           memref&lt;?x?x?xf32&gt;, vector&lt;32x256xf32&gt;
+}}}
+
+// Read the slice <code>%A[%i0, %i1]</code> (i.e. the element <code>%A[%i0, %i1]</code>) into
+// vector&lt;128xf32&gt;. The underlying implementation will require a 1-D vector
+// broadcast:
+for %i0 = 0 to %0 {
+  affine.for %i1 = 0 to %1 {
+    %3 = vector.transfer_read %A[%i0, %i1]
+         {permutation_map: (d0, d1) -&gt; (0)} :
+         memref&lt;?x?xf32&gt;, vector&lt;128xf32&gt;
+  }
+}
+
+// Read from a memref with vector element type.
+%4 = vector.transfer_read %arg1[%c3, %c3], %vf0
+  {permutation_map = (d0, d1)-&gt;(d0, d1)}
+    : memref&lt;?x?xvector&lt;4x3xf32&gt;&gt;, vector&lt;1x1x4x3xf32&gt;
+
+// Read from a tensor with vector element type.
+%4 = vector.transfer_read %arg1[%c3, %c3], %vf0
+  {permutation_map = (d0, d1)-&gt;(d0, d1)}
+    : tensor&lt;?x?xvector&lt;4x3xf32&gt;&gt;, vector&lt;1x1x4x3xf32&gt;
+</pre></div><a href="#g:35" id="g:35"><h1>transfer_write</h1></a><div class="doc"><p>The <code>vector.transfer_write</code> op performs a write from a
+ vector, supplied as its first operand, into a
+ slice within a MemRef or a Ranked
+ Tensor of the same base elemental type,
+ supplied as its second operand.</p><p>A vector memref/tensor operand must have its vector element type match a
+ suffix (shape and element type) of the vector (e.g. memref&lt;3x2x6x4x3xf32&gt;,
+ vector&lt;1x1x4x3xf32&gt;). If the operand is a tensor, the operation returns a
+ new tensor of the same type.</p><p>The slice is further defined by a full-rank index within the MemRef/Tensor,
+ supplied as the operands <code>3 .. 2 + rank(memref/tensor)</code>.</p><p>The permutation_map attribute is an
+ affine-map which specifies the transposition on the
+ slice to match the vector shape. The permutation map may be implicit and
+ omitted from parsing and printing if it is the canonical minor identity map
+ (i.e. if it does not permute any dimension). In contrast to <code>transfer_read</code>,
+ write ops cannot have broadcast dimensions.</p><p>The size of the slice is specified by the size of the vector.</p><p>An optional SSA value <code>mask</code> of the same shape as the vector type may be
+ specified to mask out elements. Elements whose corresponding mask element
+ is <code>0</code> are masked out.</p><p>An optional boolean array attribute is provided to specify which dimensions
+ of the transfer are guaranteed to be within bounds. The absence of this
+ <code>in_bounds</code> attribute signifies that any dimension of the transfer may be
+ out-of-bounds. A <code>vector.transfer_write</code> can be lowered to a simple store
+ if all dimensions are specified to be within bounds and no <code>mask</code> was
+ specified.</p><p>An optional boolean array attribute is provided to specify which dimensions
+ of the transfer are guaranteed to be within bounds. The length of the array
+ must equal the rank of the vector type. The absence of this optional
+ <code>in_bounds</code> attribute signifies that any dimension of the transfer
+ may be out-of-bounds. A <code>vector.transfer_write</code> can be lowered to a simple
+ store if all dimensions are specified to be within bounds and no <code>mask</code> was
+ specified.</p><p>Note that <code>in_bounds</code> is specified for result dimensions and not input
+ dimensions. The starting point of the transfer, i.e.,
+ <code>%A[%expr1, %expr2, %expr3, %expr4]</code> in the example below, is expected to
+ be in-bounds and as indices are increasing, accesses may run out-of-bounds.</p><p>This operation is called 'write' by opposition to 'store' because the
+ super-vector granularity is generally not representable with a single
+ hardware register. A <code>vector.transfer_write</code> is thus a
+ mid-level abstraction that supports super-vectorization with non-effecting
+ padding for full-tile-only code. It is the responsibility of
+ <code>vector.transfer_write</code>'s implementation to ensure the memory writes are
+ valid. Different lowerings may be pertinent depending on the hardware
+ support.</p><p>Example:</p><pre>// write vector&lt;16x32x64xf32&gt; into the slice
+//   <code>%A[%i0, %i1:%i1+32, %i2:%i2+64, %i3:%i3+16]</code>:
+for %i0 = 0 to %0 {
+  affine.for %i1 = 0 to %1 step 32 {
+    affine.for %i2 = 0 to %2 step 64 {
+      affine.for %i3 = 0 to %3 step 16 {
+        %val = <code>ssa-value</code> : vector&lt;16x32x64xf32&gt;
+        vector.transfer_write %val, %A[%i0, %i1, %i2, %i3]
+          {permutation_map: (d0, d1, d2, d3) -&gt; (d3, d1, d2)} :
+          vector&lt;16x32x64xf32&gt;, memref&lt;?x?x?x?xf32&gt;
+}}}}
+
+// write to a memref with vector element type.
+vector.transfer_write %4, %arg1[%c3, %c3]
+  {permutation_map = (d0, d1)-&gt;(d0, d1)}
+    : vector&lt;1x1x4x3xf32&gt;, memref&lt;?x?xvector&lt;4x3xf32&gt;&gt;
+
+// return a tensor where the vector is inserted into the source tensor.
+%5 = vector.transfer_write %4, %arg1[%c3, %c3]
+  {permutation_map = (d0, d1)-&gt;(d0, d1)}
+    : vector&lt;1x1x4x3xf32&gt;, tensor&lt;?x?xvector&lt;4x3xf32&gt;&gt;
+</pre></div><a href="#g:36" id="g:36"><h1>transpose</h1></a><div class="doc"><p>Takes a n-D vector and returns the transposed n-D vector defined by
+ the permutation of ranks in the n-sized integer array attribute.
+ In the operation</p><pre>%1 = vector.transpose %0, [i_1, .., i_n]
+  : vector&lt;d_1 x .. x d_n x f32&gt;
+  to vector&lt;d_trans[0] x .. x d_trans[n-1] x f32&gt;
+</pre><p>the transp array [i_1, .., i_n] must be a permutation of [0, .., n-1].</p><p>Example:</p><pre>%1 = vector.transpose %0, [1, 0] : vector&lt;2x3xf32&gt; to vector&lt;3x2xf32&gt;
+
+ [ [a, b, c],       [ [a, d],
+   [d, e, f] ]  -&gt;    [b, e],
+                      [c, f] ]
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Transpose" class="def">Transpose</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#Transpose" class="link">Source</a> <a href="#v:Transpose" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.transpose</code>.</p></div></div><div class="top"><p class="src"><a id="v:transpose" class="def">transpose</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#transpose" class="link">Source</a> <a href="#v:transpose" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.transpose</code>.</p></div></div><a href="#g:37" id="g:37"><h1>tuple_get</h1></a><div class="doc"><p>Returns the tuple element of 'vectors' at 'index'.</p><p>Note that this operation is used during the vector op unrolling
+ transformation and should be removed before lowering to lower-level
+ dialects.</p><p>Example:</p><pre>%4 = vector.tuple %0, %1, %2, %3
+  : vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;, vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;&gt;
+
+%5 = vector.tuple_get %4, 1
+  : tuple&lt;vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;,
+          vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;&gt;
+</pre></div><a href="#g:38" id="g:38"><h1>tuple</h1></a><div class="doc"><p>Returns a tuple of its operands 'vectors'.</p><p>Note that this operation is used during the vector op unrolling
+ transformation and should be removed before lowering to lower-level
+ dialects.</p><p>Example:</p><pre>%0 = vector.transfer_read ... : vector&lt;2x2xf32&gt;
+%1 = vector.transfer_read ... : vector&lt;2x1xf32&gt;
+%2 = vector.transfer_read ... : vector&lt;2x2xf32&gt;
+%3 = vector.transfer_read ... : vector&lt;2x1xf32&gt;
+
+%4 = vector.tuple %0, %1, %2, %3
+  : vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;, vector&lt;2x2xf32&gt;, vector&lt;2x1xf32&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Tuple" class="def">Tuple</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [operand] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#Tuple" class="link">Source</a> <a href="#v:Tuple" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.tuple</code>.</p></div></div><div class="top"><p class="src"><a id="v:tuple" class="def">tuple</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#tuple" class="link">Source</a> <a href="#v:tuple" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.tuple</code>.</p></div></div><a href="#g:39" id="g:39"><h1>type_cast</h1></a><div class="doc"><p>Performs a conversion from a memref with scalar element to a memref with a
+ *single* vector element, copying the shape of the memref to the vector. This
+ is the minimal viable operation that is required to makeke
+ super-vectorization operational. It can be seen as a special case of the
+ <code>view</code> operation but scoped in the super-vectorization context.</p><p>Syntax:</p><pre>operation ::= <code>vector.type_cast</code> ssa-use : memref-type to memref-type
+</pre><p>Example:</p><pre>%A  = alloc() : memref&lt;5x4x3xf32&gt;
+%VA = vector.type_cast %A : memref&lt;5x4x3xf32&gt; to memref&lt;vector&lt;5x4x3xf32&gt;&gt;
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:TypeCast" class="def">TypeCast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#TypeCast" class="link">Source</a> <a href="#v:TypeCast" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.type_cast</code>.</p></div></div><div class="top"><p class="src"><a id="v:type_cast" class="def">type_cast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#type_cast" class="link">Source</a> <a href="#v:type_cast" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.type_cast</code>.</p></div></div></div></div><div id="footer"><p>Produced by <a href="http://www.haskell.org/haddock/">Haddock</a> version 2.24.0</p></div></body></html>

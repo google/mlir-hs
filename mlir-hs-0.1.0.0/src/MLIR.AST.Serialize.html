@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- Copyright 2021 Google LLC</span><span>
+</span><span id="line-2"></span><span class="hs-comment">--</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- you may not use this file except in compliance with the License.</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- You may obtain a copy of the License at</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">--      http://www.apache.org/licenses/LICENSE-2.0</span><span>
+</span><span id="line-8"></span><span class="hs-comment">--</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Unless required by applicable law or agreed to in writing, software</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- See the License for the specific language governing permissions and</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- limitations under the License.</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">MLIR.AST.Serialize</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><a href="MLIR.AST.Serialize.html#ValueMapping"><span class="hs-identifier">ValueMapping</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><a href="MLIR.AST.Serialize.html#BlockMapping"><span class="hs-identifier">BlockMapping</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>  </span><span class="annot"><a href="MLIR.AST.Serialize.html#ValueAndBlockMapping"><span class="hs-identifier">ValueAndBlockMapping</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>  </span><span class="annot"><a href="MLIR.AST.Serialize.html#FromAST"><span class="hs-identifier">FromAST</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><a href="MLIR.AST.Serialize.html#packFromAST"><span class="hs-identifier">packFromAST</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.Serialize.html#packArray"><span class="hs-identifier">packArray</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.Serialize.html#unpackArray"><span class="hs-identifier">unpackArray</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Foreign.Ptr</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Foreign.Storable</span></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Foreign.Marshal.Array</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.IO.Class</span></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.Trans.Cont</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Language.C.Inline</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">C</span></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">BS</span></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="MLIR.Native.html"><span class="hs-identifier">MLIR.Native</span></a></span><span>     </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Native</span></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html"><span class="hs-identifier">MLIR.Native.FFI</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Native</span></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">type</span><span> </span><span id="Name"><span class="annot"><a href="MLIR.AST.Serialize.html#Name"><span class="hs-identifier hs-var">Name</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BS.ByteString</span></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">type</span><span> </span><span id="ValueMapping"><span class="annot"><a href="MLIR.AST.Serialize.html#ValueMapping"><span class="hs-identifier hs-var">ValueMapping</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">M.Map</span></span><span> </span><span class="annot"><a href="MLIR.AST.Serialize.html#Name"><span class="hs-identifier hs-type">Name</span></a></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#Value"><span class="hs-identifier hs-type">Native.Value</span></a></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">type</span><span> </span><span id="BlockMapping"><span class="annot"><a href="MLIR.AST.Serialize.html#BlockMapping"><span class="hs-identifier hs-var">BlockMapping</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">M.Map</span></span><span> </span><span class="annot"><a href="MLIR.AST.Serialize.html#Name"><span class="hs-identifier hs-type">Name</span></a></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#Block"><span class="hs-identifier hs-type">Native.Block</span></a></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">type</span><span> </span><span id="ValueAndBlockMapping"><span class="annot"><a href="MLIR.AST.Serialize.html#ValueAndBlockMapping"><span class="hs-identifier hs-var">ValueAndBlockMapping</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="MLIR.AST.Serialize.html#ValueMapping"><span class="hs-identifier hs-type">ValueMapping</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.Serialize.html#BlockMapping"><span class="hs-identifier hs-type">BlockMapping</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">class</span><span> </span><span id="FromAST"><span class="annot"><a href="MLIR.AST.Serialize.html#FromAST"><span class="hs-identifier hs-var">FromAST</span></a></span></span><span> </span><span id="local-6989586621679292697"><span class="annot"><a href="#local-6989586621679292697"><span class="hs-identifier hs-type">ast</span></a></span></span><span> </span><span id="local-6989586621679292696"><span class="annot"><a href="#local-6989586621679292696"><span class="hs-identifier hs-type">native</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="#local-6989586621679292697"><span class="hs-identifier hs-type">ast</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679292696"><span class="hs-identifier hs-type">native</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-41"></span><span>  </span><span id="fromAST"><span class="annot"><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-type">fromAST</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#Context"><span class="hs-identifier hs-type">Native.Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Serialize.html#ValueAndBlockMapping"><span class="hs-identifier hs-type">ValueAndBlockMapping</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679292697"><span class="hs-identifier hs-type">ast</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="#local-6989586621679292696"><span class="hs-identifier hs-type">native</span></a></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span id="local-6989586621679292652"><span id="local-6989586621679292653"><span id="local-6989586621679292654"><span class="annot"><a href="MLIR.AST.Serialize.html#packFromAST"><span class="hs-identifier hs-type">packFromAST</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="MLIR.AST.Serialize.html#FromAST"><span class="hs-identifier hs-type">FromAST</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679292654"><span class="hs-identifier hs-type">ast</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679292653"><span class="hs-identifier hs-type">native</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Storable</span></span><span> </span><span class="annot"><a href="#local-6989586621679292653"><span class="hs-identifier hs-type">native</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#Context"><span class="hs-identifier hs-type">Native.Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Serialize.html#ValueAndBlockMapping"><span class="hs-identifier hs-type">ValueAndBlockMapping</span></a></span><span>
+</span><span id="line-45"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679292654"><span class="hs-identifier hs-type">ast</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ContT</span></span><span> </span><span class="annot"><a href="#local-6989586621679292652"><span class="hs-identifier hs-type">r</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">C.CIntPtr</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="#local-6989586621679292653"><span class="hs-identifier hs-type">native</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-46"></span><span id="packFromAST"><span class="annot"><span class="annottext">packFromAST :: Context
+-&gt; ValueAndBlockMapping
+-&gt; [ast]
+-&gt; ContT r IO (CIntPtr, Ptr native)
+</span><a href="MLIR.AST.Serialize.html#packFromAST"><span class="hs-identifier hs-var hs-var">packFromAST</span></a></span></span><span> </span><span id="local-6989586621679292651"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679292651"><span class="hs-identifier hs-var">ctx</span></a></span></span><span> </span><span id="local-6989586621679292650"><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679292650"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span id="local-6989586621679292649"><span class="annot"><span class="annottext">[ast]
+</span><a href="#local-6989586621679292649"><span class="hs-identifier hs-var">asts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[native] -&gt; ContT r IO (CIntPtr, Ptr native)
+forall a r. Storable a =&gt; [a] -&gt; ContT r IO (CIntPtr, Ptr a)
+</span><a href="MLIR.AST.Serialize.html#packArray"><span class="hs-identifier hs-var">packArray</span></a></span><span> </span><span class="annot"><span class="annottext">([native] -&gt; ContT r IO (CIntPtr, Ptr native))
+-&gt; ContT r IO [native] -&gt; ContT r IO (CIntPtr, Ptr native)
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; m a -&gt; m b
+</span><span class="hs-operator hs-var">=&lt;&lt;</span></span><span> </span><span class="annot"><span class="annottext">IO [native] -&gt; ContT r IO [native]
+forall (m :: * -&gt; *) a. MonadIO m =&gt; IO a -&gt; m a
+</span><span class="hs-identifier hs-var">liftIO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ast -&gt; IO native) -&gt; [ast] -&gt; IO [native]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m (t b)
+</span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
+forall ast native.
+FromAST ast native =&gt;
+Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
+</span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679292651"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679292650"><span class="hs-identifier hs-var">env</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ast]
+</span><a href="#local-6989586621679292649"><span class="hs-identifier hs-var">asts</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- TODO(apaszke): Unify this with packing utilities from ExecutionEngine?</span><span>
+</span><span id="line-49"></span><span id="local-6989586621679292708"><span id="local-6989586621679292710"><span class="annot"><a href="MLIR.AST.Serialize.html#packArray"><span class="hs-identifier hs-type">packArray</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Storable</span></span><span> </span><span class="annot"><a href="#local-6989586621679292710"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679292710"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ContT</span></span><span> </span><span class="annot"><a href="#local-6989586621679292708"><span class="hs-identifier hs-type">r</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">C.CIntPtr</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="#local-6989586621679292710"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-50"></span><span id="packArray"><span class="annot"><span class="annottext">packArray :: [a] -&gt; ContT r IO (CIntPtr, Ptr a)
+</span><a href="MLIR.AST.Serialize.html#packArray"><span class="hs-identifier hs-var hs-var">packArray</span></a></span></span><span> </span><span id="local-6989586621679292645"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679292645"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679292644"><span class="annot"><span class="annottext">arrSize :: Int
+</span><a href="#local-6989586621679292644"><span class="hs-identifier hs-var hs-var">arrSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[a] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679292645"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>  </span><span id="local-6989586621679292642"><span class="annot"><span class="annottext">Ptr a
+</span><a href="#local-6989586621679292642"><span class="hs-identifier hs-var">ptr</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">((Ptr a -&gt; IO r) -&gt; IO r) -&gt; ContT r IO (Ptr a)
+forall k (r :: k) (m :: k -&gt; *) a.
+((a -&gt; m r) -&gt; m r) -&gt; ContT r m a
+</span><span class="hs-identifier hs-var">ContT</span></span><span> </span><span class="annot"><span class="annottext">(((Ptr a -&gt; IO r) -&gt; IO r) -&gt; ContT r IO (Ptr a))
+-&gt; ((Ptr a -&gt; IO r) -&gt; IO r) -&gt; ContT r IO (Ptr a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; (Ptr a -&gt; IO r) -&gt; IO r
+forall a b. Storable a =&gt; Int -&gt; (Ptr a -&gt; IO b) -&gt; IO b
+</span><span class="hs-identifier hs-var">allocaArray</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679292644"><span class="hs-identifier hs-var">arrSize</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="annot"><span class="annottext">IO () -&gt; ContT r IO ()
+forall (m :: * -&gt; *) a. MonadIO m =&gt; IO a -&gt; m a
+</span><span class="hs-identifier hs-var">liftIO</span></span><span> </span><span class="annot"><span class="annottext">(IO () -&gt; ContT r IO ()) -&gt; IO () -&gt; ContT r IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((Int, a) -&gt; IO ()) -&gt; [(Int, a)] -&gt; IO ()
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Foldable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m ()
+</span><span class="hs-identifier hs-var">mapM_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; a -&gt; IO ()) -&gt; (Int, a) -&gt; IO ()
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><span class="hs-identifier hs-var">uncurry</span></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; a -&gt; IO ()) -&gt; (Int, a) -&gt; IO ())
+-&gt; (Int -&gt; a -&gt; IO ()) -&gt; (Int, a) -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Ptr a -&gt; Int -&gt; a -&gt; IO ()
+forall a. Storable a =&gt; Ptr a -&gt; Int -&gt; a -&gt; IO ()
+</span><span class="hs-identifier hs-var">pokeElemOff</span></span><span> </span><span class="annot"><span class="annottext">Ptr a
+</span><a href="#local-6989586621679292642"><span class="hs-identifier hs-var">ptr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([(Int, a)] -&gt; IO ()) -&gt; [(Int, a)] -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [a] -&gt; [(Int, a)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-glyph">..</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679292645"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="annot"><span class="annottext">(CIntPtr, Ptr a) -&gt; ContT r IO (CIntPtr, Ptr a)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; CIntPtr
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679292644"><span class="hs-identifier hs-var">arrSize</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Ptr a
+</span><a href="#local-6989586621679292642"><span class="hs-identifier hs-var">ptr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span id="local-6989586621679292636"><span class="annot"><a href="MLIR.AST.Serialize.html#unpackArray"><span class="hs-identifier hs-type">unpackArray</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Storable</span></span><span> </span><span class="annot"><a href="#local-6989586621679292636"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">C.CIntPtr</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="#local-6989586621679292636"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679292636"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-57"></span><span id="unpackArray"><span class="annot"><span class="annottext">unpackArray :: CIntPtr -&gt; Ptr a -&gt; IO [a]
+</span><a href="MLIR.AST.Serialize.html#unpackArray"><span class="hs-identifier hs-var hs-var">unpackArray</span></a></span></span><span> </span><span id="local-6989586621679292635"><span class="annot"><span class="annottext">CIntPtr
+</span><a href="#local-6989586621679292635"><span class="hs-identifier hs-var">size</span></a></span></span><span> </span><span id="local-6989586621679292634"><span class="annot"><span class="annottext">Ptr a
+</span><a href="#local-6989586621679292634"><span class="hs-identifier hs-var">arrPtr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; IO a) -&gt; [Int] -&gt; IO [a]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m (t b)
+</span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Ptr a -&gt; Int -&gt; IO a
+forall a. Storable a =&gt; Ptr a -&gt; Int -&gt; IO a
+</span><span class="hs-identifier hs-var">peekElemOff</span></span><span> </span><span class="annot"><span class="annottext">Ptr a
+</span><a href="#local-6989586621679292634"><span class="hs-identifier hs-var">arrPtr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-glyph">..</span><span class="annot"><span class="annottext">CIntPtr -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">CIntPtr
+</span><a href="#local-6989586621679292635"><span class="hs-identifier hs-var">size</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">]</span><span>
+</span><span id="line-58"></span></pre></body></html>

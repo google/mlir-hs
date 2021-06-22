@@ -1,0 +1,946 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- Copyright 2021 Google LLC</span><span>
+</span><span id="line-2"></span><span class="hs-comment">--</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- you may not use this file except in compliance with the License.</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- You may obtain a copy of the License at</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">--      http://www.apache.org/licenses/LICENSE-2.0</span><span>
+</span><span id="line-8"></span><span class="hs-comment">--</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Unless required by applicable law or agreed to in writing, software</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- See the License for the specific language governing permissions and</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- limitations under the License.</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-pragma">{-# OPTIONS_HADDOCK hide #-}</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">MLIR.Native.FFI</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Foreign.Ptr</span></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Foreign.Storable</span></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Language.C.Inline</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">C</span></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Language.C.Types</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">C</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Language.C.Inline.Context</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">C.Context</span></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.RawString.QQ</span></span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Int</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Coerce</span></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-identifier">C.include</span><span> </span><span class="hs-string">&quot;&lt;string.h&gt;&quot;</span><span>
+</span><span id="line-31"></span><span class="hs-identifier">C.include</span><span> </span><span class="hs-string">&quot;&lt;stdlib.h&gt;&quot;</span><span>
+</span><span id="line-32"></span><span class="hs-identifier">C.include</span><span> </span><span class="hs-string">&quot;mlir-c/Support.h&quot;</span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- TODO(apaszke): Better buffering?</span><span>
+</span><span id="line-35"></span><span class="hs-identifier">C.verbatim</span><span> </span><span class="">[r|
+void HaskellMlirStringCallback(MlirStringRef ref, void* ctxRaw) {
+  void** ctx = ctxRaw;
+  char** data_ptr = ctxRaw;
+  size_t* size_ptr = ctx[1];
+  size_t old_size = *size_ptr;
+  size_t new_size = old_size + ref.length;
+  if (new_size == 0) return;
+  *data_ptr = realloc(*data_ptr, new_size);
+  *size_ptr = new_size;
+  memcpy((*data_ptr) + old_size, ref.data, ref.length);
+}
+|]</span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="annot"><a href="MLIR.Native.FFI.html#stringCallbackDecl"><span class="hs-identifier hs-type">stringCallbackDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-50"></span><span id="stringCallbackDecl"><span class="annot"><span class="annottext">stringCallbackDecl :: String
+</span><a href="MLIR.Native.FFI.html#stringCallbackDecl"><span class="hs-identifier hs-var hs-var">stringCallbackDecl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="">[r|
+void HaskellMlirStringCallback(MlirStringRef ref, void* ctxRaw);
+|]</span></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">data</span><span> </span><span id="MlirContextObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirContextObject"><span class="hs-identifier hs-var">MlirContextObject</span></a></span></span><span>
+</span><span id="line-55"></span><span class="hs-keyword">data</span><span> </span><span id="MlirLocationObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirLocationObject"><span class="hs-identifier hs-var">MlirLocationObject</span></a></span></span><span>
+</span><span id="line-56"></span><span class="hs-keyword">data</span><span> </span><span id="MlirModuleObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirModuleObject"><span class="hs-identifier hs-var">MlirModuleObject</span></a></span></span><span>
+</span><span id="line-57"></span><span class="hs-keyword">data</span><span> </span><span id="MlirOperationObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirOperationObject"><span class="hs-identifier hs-var">MlirOperationObject</span></a></span></span><span>
+</span><span id="line-58"></span><span class="hs-keyword">data</span><span> </span><span id="MlirPassManagerObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirPassManagerObject"><span class="hs-identifier hs-var">MlirPassManagerObject</span></a></span></span><span>
+</span><span id="line-59"></span><span class="hs-keyword">data</span><span> </span><span id="MlirPassObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirPassObject"><span class="hs-identifier hs-var">MlirPassObject</span></a></span></span><span>
+</span><span id="line-60"></span><span class="hs-keyword">data</span><span> </span><span id="MlirExecutionEngineObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirExecutionEngineObject"><span class="hs-identifier hs-var">MlirExecutionEngineObject</span></a></span></span><span>
+</span><span id="line-61"></span><span class="hs-keyword">data</span><span> </span><span id="MlirTypeObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirTypeObject"><span class="hs-identifier hs-var">MlirTypeObject</span></a></span></span><span>
+</span><span id="line-62"></span><span class="hs-keyword">data</span><span> </span><span id="MlirBlockObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirBlockObject"><span class="hs-identifier hs-var">MlirBlockObject</span></a></span></span><span>
+</span><span id="line-63"></span><span class="hs-keyword">data</span><span> </span><span id="MlirRegionObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirRegionObject"><span class="hs-identifier hs-var">MlirRegionObject</span></a></span></span><span>
+</span><span id="line-64"></span><span class="hs-keyword">data</span><span> </span><span id="MlirAttributeObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirAttributeObject"><span class="hs-identifier hs-var">MlirAttributeObject</span></a></span></span><span>
+</span><span id="line-65"></span><span class="hs-keyword">data</span><span> </span><span id="MlirValueObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirValueObject"><span class="hs-identifier hs-var">MlirValueObject</span></a></span></span><span>
+</span><span id="line-66"></span><span class="hs-keyword">data</span><span> </span><span id="MlirIdentifierObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirIdentifierObject"><span class="hs-identifier hs-var">MlirIdentifierObject</span></a></span></span><span>
+</span><span id="line-67"></span><span class="hs-keyword">data</span><span> </span><span id="MlirAffineExprObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirAffineExprObject"><span class="hs-identifier hs-var">MlirAffineExprObject</span></a></span></span><span>
+</span><span id="line-68"></span><span class="hs-keyword">data</span><span> </span><span id="MlirAffineMapObject"><span class="annot"><a href="MLIR.Native.FFI.html#MlirAffineMapObject"><span class="hs-identifier hs-var">MlirAffineMapObject</span></a></span></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span class="hs-comment">-- | A native MLIR context.</span><span>
+</span><span id="line-71"></span><span class="hs-keyword">newtype</span><span> </span><span id="Context"><span class="annot"><a href="MLIR.Native.FFI.html#Context"><span class="hs-identifier hs-var">Context</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ContextPtr"><span class="annot"><a href="MLIR.Native.FFI.html#ContextPtr"><span class="hs-identifier hs-var">ContextPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirContextObject"><span class="hs-identifier hs-type">MlirContextObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>                  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292235"><span id="local-6989586621679292237"><span id="local-6989586621679292239"><span id="local-6989586621679292241"><span id="local-6989586621679292243"><span id="local-6989586621679292245"><span id="local-6989586621679292247"><span id="local-6989586621679292249"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Context
+Ptr b -&gt; Int -&gt; Context -&gt; IO ()
+Ptr Context -&gt; IO Context
+Ptr Context -&gt; Int -&gt; IO Context
+Ptr Context -&gt; Int -&gt; Context -&gt; IO ()
+Ptr Context -&gt; Context -&gt; IO ()
+Context -&gt; Int
+(Context -&gt; Int)
+-&gt; (Context -&gt; Int)
+-&gt; (Ptr Context -&gt; Int -&gt; IO Context)
+-&gt; (Ptr Context -&gt; Int -&gt; Context -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Context)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Context -&gt; IO ())
+-&gt; (Ptr Context -&gt; IO Context)
+-&gt; (Ptr Context -&gt; Context -&gt; IO ())
+-&gt; Storable Context
+forall b. Ptr b -&gt; Int -&gt; IO Context
+forall b. Ptr b -&gt; Int -&gt; Context -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Context -&gt; Context -&gt; IO ()
+$cpoke :: Ptr Context -&gt; Context -&gt; IO ()
+peek :: Ptr Context -&gt; IO Context
+$cpeek :: Ptr Context -&gt; IO Context
+pokeByteOff :: Ptr b -&gt; Int -&gt; Context -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Context -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Context
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Context
+pokeElemOff :: Ptr Context -&gt; Int -&gt; Context -&gt; IO ()
+$cpokeElemOff :: Ptr Context -&gt; Int -&gt; Context -&gt; IO ()
+peekElemOff :: Ptr Context -&gt; Int -&gt; IO Context
+$cpeekElemOff :: Ptr Context -&gt; Int -&gt; IO Context
+alignment :: Context -&gt; Int
+$calignment :: Context -&gt; Int
+sizeOf :: Context -&gt; Int
+$csizeOf :: Context -&gt; Int
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span class="hs-comment">-- | A native MLIR pass instance.</span><span>
+</span><span id="line-74"></span><span class="hs-keyword">newtype</span><span> </span><span id="Pass"><span class="annot"><a href="MLIR.Native.FFI.html#Pass"><span class="hs-identifier hs-var">Pass</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PassPtr"><span class="annot"><a href="MLIR.Native.FFI.html#PassPtr"><span class="hs-identifier hs-var">PassPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirPassObject"><span class="hs-identifier hs-type">MlirPassObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>               </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292217"><span id="local-6989586621679292219"><span id="local-6989586621679292221"><span id="local-6989586621679292223"><span id="local-6989586621679292225"><span id="local-6989586621679292227"><span id="local-6989586621679292229"><span id="local-6989586621679292231"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Pass
+Ptr b -&gt; Int -&gt; Pass -&gt; IO ()
+Ptr Pass -&gt; IO Pass
+Ptr Pass -&gt; Int -&gt; IO Pass
+Ptr Pass -&gt; Int -&gt; Pass -&gt; IO ()
+Ptr Pass -&gt; Pass -&gt; IO ()
+Pass -&gt; Int
+(Pass -&gt; Int)
+-&gt; (Pass -&gt; Int)
+-&gt; (Ptr Pass -&gt; Int -&gt; IO Pass)
+-&gt; (Ptr Pass -&gt; Int -&gt; Pass -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Pass)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Pass -&gt; IO ())
+-&gt; (Ptr Pass -&gt; IO Pass)
+-&gt; (Ptr Pass -&gt; Pass -&gt; IO ())
+-&gt; Storable Pass
+forall b. Ptr b -&gt; Int -&gt; IO Pass
+forall b. Ptr b -&gt; Int -&gt; Pass -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Pass -&gt; Pass -&gt; IO ()
+$cpoke :: Ptr Pass -&gt; Pass -&gt; IO ()
+peek :: Ptr Pass -&gt; IO Pass
+$cpeek :: Ptr Pass -&gt; IO Pass
+pokeByteOff :: Ptr b -&gt; Int -&gt; Pass -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Pass -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Pass
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Pass
+pokeElemOff :: Ptr Pass -&gt; Int -&gt; Pass -&gt; IO ()
+$cpokeElemOff :: Ptr Pass -&gt; Int -&gt; Pass -&gt; IO ()
+peekElemOff :: Ptr Pass -&gt; Int -&gt; IO Pass
+$cpeekElemOff :: Ptr Pass -&gt; Int -&gt; IO Pass
+alignment :: Pass -&gt; Int
+$calignment :: Pass -&gt; Int
+sizeOf :: Pass -&gt; Int
+$csizeOf :: Pass -&gt; Int
+</span><a href="#local-6989586621679292217"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- | A native MLIR pass manager instance.</span><span>
+</span><span id="line-77"></span><span class="hs-keyword">newtype</span><span> </span><span id="PassManager"><span class="annot"><a href="MLIR.Native.FFI.html#PassManager"><span class="hs-identifier hs-var">PassManager</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PassManagerPtr"><span class="annot"><a href="MLIR.Native.FFI.html#PassManagerPtr"><span class="hs-identifier hs-var">PassManagerPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirPassManagerObject"><span class="hs-identifier hs-type">MlirPassManagerObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-78"></span><span>                      </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292200"><span id="local-6989586621679292202"><span id="local-6989586621679292204"><span id="local-6989586621679292206"><span id="local-6989586621679292208"><span id="local-6989586621679292210"><span id="local-6989586621679292212"><span id="local-6989586621679292214"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO PassManager
+Ptr b -&gt; Int -&gt; PassManager -&gt; IO ()
+Ptr PassManager -&gt; IO PassManager
+Ptr PassManager -&gt; Int -&gt; IO PassManager
+Ptr PassManager -&gt; Int -&gt; PassManager -&gt; IO ()
+Ptr PassManager -&gt; PassManager -&gt; IO ()
+PassManager -&gt; Int
+(PassManager -&gt; Int)
+-&gt; (PassManager -&gt; Int)
+-&gt; (Ptr PassManager -&gt; Int -&gt; IO PassManager)
+-&gt; (Ptr PassManager -&gt; Int -&gt; PassManager -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO PassManager)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; PassManager -&gt; IO ())
+-&gt; (Ptr PassManager -&gt; IO PassManager)
+-&gt; (Ptr PassManager -&gt; PassManager -&gt; IO ())
+-&gt; Storable PassManager
+forall b. Ptr b -&gt; Int -&gt; IO PassManager
+forall b. Ptr b -&gt; Int -&gt; PassManager -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr PassManager -&gt; PassManager -&gt; IO ()
+$cpoke :: Ptr PassManager -&gt; PassManager -&gt; IO ()
+peek :: Ptr PassManager -&gt; IO PassManager
+$cpeek :: Ptr PassManager -&gt; IO PassManager
+pokeByteOff :: Ptr b -&gt; Int -&gt; PassManager -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; PassManager -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO PassManager
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO PassManager
+pokeElemOff :: Ptr PassManager -&gt; Int -&gt; PassManager -&gt; IO ()
+$cpokeElemOff :: Ptr PassManager -&gt; Int -&gt; PassManager -&gt; IO ()
+peekElemOff :: Ptr PassManager -&gt; Int -&gt; IO PassManager
+$cpeekElemOff :: Ptr PassManager -&gt; Int -&gt; IO PassManager
+alignment :: PassManager -&gt; Int
+$calignment :: PassManager -&gt; Int
+sizeOf :: PassManager -&gt; Int
+$csizeOf :: PassManager -&gt; Int
+</span><a href="#local-6989586621679292200"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-79"></span><span class="hs-comment">-- | A native MLIR location object.</span><span>
+</span><span id="line-80"></span><span class="hs-keyword">newtype</span><span> </span><span id="Location"><span class="annot"><a href="MLIR.Native.FFI.html#Location"><span class="hs-identifier hs-var">Location</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="LocationPtr"><span class="annot"><a href="MLIR.Native.FFI.html#LocationPtr"><span class="hs-identifier hs-var">LocationPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirLocationObject"><span class="hs-identifier hs-type">MlirLocationObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-81"></span><span>                   </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292183"><span id="local-6989586621679292185"><span id="local-6989586621679292187"><span id="local-6989586621679292189"><span id="local-6989586621679292191"><span id="local-6989586621679292193"><span id="local-6989586621679292195"><span id="local-6989586621679292197"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Location
+Ptr b -&gt; Int -&gt; Location -&gt; IO ()
+Ptr Location -&gt; IO Location
+Ptr Location -&gt; Int -&gt; IO Location
+Ptr Location -&gt; Int -&gt; Location -&gt; IO ()
+Ptr Location -&gt; Location -&gt; IO ()
+Location -&gt; Int
+(Location -&gt; Int)
+-&gt; (Location -&gt; Int)
+-&gt; (Ptr Location -&gt; Int -&gt; IO Location)
+-&gt; (Ptr Location -&gt; Int -&gt; Location -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Location)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Location -&gt; IO ())
+-&gt; (Ptr Location -&gt; IO Location)
+-&gt; (Ptr Location -&gt; Location -&gt; IO ())
+-&gt; Storable Location
+forall b. Ptr b -&gt; Int -&gt; IO Location
+forall b. Ptr b -&gt; Int -&gt; Location -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Location -&gt; Location -&gt; IO ()
+$cpoke :: Ptr Location -&gt; Location -&gt; IO ()
+peek :: Ptr Location -&gt; IO Location
+$cpeek :: Ptr Location -&gt; IO Location
+pokeByteOff :: Ptr b -&gt; Int -&gt; Location -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Location -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Location
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Location
+pokeElemOff :: Ptr Location -&gt; Int -&gt; Location -&gt; IO ()
+$cpokeElemOff :: Ptr Location -&gt; Int -&gt; Location -&gt; IO ()
+peekElemOff :: Ptr Location -&gt; Int -&gt; IO Location
+$cpeekElemOff :: Ptr Location -&gt; Int -&gt; IO Location
+alignment :: Location -&gt; Int
+$calignment :: Location -&gt; Int
+sizeOf :: Location -&gt; Int
+$csizeOf :: Location -&gt; Int
+</span><a href="#local-6989586621679292183"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-82"></span><span class="hs-comment">-- | A native MLIR operation instance.</span><span>
+</span><span id="line-83"></span><span class="hs-keyword">newtype</span><span> </span><span id="Operation"><span class="annot"><a href="MLIR.Native.FFI.html#Operation"><span class="hs-identifier hs-var">Operation</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="OperationPtr"><span class="annot"><a href="MLIR.Native.FFI.html#OperationPtr"><span class="hs-identifier hs-var">OperationPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirOperationObject"><span class="hs-identifier hs-type">MlirOperationObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-84"></span><span>                    </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292166"><span id="local-6989586621679292168"><span id="local-6989586621679292170"><span id="local-6989586621679292172"><span id="local-6989586621679292174"><span id="local-6989586621679292176"><span id="local-6989586621679292178"><span id="local-6989586621679292180"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Operation
+Ptr b -&gt; Int -&gt; Operation -&gt; IO ()
+Ptr Operation -&gt; IO Operation
+Ptr Operation -&gt; Int -&gt; IO Operation
+Ptr Operation -&gt; Int -&gt; Operation -&gt; IO ()
+Ptr Operation -&gt; Operation -&gt; IO ()
+Operation -&gt; Int
+(Operation -&gt; Int)
+-&gt; (Operation -&gt; Int)
+-&gt; (Ptr Operation -&gt; Int -&gt; IO Operation)
+-&gt; (Ptr Operation -&gt; Int -&gt; Operation -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Operation)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Operation -&gt; IO ())
+-&gt; (Ptr Operation -&gt; IO Operation)
+-&gt; (Ptr Operation -&gt; Operation -&gt; IO ())
+-&gt; Storable Operation
+forall b. Ptr b -&gt; Int -&gt; IO Operation
+forall b. Ptr b -&gt; Int -&gt; Operation -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Operation -&gt; Operation -&gt; IO ()
+$cpoke :: Ptr Operation -&gt; Operation -&gt; IO ()
+peek :: Ptr Operation -&gt; IO Operation
+$cpeek :: Ptr Operation -&gt; IO Operation
+pokeByteOff :: Ptr b -&gt; Int -&gt; Operation -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Operation -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Operation
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Operation
+pokeElemOff :: Ptr Operation -&gt; Int -&gt; Operation -&gt; IO ()
+$cpokeElemOff :: Ptr Operation -&gt; Int -&gt; Operation -&gt; IO ()
+peekElemOff :: Ptr Operation -&gt; Int -&gt; IO Operation
+$cpeekElemOff :: Ptr Operation -&gt; Int -&gt; IO Operation
+alignment :: Operation -&gt; Int
+$calignment :: Operation -&gt; Int
+sizeOf :: Operation -&gt; Int
+$csizeOf :: Operation -&gt; Int
+</span><a href="#local-6989586621679292166"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- | A native MLIR module operation.</span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- Since every module is an operation, it can be converted to</span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- an 'Operation' using 'MLIR.Native.moduleAsOperation'.</span><span>
+</span><span id="line-88"></span><span class="hs-keyword">newtype</span><span> </span><span id="Module"><span class="annot"><a href="MLIR.Native.FFI.html#Module"><span class="hs-identifier hs-var">Module</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ModulePtr"><span class="annot"><a href="MLIR.Native.FFI.html#ModulePtr"><span class="hs-identifier hs-var">ModulePtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirModuleObject"><span class="hs-identifier hs-type">MlirModuleObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-89"></span><span>                 </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292149"><span id="local-6989586621679292151"><span id="local-6989586621679292153"><span id="local-6989586621679292155"><span id="local-6989586621679292157"><span id="local-6989586621679292159"><span id="local-6989586621679292161"><span id="local-6989586621679292163"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Module
+Ptr b -&gt; Int -&gt; Module -&gt; IO ()
+Ptr Module -&gt; IO Module
+Ptr Module -&gt; Int -&gt; IO Module
+Ptr Module -&gt; Int -&gt; Module -&gt; IO ()
+Ptr Module -&gt; Module -&gt; IO ()
+Module -&gt; Int
+(Module -&gt; Int)
+-&gt; (Module -&gt; Int)
+-&gt; (Ptr Module -&gt; Int -&gt; IO Module)
+-&gt; (Ptr Module -&gt; Int -&gt; Module -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Module)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Module -&gt; IO ())
+-&gt; (Ptr Module -&gt; IO Module)
+-&gt; (Ptr Module -&gt; Module -&gt; IO ())
+-&gt; Storable Module
+forall b. Ptr b -&gt; Int -&gt; IO Module
+forall b. Ptr b -&gt; Int -&gt; Module -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Module -&gt; Module -&gt; IO ()
+$cpoke :: Ptr Module -&gt; Module -&gt; IO ()
+peek :: Ptr Module -&gt; IO Module
+$cpeek :: Ptr Module -&gt; IO Module
+pokeByteOff :: Ptr b -&gt; Int -&gt; Module -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Module -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Module
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Module
+pokeElemOff :: Ptr Module -&gt; Int -&gt; Module -&gt; IO ()
+$cpokeElemOff :: Ptr Module -&gt; Int -&gt; Module -&gt; IO ()
+peekElemOff :: Ptr Module -&gt; Int -&gt; IO Module
+$cpeekElemOff :: Ptr Module -&gt; Int -&gt; IO Module
+alignment :: Module -&gt; Int
+$calignment :: Module -&gt; Int
+sizeOf :: Module -&gt; Int
+$csizeOf :: Module -&gt; Int
+</span><a href="#local-6989586621679292149"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- | A native MLIR execution engine.</span><span>
+</span><span id="line-91"></span><span class="hs-keyword">newtype</span><span> </span><span id="ExecutionEngine"><span class="annot"><a href="MLIR.Native.FFI.html#ExecutionEngine"><span class="hs-identifier hs-var">ExecutionEngine</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ExecutionEnginePtr"><span class="annot"><a href="MLIR.Native.FFI.html#ExecutionEnginePtr"><span class="hs-identifier hs-var">ExecutionEnginePtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirExecutionEngineObject"><span class="hs-identifier hs-type">MlirExecutionEngineObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-92"></span><span>                          </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292132"><span id="local-6989586621679292134"><span id="local-6989586621679292136"><span id="local-6989586621679292138"><span id="local-6989586621679292140"><span id="local-6989586621679292142"><span id="local-6989586621679292144"><span id="local-6989586621679292146"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO ExecutionEngine
+Ptr b -&gt; Int -&gt; ExecutionEngine -&gt; IO ()
+Ptr ExecutionEngine -&gt; IO ExecutionEngine
+Ptr ExecutionEngine -&gt; Int -&gt; IO ExecutionEngine
+Ptr ExecutionEngine -&gt; Int -&gt; ExecutionEngine -&gt; IO ()
+Ptr ExecutionEngine -&gt; ExecutionEngine -&gt; IO ()
+ExecutionEngine -&gt; Int
+(ExecutionEngine -&gt; Int)
+-&gt; (ExecutionEngine -&gt; Int)
+-&gt; (Ptr ExecutionEngine -&gt; Int -&gt; IO ExecutionEngine)
+-&gt; (Ptr ExecutionEngine -&gt; Int -&gt; ExecutionEngine -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO ExecutionEngine)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; ExecutionEngine -&gt; IO ())
+-&gt; (Ptr ExecutionEngine -&gt; IO ExecutionEngine)
+-&gt; (Ptr ExecutionEngine -&gt; ExecutionEngine -&gt; IO ())
+-&gt; Storable ExecutionEngine
+forall b. Ptr b -&gt; Int -&gt; IO ExecutionEngine
+forall b. Ptr b -&gt; Int -&gt; ExecutionEngine -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr ExecutionEngine -&gt; ExecutionEngine -&gt; IO ()
+$cpoke :: Ptr ExecutionEngine -&gt; ExecutionEngine -&gt; IO ()
+peek :: Ptr ExecutionEngine -&gt; IO ExecutionEngine
+$cpeek :: Ptr ExecutionEngine -&gt; IO ExecutionEngine
+pokeByteOff :: Ptr b -&gt; Int -&gt; ExecutionEngine -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; ExecutionEngine -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO ExecutionEngine
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO ExecutionEngine
+pokeElemOff :: Ptr ExecutionEngine -&gt; Int -&gt; ExecutionEngine -&gt; IO ()
+$cpokeElemOff :: Ptr ExecutionEngine -&gt; Int -&gt; ExecutionEngine -&gt; IO ()
+peekElemOff :: Ptr ExecutionEngine -&gt; Int -&gt; IO ExecutionEngine
+$cpeekElemOff :: Ptr ExecutionEngine -&gt; Int -&gt; IO ExecutionEngine
+alignment :: ExecutionEngine -&gt; Int
+$calignment :: ExecutionEngine -&gt; Int
+sizeOf :: ExecutionEngine -&gt; Int
+$csizeOf :: ExecutionEngine -&gt; Int
+</span><a href="#local-6989586621679292132"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- | A native MLIR type object.</span><span>
+</span><span id="line-94"></span><span class="hs-keyword">newtype</span><span> </span><span id="Type"><span class="annot"><a href="MLIR.Native.FFI.html#Type"><span class="hs-identifier hs-var">Type</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="TypePtr"><span class="annot"><a href="MLIR.Native.FFI.html#TypePtr"><span class="hs-identifier hs-var">TypePtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirTypeObject"><span class="hs-identifier hs-type">MlirTypeObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-95"></span><span>               </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292115"><span id="local-6989586621679292117"><span id="local-6989586621679292119"><span id="local-6989586621679292121"><span id="local-6989586621679292123"><span id="local-6989586621679292125"><span id="local-6989586621679292127"><span id="local-6989586621679292129"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Type
+Ptr b -&gt; Int -&gt; Type -&gt; IO ()
+Ptr Type -&gt; IO Type
+Ptr Type -&gt; Int -&gt; IO Type
+Ptr Type -&gt; Int -&gt; Type -&gt; IO ()
+Ptr Type -&gt; Type -&gt; IO ()
+Type -&gt; Int
+(Type -&gt; Int)
+-&gt; (Type -&gt; Int)
+-&gt; (Ptr Type -&gt; Int -&gt; IO Type)
+-&gt; (Ptr Type -&gt; Int -&gt; Type -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Type)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Type -&gt; IO ())
+-&gt; (Ptr Type -&gt; IO Type)
+-&gt; (Ptr Type -&gt; Type -&gt; IO ())
+-&gt; Storable Type
+forall b. Ptr b -&gt; Int -&gt; IO Type
+forall b. Ptr b -&gt; Int -&gt; Type -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Type -&gt; Type -&gt; IO ()
+$cpoke :: Ptr Type -&gt; Type -&gt; IO ()
+peek :: Ptr Type -&gt; IO Type
+$cpeek :: Ptr Type -&gt; IO Type
+pokeByteOff :: Ptr b -&gt; Int -&gt; Type -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Type -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Type
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Type
+pokeElemOff :: Ptr Type -&gt; Int -&gt; Type -&gt; IO ()
+$cpokeElemOff :: Ptr Type -&gt; Int -&gt; Type -&gt; IO ()
+peekElemOff :: Ptr Type -&gt; Int -&gt; IO Type
+$cpeekElemOff :: Ptr Type -&gt; Int -&gt; IO Type
+alignment :: Type -&gt; Int
+$calignment :: Type -&gt; Int
+sizeOf :: Type -&gt; Int
+$csizeOf :: Type -&gt; Int
+</span><a href="#local-6989586621679292115"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-96"></span><span class="hs-comment">-- | A native MLIR block object.</span><span>
+</span><span id="line-97"></span><span class="hs-comment">-- Every block is a list of 'Operation's.</span><span>
+</span><span id="line-98"></span><span class="hs-keyword">newtype</span><span> </span><span id="Block"><span class="annot"><a href="MLIR.Native.FFI.html#Block"><span class="hs-identifier hs-var">Block</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="BlockPtr"><span class="annot"><a href="MLIR.Native.FFI.html#BlockPtr"><span class="hs-identifier hs-var">BlockPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirBlockObject"><span class="hs-identifier hs-type">MlirBlockObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-99"></span><span>                </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292098"><span id="local-6989586621679292100"><span id="local-6989586621679292102"><span id="local-6989586621679292104"><span id="local-6989586621679292106"><span id="local-6989586621679292108"><span id="local-6989586621679292110"><span id="local-6989586621679292112"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Block
+Ptr b -&gt; Int -&gt; Block -&gt; IO ()
+Ptr Block -&gt; IO Block
+Ptr Block -&gt; Int -&gt; IO Block
+Ptr Block -&gt; Int -&gt; Block -&gt; IO ()
+Ptr Block -&gt; Block -&gt; IO ()
+Block -&gt; Int
+(Block -&gt; Int)
+-&gt; (Block -&gt; Int)
+-&gt; (Ptr Block -&gt; Int -&gt; IO Block)
+-&gt; (Ptr Block -&gt; Int -&gt; Block -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Block)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Block -&gt; IO ())
+-&gt; (Ptr Block -&gt; IO Block)
+-&gt; (Ptr Block -&gt; Block -&gt; IO ())
+-&gt; Storable Block
+forall b. Ptr b -&gt; Int -&gt; IO Block
+forall b. Ptr b -&gt; Int -&gt; Block -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Block -&gt; Block -&gt; IO ()
+$cpoke :: Ptr Block -&gt; Block -&gt; IO ()
+peek :: Ptr Block -&gt; IO Block
+$cpeek :: Ptr Block -&gt; IO Block
+pokeByteOff :: Ptr b -&gt; Int -&gt; Block -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Block -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Block
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Block
+pokeElemOff :: Ptr Block -&gt; Int -&gt; Block -&gt; IO ()
+$cpokeElemOff :: Ptr Block -&gt; Int -&gt; Block -&gt; IO ()
+peekElemOff :: Ptr Block -&gt; Int -&gt; IO Block
+$cpeekElemOff :: Ptr Block -&gt; Int -&gt; IO Block
+alignment :: Block -&gt; Int
+$calignment :: Block -&gt; Int
+sizeOf :: Block -&gt; Int
+$csizeOf :: Block -&gt; Int
+</span><a href="#local-6989586621679292098"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-100"></span><span class="hs-comment">-- | A native MLIR region.</span><span>
+</span><span id="line-101"></span><span class="hs-keyword">newtype</span><span> </span><span id="Region"><span class="annot"><a href="MLIR.Native.FFI.html#Region"><span class="hs-identifier hs-var">Region</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="RegionPtr"><span class="annot"><a href="MLIR.Native.FFI.html#RegionPtr"><span class="hs-identifier hs-var">RegionPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirRegionObject"><span class="hs-identifier hs-type">MlirRegionObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-102"></span><span>                 </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292081"><span id="local-6989586621679292083"><span id="local-6989586621679292085"><span id="local-6989586621679292087"><span id="local-6989586621679292089"><span id="local-6989586621679292091"><span id="local-6989586621679292093"><span id="local-6989586621679292095"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Region
+Ptr b -&gt; Int -&gt; Region -&gt; IO ()
+Ptr Region -&gt; IO Region
+Ptr Region -&gt; Int -&gt; IO Region
+Ptr Region -&gt; Int -&gt; Region -&gt; IO ()
+Ptr Region -&gt; Region -&gt; IO ()
+Region -&gt; Int
+(Region -&gt; Int)
+-&gt; (Region -&gt; Int)
+-&gt; (Ptr Region -&gt; Int -&gt; IO Region)
+-&gt; (Ptr Region -&gt; Int -&gt; Region -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Region)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Region -&gt; IO ())
+-&gt; (Ptr Region -&gt; IO Region)
+-&gt; (Ptr Region -&gt; Region -&gt; IO ())
+-&gt; Storable Region
+forall b. Ptr b -&gt; Int -&gt; IO Region
+forall b. Ptr b -&gt; Int -&gt; Region -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Region -&gt; Region -&gt; IO ()
+$cpoke :: Ptr Region -&gt; Region -&gt; IO ()
+peek :: Ptr Region -&gt; IO Region
+$cpeek :: Ptr Region -&gt; IO Region
+pokeByteOff :: Ptr b -&gt; Int -&gt; Region -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Region -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Region
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Region
+pokeElemOff :: Ptr Region -&gt; Int -&gt; Region -&gt; IO ()
+$cpokeElemOff :: Ptr Region -&gt; Int -&gt; Region -&gt; IO ()
+peekElemOff :: Ptr Region -&gt; Int -&gt; IO Region
+$cpeekElemOff :: Ptr Region -&gt; Int -&gt; IO Region
+alignment :: Region -&gt; Int
+$calignment :: Region -&gt; Int
+sizeOf :: Region -&gt; Int
+$csizeOf :: Region -&gt; Int
+</span><a href="#local-6989586621679292081"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- | A native MLIR attribute.</span><span>
+</span><span id="line-104"></span><span class="hs-keyword">newtype</span><span> </span><span id="Attribute"><span class="annot"><a href="MLIR.Native.FFI.html#Attribute"><span class="hs-identifier hs-var">Attribute</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="AttributePtr"><span class="annot"><a href="MLIR.Native.FFI.html#AttributePtr"><span class="hs-identifier hs-var">AttributePtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirAttributeObject"><span class="hs-identifier hs-type">MlirAttributeObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-105"></span><span>                    </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292064"><span id="local-6989586621679292066"><span id="local-6989586621679292068"><span id="local-6989586621679292070"><span id="local-6989586621679292072"><span id="local-6989586621679292074"><span id="local-6989586621679292076"><span id="local-6989586621679292078"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Attribute
+Ptr b -&gt; Int -&gt; Attribute -&gt; IO ()
+Ptr Attribute -&gt; IO Attribute
+Ptr Attribute -&gt; Int -&gt; IO Attribute
+Ptr Attribute -&gt; Int -&gt; Attribute -&gt; IO ()
+Ptr Attribute -&gt; Attribute -&gt; IO ()
+Attribute -&gt; Int
+(Attribute -&gt; Int)
+-&gt; (Attribute -&gt; Int)
+-&gt; (Ptr Attribute -&gt; Int -&gt; IO Attribute)
+-&gt; (Ptr Attribute -&gt; Int -&gt; Attribute -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Attribute)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Attribute -&gt; IO ())
+-&gt; (Ptr Attribute -&gt; IO Attribute)
+-&gt; (Ptr Attribute -&gt; Attribute -&gt; IO ())
+-&gt; Storable Attribute
+forall b. Ptr b -&gt; Int -&gt; IO Attribute
+forall b. Ptr b -&gt; Int -&gt; Attribute -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Attribute -&gt; Attribute -&gt; IO ()
+$cpoke :: Ptr Attribute -&gt; Attribute -&gt; IO ()
+peek :: Ptr Attribute -&gt; IO Attribute
+$cpeek :: Ptr Attribute -&gt; IO Attribute
+pokeByteOff :: Ptr b -&gt; Int -&gt; Attribute -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Attribute -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Attribute
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Attribute
+pokeElemOff :: Ptr Attribute -&gt; Int -&gt; Attribute -&gt; IO ()
+$cpokeElemOff :: Ptr Attribute -&gt; Int -&gt; Attribute -&gt; IO ()
+peekElemOff :: Ptr Attribute -&gt; Int -&gt; IO Attribute
+$cpeekElemOff :: Ptr Attribute -&gt; Int -&gt; IO Attribute
+alignment :: Attribute -&gt; Int
+$calignment :: Attribute -&gt; Int
+sizeOf :: Attribute -&gt; Int
+$csizeOf :: Attribute -&gt; Int
+</span><a href="#local-6989586621679292064"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-106"></span><span class="hs-comment">-- | A native MLIR value object.</span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- Every 'Value' is either a 'Block' argument or an output from an 'Operation'.</span><span>
+</span><span id="line-108"></span><span class="hs-keyword">newtype</span><span> </span><span id="Value"><span class="annot"><a href="MLIR.Native.FFI.html#Value"><span class="hs-identifier hs-var">Value</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ValuePtr"><span class="annot"><a href="MLIR.Native.FFI.html#ValuePtr"><span class="hs-identifier hs-var">ValuePtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirValueObject"><span class="hs-identifier hs-type">MlirValueObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-109"></span><span>                </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292047"><span id="local-6989586621679292049"><span id="local-6989586621679292051"><span id="local-6989586621679292053"><span id="local-6989586621679292055"><span id="local-6989586621679292057"><span id="local-6989586621679292059"><span id="local-6989586621679292061"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Value
+Ptr b -&gt; Int -&gt; Value -&gt; IO ()
+Ptr Value -&gt; IO Value
+Ptr Value -&gt; Int -&gt; IO Value
+Ptr Value -&gt; Int -&gt; Value -&gt; IO ()
+Ptr Value -&gt; Value -&gt; IO ()
+Value -&gt; Int
+(Value -&gt; Int)
+-&gt; (Value -&gt; Int)
+-&gt; (Ptr Value -&gt; Int -&gt; IO Value)
+-&gt; (Ptr Value -&gt; Int -&gt; Value -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Value)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Value -&gt; IO ())
+-&gt; (Ptr Value -&gt; IO Value)
+-&gt; (Ptr Value -&gt; Value -&gt; IO ())
+-&gt; Storable Value
+forall b. Ptr b -&gt; Int -&gt; IO Value
+forall b. Ptr b -&gt; Int -&gt; Value -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Value -&gt; Value -&gt; IO ()
+$cpoke :: Ptr Value -&gt; Value -&gt; IO ()
+peek :: Ptr Value -&gt; IO Value
+$cpeek :: Ptr Value -&gt; IO Value
+pokeByteOff :: Ptr b -&gt; Int -&gt; Value -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Value -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Value
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Value
+pokeElemOff :: Ptr Value -&gt; Int -&gt; Value -&gt; IO ()
+$cpokeElemOff :: Ptr Value -&gt; Int -&gt; Value -&gt; IO ()
+peekElemOff :: Ptr Value -&gt; Int -&gt; IO Value
+$cpeekElemOff :: Ptr Value -&gt; Int -&gt; IO Value
+alignment :: Value -&gt; Int
+$calignment :: Value -&gt; Int
+sizeOf :: Value -&gt; Int
+$csizeOf :: Value -&gt; Int
+</span><a href="#local-6989586621679292047"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-110"></span><span class="hs-comment">-- | A native MLIR identifier.</span><span>
+</span><span id="line-111"></span><span class="hs-comment">-- Identifiers are strings interned in the MLIR context.</span><span>
+</span><span id="line-112"></span><span class="hs-keyword">newtype</span><span> </span><span id="Identifier"><span class="annot"><a href="MLIR.Native.FFI.html#Identifier"><span class="hs-identifier hs-var">Identifier</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="IdentifierPtr"><span class="annot"><a href="MLIR.Native.FFI.html#IdentifierPtr"><span class="hs-identifier hs-var">IdentifierPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirIdentifierObject"><span class="hs-identifier hs-type">MlirIdentifierObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-113"></span><span>                     </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292030"><span id="local-6989586621679292032"><span id="local-6989586621679292034"><span id="local-6989586621679292036"><span id="local-6989586621679292038"><span id="local-6989586621679292040"><span id="local-6989586621679292042"><span id="local-6989586621679292044"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO Identifier
+Ptr b -&gt; Int -&gt; Identifier -&gt; IO ()
+Ptr Identifier -&gt; IO Identifier
+Ptr Identifier -&gt; Int -&gt; IO Identifier
+Ptr Identifier -&gt; Int -&gt; Identifier -&gt; IO ()
+Ptr Identifier -&gt; Identifier -&gt; IO ()
+Identifier -&gt; Int
+(Identifier -&gt; Int)
+-&gt; (Identifier -&gt; Int)
+-&gt; (Ptr Identifier -&gt; Int -&gt; IO Identifier)
+-&gt; (Ptr Identifier -&gt; Int -&gt; Identifier -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO Identifier)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; Identifier -&gt; IO ())
+-&gt; (Ptr Identifier -&gt; IO Identifier)
+-&gt; (Ptr Identifier -&gt; Identifier -&gt; IO ())
+-&gt; Storable Identifier
+forall b. Ptr b -&gt; Int -&gt; IO Identifier
+forall b. Ptr b -&gt; Int -&gt; Identifier -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr Identifier -&gt; Identifier -&gt; IO ()
+$cpoke :: Ptr Identifier -&gt; Identifier -&gt; IO ()
+peek :: Ptr Identifier -&gt; IO Identifier
+$cpeek :: Ptr Identifier -&gt; IO Identifier
+pokeByteOff :: Ptr b -&gt; Int -&gt; Identifier -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; Identifier -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO Identifier
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO Identifier
+pokeElemOff :: Ptr Identifier -&gt; Int -&gt; Identifier -&gt; IO ()
+$cpokeElemOff :: Ptr Identifier -&gt; Int -&gt; Identifier -&gt; IO ()
+peekElemOff :: Ptr Identifier -&gt; Int -&gt; IO Identifier
+$cpeekElemOff :: Ptr Identifier -&gt; Int -&gt; IO Identifier
+alignment :: Identifier -&gt; Int
+$calignment :: Identifier -&gt; Int
+sizeOf :: Identifier -&gt; Int
+$csizeOf :: Identifier -&gt; Int
+</span><a href="#local-6989586621679292030"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- | A native MLIR affine expression object.</span><span>
+</span><span id="line-115"></span><span class="hs-keyword">newtype</span><span> </span><span id="AffineExpr"><span class="annot"><a href="MLIR.Native.FFI.html#AffineExpr"><span class="hs-identifier hs-var">AffineExpr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="AffineExprPtr"><span class="annot"><a href="MLIR.Native.FFI.html#AffineExprPtr"><span class="hs-identifier hs-var">AffineExprPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirAffineExprObject"><span class="hs-identifier hs-type">MlirAffineExprObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-116"></span><span>                     </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679292013"><span id="local-6989586621679292015"><span id="local-6989586621679292017"><span id="local-6989586621679292019"><span id="local-6989586621679292021"><span id="local-6989586621679292023"><span id="local-6989586621679292025"><span id="local-6989586621679292027"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO AffineExpr
+Ptr b -&gt; Int -&gt; AffineExpr -&gt; IO ()
+Ptr AffineExpr -&gt; IO AffineExpr
+Ptr AffineExpr -&gt; Int -&gt; IO AffineExpr
+Ptr AffineExpr -&gt; Int -&gt; AffineExpr -&gt; IO ()
+Ptr AffineExpr -&gt; AffineExpr -&gt; IO ()
+AffineExpr -&gt; Int
+(AffineExpr -&gt; Int)
+-&gt; (AffineExpr -&gt; Int)
+-&gt; (Ptr AffineExpr -&gt; Int -&gt; IO AffineExpr)
+-&gt; (Ptr AffineExpr -&gt; Int -&gt; AffineExpr -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO AffineExpr)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; AffineExpr -&gt; IO ())
+-&gt; (Ptr AffineExpr -&gt; IO AffineExpr)
+-&gt; (Ptr AffineExpr -&gt; AffineExpr -&gt; IO ())
+-&gt; Storable AffineExpr
+forall b. Ptr b -&gt; Int -&gt; IO AffineExpr
+forall b. Ptr b -&gt; Int -&gt; AffineExpr -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr AffineExpr -&gt; AffineExpr -&gt; IO ()
+$cpoke :: Ptr AffineExpr -&gt; AffineExpr -&gt; IO ()
+peek :: Ptr AffineExpr -&gt; IO AffineExpr
+$cpeek :: Ptr AffineExpr -&gt; IO AffineExpr
+pokeByteOff :: Ptr b -&gt; Int -&gt; AffineExpr -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; AffineExpr -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO AffineExpr
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO AffineExpr
+pokeElemOff :: Ptr AffineExpr -&gt; Int -&gt; AffineExpr -&gt; IO ()
+$cpokeElemOff :: Ptr AffineExpr -&gt; Int -&gt; AffineExpr -&gt; IO ()
+peekElemOff :: Ptr AffineExpr -&gt; Int -&gt; IO AffineExpr
+$cpeekElemOff :: Ptr AffineExpr -&gt; Int -&gt; IO AffineExpr
+alignment :: AffineExpr -&gt; Int
+$calignment :: AffineExpr -&gt; Int
+sizeOf :: AffineExpr -&gt; Int
+$csizeOf :: AffineExpr -&gt; Int
+</span><a href="#local-6989586621679292013"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-117"></span><span class="hs-comment">-- | A native MLIR affine map object.</span><span>
+</span><span id="line-118"></span><span class="hs-keyword">newtype</span><span> </span><span id="AffineMap"><span class="annot"><a href="MLIR.Native.FFI.html#AffineMap"><span class="hs-identifier hs-var">AffineMap</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="AffineMapPtr"><span class="annot"><a href="MLIR.Native.FFI.html#AffineMapPtr"><span class="hs-identifier hs-var">AffineMapPtr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#MlirAffineMapObject"><span class="hs-identifier hs-type">MlirAffineMapObject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-119"></span><span>                    </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679291996"><span id="local-6989586621679291998"><span id="local-6989586621679292000"><span id="local-6989586621679292002"><span id="local-6989586621679292004"><span id="local-6989586621679292006"><span id="local-6989586621679292008"><span id="local-6989586621679292010"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO AffineMap
+Ptr b -&gt; Int -&gt; AffineMap -&gt; IO ()
+Ptr AffineMap -&gt; IO AffineMap
+Ptr AffineMap -&gt; Int -&gt; IO AffineMap
+Ptr AffineMap -&gt; Int -&gt; AffineMap -&gt; IO ()
+Ptr AffineMap -&gt; AffineMap -&gt; IO ()
+AffineMap -&gt; Int
+(AffineMap -&gt; Int)
+-&gt; (AffineMap -&gt; Int)
+-&gt; (Ptr AffineMap -&gt; Int -&gt; IO AffineMap)
+-&gt; (Ptr AffineMap -&gt; Int -&gt; AffineMap -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO AffineMap)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; AffineMap -&gt; IO ())
+-&gt; (Ptr AffineMap -&gt; IO AffineMap)
+-&gt; (Ptr AffineMap -&gt; AffineMap -&gt; IO ())
+-&gt; Storable AffineMap
+forall b. Ptr b -&gt; Int -&gt; IO AffineMap
+forall b. Ptr b -&gt; Int -&gt; AffineMap -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr AffineMap -&gt; AffineMap -&gt; IO ()
+$cpoke :: Ptr AffineMap -&gt; AffineMap -&gt; IO ()
+peek :: Ptr AffineMap -&gt; IO AffineMap
+$cpeek :: Ptr AffineMap -&gt; IO AffineMap
+pokeByteOff :: Ptr b -&gt; Int -&gt; AffineMap -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; AffineMap -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO AffineMap
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO AffineMap
+pokeElemOff :: Ptr AffineMap -&gt; Int -&gt; AffineMap -&gt; IO ()
+$cpokeElemOff :: Ptr AffineMap -&gt; Int -&gt; AffineMap -&gt; IO ()
+peekElemOff :: Ptr AffineMap -&gt; Int -&gt; IO AffineMap
+$cpeekElemOff :: Ptr AffineMap -&gt; Int -&gt; IO AffineMap
+alignment :: AffineMap -&gt; Int
+$calignment :: AffineMap -&gt; Int
+sizeOf :: AffineMap -&gt; Int
+$csizeOf :: AffineMap -&gt; Int
+</span><a href="#local-6989586621679291996"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span class="hs-keyword">data</span><span> </span><span id="NamedAttribute"><span class="annot"><a href="MLIR.Native.FFI.html#NamedAttribute"><span class="hs-identifier hs-var">NamedAttribute</span></a></span></span><span>  </span><span class="hs-comment">-- C structs cannot be represented in Haskell</span><span>
+</span><span id="line-121"></span><span>
+</span><span id="line-122"></span><span class="hs-comment">-- | A result code for many failable MLIR operations.</span><span>
+</span><span id="line-123"></span><span class="hs-comment">-- The only valid cases are 'Success' and 'Failure'.</span><span>
+</span><span id="line-124"></span><span class="hs-keyword">newtype</span><span> </span><span id="LogicalResult"><span class="annot"><a href="MLIR.Native.FFI.html#LogicalResult"><span class="hs-identifier hs-var">LogicalResult</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="UnsafeMkLogicalResult"><span class="annot"><a href="MLIR.Native.FFI.html#UnsafeMkLogicalResult"><span class="hs-identifier hs-var">UnsafeMkLogicalResult</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int8</span></span><span>
+</span><span id="line-125"></span><span>                        </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679291978"><span id="local-6989586621679291980"><span id="local-6989586621679291982"><span id="local-6989586621679291984"><span id="local-6989586621679291986"><span id="local-6989586621679291988"><span id="local-6989586621679291990"><span id="local-6989586621679291992"><span class="annot"><span class="annottext">Ptr b -&gt; Int -&gt; IO LogicalResult
+Ptr b -&gt; Int -&gt; LogicalResult -&gt; IO ()
+Ptr LogicalResult -&gt; IO LogicalResult
+Ptr LogicalResult -&gt; Int -&gt; IO LogicalResult
+Ptr LogicalResult -&gt; Int -&gt; LogicalResult -&gt; IO ()
+Ptr LogicalResult -&gt; LogicalResult -&gt; IO ()
+LogicalResult -&gt; Int
+(LogicalResult -&gt; Int)
+-&gt; (LogicalResult -&gt; Int)
+-&gt; (Ptr LogicalResult -&gt; Int -&gt; IO LogicalResult)
+-&gt; (Ptr LogicalResult -&gt; Int -&gt; LogicalResult -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO LogicalResult)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; LogicalResult -&gt; IO ())
+-&gt; (Ptr LogicalResult -&gt; IO LogicalResult)
+-&gt; (Ptr LogicalResult -&gt; LogicalResult -&gt; IO ())
+-&gt; Storable LogicalResult
+forall b. Ptr b -&gt; Int -&gt; IO LogicalResult
+forall b. Ptr b -&gt; Int -&gt; LogicalResult -&gt; IO ()
+forall a.
+(a -&gt; Int)
+-&gt; (a -&gt; Int)
+-&gt; (Ptr a -&gt; Int -&gt; IO a)
+-&gt; (Ptr a -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (forall b. Ptr b -&gt; Int -&gt; IO a)
+-&gt; (forall b. Ptr b -&gt; Int -&gt; a -&gt; IO ())
+-&gt; (Ptr a -&gt; IO a)
+-&gt; (Ptr a -&gt; a -&gt; IO ())
+-&gt; Storable a
+poke :: Ptr LogicalResult -&gt; LogicalResult -&gt; IO ()
+$cpoke :: Ptr LogicalResult -&gt; LogicalResult -&gt; IO ()
+peek :: Ptr LogicalResult -&gt; IO LogicalResult
+$cpeek :: Ptr LogicalResult -&gt; IO LogicalResult
+pokeByteOff :: Ptr b -&gt; Int -&gt; LogicalResult -&gt; IO ()
+$cpokeByteOff :: forall b. Ptr b -&gt; Int -&gt; LogicalResult -&gt; IO ()
+peekByteOff :: Ptr b -&gt; Int -&gt; IO LogicalResult
+$cpeekByteOff :: forall b. Ptr b -&gt; Int -&gt; IO LogicalResult
+pokeElemOff :: Ptr LogicalResult -&gt; Int -&gt; LogicalResult -&gt; IO ()
+$cpokeElemOff :: Ptr LogicalResult -&gt; Int -&gt; LogicalResult -&gt; IO ()
+peekElemOff :: Ptr LogicalResult -&gt; Int -&gt; IO LogicalResult
+$cpeekElemOff :: Ptr LogicalResult -&gt; Int -&gt; IO LogicalResult
+alignment :: LogicalResult -&gt; Int
+$calignment :: LogicalResult -&gt; Int
+sizeOf :: LogicalResult -&gt; Int
+$csizeOf :: LogicalResult -&gt; Int
+</span><a href="#local-6989586621679291978"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Storable</span></a></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int8</span></span><span>
+</span><span id="line-126"></span><span>                        </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679291974"><span id="local-6989586621679291976"><span class="annot"><span class="annottext">LogicalResult -&gt; LogicalResult -&gt; Bool
+(LogicalResult -&gt; LogicalResult -&gt; Bool)
+-&gt; (LogicalResult -&gt; LogicalResult -&gt; Bool) -&gt; Eq LogicalResult
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: LogicalResult -&gt; LogicalResult -&gt; Bool
+$c/= :: LogicalResult -&gt; LogicalResult -&gt; Bool
+== :: LogicalResult -&gt; LogicalResult -&gt; Bool
+$c== :: LogicalResult -&gt; LogicalResult -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span>
+</span><span id="line-127"></span><span>
+</span><span id="line-128"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679291968"><span id="local-6989586621679291971"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#LogicalResult"><span class="hs-identifier hs-type">LogicalResult</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-129"></span><span>  </span><span id="local-6989586621679291966"><span class="annot"><span class="annottext">show :: LogicalResult -&gt; String
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></span></span><span> </span><span class="annot"><span class="annottext">LogicalResult
+</span><a href="MLIR.Native.FFI.html#Success"><span class="hs-identifier hs-var">Success</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Success&quot;</span></span><span>
+</span><span id="line-130"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">LogicalResult
+</span><a href="MLIR.Native.FFI.html#Failure"><span class="hs-identifier hs-var">Failure</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Failure&quot;</span></span><span>
+</span><span id="line-131"></span><span>
+</span><span id="line-132"></span><span class="hs-comment">-- | Indicates a successful completion of an MLIR operation.</span><span>
+</span><span id="line-133"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#Success"><span class="hs-identifier hs-type">Success</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#LogicalResult"><span class="hs-identifier hs-type">LogicalResult</span></a></span><span>
+</span><span id="line-134"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bSuccess"><span id="%24mSuccess"><span id="Success"><span class="annot"><span class="annottext">$bSuccess :: LogicalResult
+$mSuccess :: forall r. LogicalResult -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="MLIR.Native.FFI.html#%24bSuccess"><span class="hs-identifier hs-var hs-var hs-var">Success</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#UnsafeMkLogicalResult"><span class="hs-identifier hs-type">UnsafeMkLogicalResult</span></a></span><span> </span><span class="annot"><span class="hs-number">1</span></span><span>
+</span><span id="line-135"></span><span class="hs-comment">-- | Indicates a filure of an MLIR operation. Inspect the diagnostics output</span><span>
+</span><span id="line-136"></span><span class="hs-comment">-- to find the cause of the issue.</span><span>
+</span><span id="line-137"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#Failure"><span class="hs-identifier hs-type">Failure</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#LogicalResult"><span class="hs-identifier hs-type">LogicalResult</span></a></span><span>
+</span><span id="line-138"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bFailure"><span id="%24mFailure"><span id="Failure"><span class="annot"><span class="annottext">$bFailure :: LogicalResult
+$mFailure :: forall r. LogicalResult -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="MLIR.Native.FFI.html#%24bFailure"><span class="hs-identifier hs-var hs-var hs-var">Failure</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#UnsafeMkLogicalResult"><span class="hs-identifier hs-type">UnsafeMkLogicalResult</span></a></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span class="hs-pragma">{-# COMPLETE</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#Success"><span class="hs-pragma hs-type">Success</span></a></span><span class="hs-pragma">,</span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#Failure"><span class="hs-pragma hs-type">Failure</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-141"></span><span>
+</span><span id="line-142"></span><span id="mlirCtx"><span class="annot"><span class="annottext">mlirCtx :: Context
+</span><a href="MLIR.Native.FFI.html#mlirCtx"><span class="hs-identifier hs-var hs-var">mlirCtx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Context
+forall a. Monoid a =&gt; a
+</span><span class="hs-identifier hs-var">mempty</span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-143"></span><span>  </span><span class="hs-comment">-- This is a lie...</span><span>
+</span><span id="line-144"></span><span>  </span><span class="hs-comment">-- All of those types are really C structs that hold a single pointer, but</span><span>
+</span><span id="line-145"></span><span>  </span><span class="hs-comment">-- dealing with structs is just way too complicated. For simplicity, we</span><span>
+</span><span id="line-146"></span><span>  </span><span class="hs-comment">-- assume that the layout of the struct is equal to the layout of a single</span><span>
+</span><span id="line-147"></span><span>  </span><span class="hs-comment">-- pointer here, but I'm not 100% sure if that's a good assumption.</span><span>
+</span><span id="line-148"></span><span>  </span><span class="annot"><span class="annottext">ctxTypesTable :: TypesTable
+</span><span class="hs-identifier hs-var">C.Context.ctxTypesTable</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(TypeSpecifier, TypeQ)] -&gt; TypesTable
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-149"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirContext&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Context</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-150"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirLocation&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Location</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-151"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirModule&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Module</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-152"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirOperation&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Operation</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-153"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirPassManager&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">PassManager</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-154"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirPass&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Pass</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-155"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirExecutionEngine&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">ExecutionEngine</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-156"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirLogicalResult&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">LogicalResult</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-157"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirType&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Type</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-158"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirBlock&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Block</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-159"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirRegion&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Region</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-160"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirAttribute&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Attribute</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-161"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirNamedAttribute&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">NamedAttribute</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-162"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirValue&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Value</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-163"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirIdentifier&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">Identifier</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-164"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirAffineExpr&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">AffineExpr</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-165"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CIdentifier -&gt; TypeSpecifier
+</span><span class="hs-identifier hs-var">C.TypeName</span></span><span> </span><span class="annot"><span class="annottext">CIdentifier
+</span><span class="hs-string">&quot;MlirAffineMap&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">[t|</span><span class="hs-identifier">AffineMap</span><span class="hs-special">|]</span><span class="hs-special">)</span><span>
+</span><span id="line-166"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-167"></span><span class="hs-special">}</span><span>
+</span><span id="line-168"></span><span>
+</span><span id="line-169"></span><span id="local-6989586621679291954"><span class="annot"><a href="MLIR.Native.FFI.html#nullable"><span class="hs-identifier hs-type">nullable</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Coercible</span></span><span> </span><span class="annot"><a href="#local-6989586621679291954"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679291954"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679291954"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-170"></span><span id="nullable"><span class="annot"><span class="annottext">nullable :: a -&gt; Maybe a
+</span><a href="MLIR.Native.FFI.html#nullable"><span class="hs-identifier hs-var hs-var">nullable</span></a></span></span><span> </span><span id="local-6989586621679291952"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679291952"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">a -&gt; Ptr Any
+</span><span class="hs-identifier hs-var">coerce</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679291952"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Ptr Any -&gt; Ptr Any -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Ptr Any
+forall a. Ptr a
+</span><span class="hs-identifier hs-var">nullPtr</span></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Maybe a
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679291952"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-171"></span></pre></body></html>

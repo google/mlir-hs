@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>MLIR.AST.Dialect.Linalg</title><link href="linuwial.css" rel="stylesheet" type="text/css" title="Linuwial" /><link rel="stylesheet" type="text/css" href="quick-jump.css" /><link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700" /><script src="haddock-bundle.min.js" async="async" type="text/javascript"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({ tex2jax: { processClass: "mathjax", ignoreClass: ".*" } });</script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script></head><body><div id="package-header"><span class="caption">mlir-hs-0.1.0.0</span><ul class="links" id="page-menu"><li><a href="src/MLIR.AST.Dialect.Linalg.html">Source</a></li><li><a href="index.html">Contents</a></li><li><a href="doc-index.html">Index</a></li></ul></div><div id="content"><div id="module-header"><table class="info"><tr><th>Safe Haskell</th><td>None</td></tr><tr><th>Language</th><td>Haskell2010</td></tr></table><p class="caption">MLIR.AST.Dialect.Linalg</p></div><div id="table-of-contents"><div id="contents-list"><p class="caption" onclick="window.scrollTo(0,0)">Contents</p><ul><li><a href="#g:1">collapse_shape</a></li><li><a href="#g:2">expand_shape</a></li><li><a href="#g:3">index</a></li><li><a href="#g:4">init_tensor</a></li><li><a href="#g:5">pad_tensor</a></li><li><a href="#g:6">range</a></li><li><a href="#g:7">tensor_collapse_shape</a></li><li><a href="#g:8">tensor_expand_shape</a></li><li><a href="#g:9">tiled_loop</a></li><li><a href="#g:10">yield</a></li><li><a href="#g:11">batch_matmul_i16_i16_i32</a></li><li><a href="#g:12">batch_matmul_i32_i32_i32</a></li><li><a href="#g:13">batch_matmul_i8_i8_i32</a></li><li><a href="#g:14">batch_matmul</a></li><li><a href="#g:15">conv_3d</a></li><li><a href="#g:16">conv_2d</a></li><li><a href="#g:17">conv_3d_input_ncdhw_filter_dhwcf</a></li><li><a href="#g:18">conv_2d_input_nchw_filter_hwcf</a></li><li><a href="#g:19">conv_1d_input_ncw_filter_wcf</a></li><li><a href="#g:20">conv_3d_input_ndhwc_filter_dhwcf</a></li><li><a href="#g:21">conv_2d_input_nhwc_filter_hwcf</a></li><li><a href="#g:22">conv_1d_input_nwc_filter_wcf</a></li><li><a href="#g:23">conv_3d_ncdhw</a></li><li><a href="#g:24">conv_2d_nchw</a></li><li><a href="#g:25">conv_1d_ncw</a></li><li><a href="#g:26">conv_3d_ndhwc</a></li><li><a href="#g:27">conv_2d_nhwc</a></li><li><a href="#g:28">conv_1d_nwc</a></li><li><a href="#g:29">conv</a></li><li><a href="#g:30">conv_1d</a></li><li><a href="#g:31">copy</a></li><li><a href="#g:32">depthwise_conv_2d_input_nhwc_filter_hwcf</a></li><li><a href="#g:33">depthwise_conv_2d_input_nhwc_filter_hwc</a></li><li><a href="#g:34">dot_i16_i16_i32</a></li><li><a href="#g:35">dot_i32_i32_i32</a></li><li><a href="#g:36">dot_i8_i8_i32</a></li><li><a href="#g:37">dot</a></li><li><a href="#g:38">fill</a></li><li><a href="#g:39">fill_rng_2d</a></li><li><a href="#g:40">generic</a></li><li><a href="#g:41">matmul_column_major</a></li><li><a href="#g:42">matmul_i16_i16_i32</a></li><li><a href="#g:43">matmul_i32_i32_i32</a></li><li><a href="#g:44">matmul_i8_i8_i32</a></li><li><a href="#g:45">matmul</a></li><li><a href="#g:46">matvec_i16_i16_i32</a></li><li><a href="#g:47">matvec_i32_i32_i32</a></li><li><a href="#g:48">matvec_i8_i8_i32</a></li><li><a href="#g:49">matvec</a></li><li><a href="#g:50">pooling_max</a></li><li><a href="#g:51">pooling_min</a></li><li><a href="#g:52">pooling_nhwc_max</a></li><li><a href="#g:53">pooling_nhwc_i16_max</a></li><li><a href="#g:54">pooling_nhwc_i32_max</a></li><li><a href="#g:55">pooling_nhwc_i8_max</a></li><li><a href="#g:56">pooling_nhwc_min</a></li><li><a href="#g:57">pooling_nhwc_sum</a></li><li><a href="#g:58">pooling_sum</a></li><li><a href="#g:59">vecmat_i16_i16_i32</a></li><li><a href="#g:60">vecmat_i32_i32_i32</a></li><li><a href="#g:61">vecmat_i8_i8_i32</a></li><li><a href="#g:62">vecmat</a></li></ul></div></div><div id="synopsis"><details id="syn"><summary>Synopsis</summary><ul class="details-toggle" data-details-id="syn"><li class="src short"><span class="keyword">pattern</span> <a href="#v:Linalg_InitTensor">Linalg_InitTensor</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [operand] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:init_tensor">init_tensor</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Linalg_Range">Linalg_Range</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:range">range</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a></li><li class="src short"><span class="keyword">pattern</span> <a href="#v:Linalg_Yield">Linalg_Yield</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; [operand] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand</li><li class="src short"><a href="#v:yield">yield</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:EndOfBlock" title="MLIR.AST.Builder">EndOfBlock</a></li></ul></details></div><div id="interface"><a href="#g:1" id="g:1"><h1>collapse_shape</h1></a><div class="doc"><p>The <code>linalg.collapse_shape</code> op produces a new view with a smaller rank
+ whose sizes are a reassociation of the original <code>view</code>. Depending on
+ whether or not the reassociated MemRefType is contiguous, the resulting
+ memref may require explicit alloc and copies.</p><p>A reassociation is defined as a continuous grouping of dimensions and is
+ represented with an array of I64ArrayAttr attribute.</p><p>For now, it is assumed that either:
+   1. a reassociation produces and consumes contiguous MemRefType or,
+   2. the reshape op will be folded into its consumers (by changing the shape
+      of the computations).
+ All other cases are undefined behavior and a reshape op may not lower to
+ LLVM if it cannot be proven statically that it does not require alloc+copy.</p><p>The result memref type of a reshape can be zero-ranked if the operand
+ memref type is statically shaped with all dimensions being unit extent. In
+ such case the reassociation map is empty.</p><p>The verification rule is that the reassociation maps are applied to the
+ operand memref with the larger rank to obtain the result memref with the
+ smaller rank.</p><p>Examples:</p><pre>// Dimension collapse (i, j) -&gt; i' and k -&gt; k'
+%1 = linalg.collapse_shape %0 [[0, 1], [2]] :
+  memref&lt;?x?x?xf32, stride_spec&gt; into memref&lt;?x?xf32, stride_spec_2&gt;
+</pre></div><a href="#g:2" id="g:2"><h1>expand_shape</h1></a><div class="doc"><p>The <code>linalg.expand_shape</code> op produces a new view with a higher rank whose
+ sizes are a reassociation of the original <code>view</code>. Depending on whether or
+ not the reassociated MemRefType is contiguous, the resulting memref may
+ require explicit alloc and copies.</p><p>A reassociation is defined as a continuous grouping of dimensions and is
+ represented with an array of I64ArrayAttr attribute.</p><p>For now, it is assumed that either:
+   1. a reassociation produces and consumes contiguous MemRefType or,
+   2. the reshape op will be folded into its consumers (by changing the shape
+      of the computations).
+ All other cases are undefined behavior and a reshape op may not lower to
+ LLVM if it cannot be proven statically that it does not require alloc+copy.</p><p>The operand memref type when dimensions can be zero-ranked if the result
+ memref type is statically shaped with all dimensions being unit extent. In
+ such case the reassociation map is empty.</p><p>The verification rule is that the reassociation maps are applied to the
+ result memref with the larger rank to obtain the operand memref with the
+ smaller rank.</p><p>Example:</p><pre>// Dimension expansion i -&gt; (i', j') and (k) -&gt; (k')
+%1 = linalg.expand_shape %0 [[0, 1], [2]] :
+  memref&lt;?x?xf32, stride_spec&gt; into memref&lt;?x?x?xf32, stride_spec_2&gt;
+</pre></div><a href="#g:3" id="g:3"><h1>index</h1></a><div class="doc"><p>The <code>linalg.index</code> operation returns the iteration index of the immediately
+ enclosing linalg structured operation for the iteration dimension <code>dim</code>. The
+ <code>dim</code> attribute specifies the position of the accessed dimension in the
+ indexing map domain.</p><p>Example:</p><pre>#map = affine_map&lt;(i, j) -&gt; (i, j)&gt;
+linalg.generic {indexing_maps = [#map, #map],
+                iterator_types = [&quot;parallel&quot;, &quot;parallel&quot;]}
+  outs(%I, %J : memref&lt;?x?xindex&gt;, memref&lt;?x?xindex&gt;) {
+  ^bb0(%arg0 : index, %arg1 : index):
+  // Access the outer iteration dimension i
+  %i = linalg.index 0 : index
+  // Access the inner iteration dimension j
+  %j = linalg.index 1 : index
+  linalg.yield %i, %j : index, index
+}
+</pre><p>This may lower to IR resembling:</p><pre>%0 = dim %I, %c0 : memref&lt;?x?xindex&gt;
+%1 = dim %I, %c1 : memref&lt;?x?xindex&gt;
+scf.for %i = %c0 to %0 step %c1 {
+  scf.for %j = %c0 to %1 step %c1 {
+    store %i, %I[%i, %j] : memref&lt;?x?xindex&gt;
+    store %j, %J[%i, %j] : memref&lt;?x?xindex&gt;
+  }
+}
+</pre></div><a href="#g:4" id="g:4"><h1>init_tensor</h1></a><div class="doc"><p><code>linalg.init_tensor</code> is an operation that materializes a tensor of
+ a given shape. The shape could be dynamic or static.</p></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Linalg_InitTensor" class="def">Linalg_InitTensor</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [operand] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Linalg.html#Linalg_InitTensor" class="link">Source</a> <a href="#v:Linalg_InitTensor" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>linalg.init_tensor</code>.</p></div></div><div class="top"><p class="src"><a id="v:init_tensor" class="def">init_tensor</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Linalg.html#init_tensor" class="link">Source</a> <a href="#v:init_tensor" class="selflink">#</a></p><div class="doc"><p>A builder for <code>linalg.init_tensor</code>.</p></div></div><a href="#g:5" id="g:5"><h1>pad_tensor</h1></a><div class="doc"><p><code>linalg.pad_tensor</code> is an operation that pads the <code>source</code> tensor
+ with given <code>low</code> and <code>high</code> padding config.</p><p>The PadTensor operation supports the following arguments:</p><ul><li>source: the &quot;base&quot; tensor on which to pad.</li><li>low: A list contains the padding along the start of each
+        dimension, i.e <code>low</code>.</li><li>high: A list contains the padding along the end of each
+        dimension, i.e. <code>high</code>.</li></ul><p>The result tensor dimensions are <code>low</code> + <code>dim</code> + <code>high</code> along that
+ dimension. The number of elements of <code>low</code> and <code>high</code> must match
+ the rank of the input tensor (which is also the rank of the output
+ tensor). They can be either a constant or a dynamic value.</p><p>The region of the <code>pad_tensor</code> operation returns the value to use
+ for the padding. The arguments of the region represent the index
+ of the source being accessed. There should be as many arguments as
+ the rank of the <code>source</code> tensor. The value <code>yield</code>-ed by the
+ region is used as the value of the view at the given position.</p><p>Example 1:</p><pre>  %pad_value = ... : f32
+  %0 = linalg.pad_tensor %0 low[1, 2] high[2, 3] {
+  ^bb0(%arg0 : index, %arg1 : index):
+    linalg.yield %pad_value : f32
+  } : tensor&lt;?x?xf32&gt; to tensor&lt;?x?xf32&gt;
+</pre><p>Example 2:</p><pre>  %pad_value = ... : f32
+  %0 = linalg.pad_tensor %arg0 low[2, %arg1, 3, 3] high[3, 3, %arg1, 2] {
+  ^bb0(%arg2: index, %arg3: index, %arg4: index, %arg5: index):
+      linalg.yield %pad_value : f32
+  } : tensor&lt;1x2x2x?xf32&gt; to tensor&lt;6x?x?x?xf32&gt;
+</pre><p>Example 3:</p><pre>  %pad_value = ... : f32
+  %0 = linalg.pad_tensor %arg0 low[0, 0] high[%ub0, %ub1] {
+  ^bb0(%arg1: index, %arg2: index):
+    linalg.yield %pad_value : f32
+  } : tensor&lt;2x3xf32&gt; to tensor&lt;?x?xf32&gt;
+</pre></div><a href="#g:6" id="g:6"><h1>range</h1></a><div class="doc"><p>The <code>linalg.range</code> op creates a <code>!linalg.range</code> from 3 values of type
+ <code>index</code> that represent the min, max and step values of the <code>range</code>. This
+ type does not pass function boundaries at the moment.</p><p>Example:</p><pre>%3 = linalg.range %0:%1:%2 : !linalg.range
+</pre><p>@</p></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Linalg_Range" class="def">Linalg_Range</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Linalg.html#Linalg_Range" class="link">Source</a> <a href="#v:Linalg_Range" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>linalg.range</code>.</p></div></div><div class="top"><p class="src"><a id="v:range" class="def">range</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Linalg.html#range" class="link">Source</a> <a href="#v:range" class="selflink">#</a></p><div class="doc"><p>A builder for <code>linalg.range</code>.</p></div></div><a href="#g:7" id="g:7"><h1>tensor_collapse_shape</h1></a><div class="doc"><p>The <code>linalg.tensor_collapse_shape</code> op produces a new tensor with a smaller
+ rank whose sizes are a reassociation of the original <code>src</code>.</p><p>A reassociation is defined as a continuous grouping of dimensions and is
+ represented with an array of I64ArrayAttr attribute.</p><p>The verification rule is that the reassociation maps are applied to the
+ operand tensor with the higher rank to obtain the result tensor with the
+ smaller rank.</p><p>The result tensor type of a reshape can be zero-ranked if the operand
+ tensor type is statically shaped with all dimensions being unit extent. In
+ such case the reassociation map is empty.</p><p>Examples:</p><pre>// Dimension collapse (i, j) -&gt; i' and k -&gt; k'
+%b = linalg.tensor_collapse_shape %a [[0, 1], [2]]
+    : tensor&lt;?x?x?xf32&gt; into tensor&lt;?x?xf32&gt;
+</pre></div><a href="#g:8" id="g:8"><h1>tensor_expand_shape</h1></a><div class="doc"><p>The <code>linalg.tensor_expand_shape</code> op produces a new tensor with a higher
+ rank whose sizes are a reassociation of the original <code>src</code>.</p><p>A reassociation is defined as a continuous grouping of dimensions and is
+ represented with an array of I64ArrayAttr attribute.</p><p>The verification rule is that the reassociation maps are applied to the
+ result tensor with the higher rank to obtain the operand tensor with the
+ smaller rank.</p><p>The operand tensor type of a reshape can be zero-ranked if the result
+ tensor type is statically shaped with all dimensions being unit extent. In
+ such cases the reassociation map is empty.</p><p>Examples:</p><pre>// Dimension expansion i -&gt; (i', j') and (k) -&gt; (k')
+%b = linalg.tensor_expand_shape %a [[0, 1], [2]]
+    : tensor&lt;?x?xf32&gt; into tensor&lt;?x?x?xf32&gt;
+</pre></div><a href="#g:9" id="g:9"><h1>tiled_loop</h1></a><div class="doc"><p>This is a loop-like operation with additional properties. The arguments
+ also include the input and the output tensors or memrefs and the attributes
+ to specify the iterator types.</p><p>Parsing TiledLoopOp will set all elements of the <code>iterator_types</code> attribute
+ to &quot;parallel&quot; type, when it is absent from the custom format.</p><p>Tensor-based version:</p><p>The body region of the loop contains <code>extract_slice</code> operations applied to
+ every tensor argument of TiledLoopOp.</p><p>The body region must contain exactly one block that terminates with
+ <code>linalg.yield</code> with the operands resulting from <code>insert_slice</code> operations.</p><p>Example:</p><pre>%0 = linalg.tiled_loop (%i) = (%c0) to (%c24) step (%c4)
+    ins(%lhs, %rhs : tensor&lt;24x64xi8&gt;, tensor&lt;24x64xi8&gt;)
+    outs(%out : tensor&lt;24x64xi8&gt;)
+    iterators(&quot;parallel&quot;)
+    distribution(&quot;block_x&quot;) {
+  %lhs_sub = tensor.extract_slice %lhs[%i, 0] [%c4, %c64] [1, 1]
+      : tensor&lt;24x64xi8&gt; to tensor&lt;?x?xi8&gt;
+  %rhs_sub = tensor.extract_slice %rhs[%i, 0] [%c4, %c64] [1, 1]
+      : tensor&lt;24x64xi8&gt; to tensor&lt;?x?xi8&gt;
+  %out_sub = tensor.extract_slice %out[%i, 0] [%c4, %c64] [1, 1]
+      : tensor&lt;24x64xi8&gt; to tensor&lt;?x?xi8&gt;
+
+  %result_sub = linalg.generic ...
+
+  %result = tensor.insert_slice %result_sub into %out[%i, 0][%c4, %c64][1, 1]
+    : tensor&lt;?x?xi8&gt; into tensor&lt;24x64xi8&gt;
+  linalg.yield %result : tensor&lt;24x64xi8&gt;
+}
+</pre><p>MemRef-based version:</p><p>The body region of the loop contains <code>subview</code> operations applied to
+ every memref argument of TiledLoopOp.</p><p>The body region must contain exactly one block that terminates with
+ <code>linalg.yield</code> with no operands.</p><p>Example:</p><pre>linalg.tiled_loop (%i) = (%c0) to (%c24) step (%c4)
+    ins(%lhs, %rhs : memref&lt;24x64xi8&gt;, memref&lt;24x64xi8&gt;)
+    outs(%out : memref&lt;24x64xi8&gt;)
+    iterators(&quot;parallel&quot;)
+    distribution(&quot;block_x&quot;) {
+  %lhs_sub = subview %lhs[%i, 0] [%c4, %c64] [1, 1]
+      : memref&lt;24x64xi8&gt; to memref&lt;?x?xi8&gt;
+  %rhs_sub = subview %rhs[%i, 0] [%c4, %c64] [1, 1]
+      : memref&lt;24x64xi8&gt; to memref&lt;?x?xi8&gt;
+  %out_sub = subview %out[%i, 0] [%c4, %c64] [1, 1]
+      : memref&lt;24x64xi8&gt; to memref&lt;?x?xi8&gt;
+
+  %result_sub = linalg.generic ...
+  linalg.yield
+}
+</pre></div><a href="#g:10" id="g:10"><h1>yield</h1></a><div class="doc"><p><code>linalg.yield</code> is a special terminator operation for blocks inside regions
+ in <code>linalg</code> generic ops. It returns values to the immediately enclosing
+ <code>linalg</code> generic op.</p><p>Example:</p><pre>linalg.yield %f0, %f1 : f32, f32
+</pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Linalg_Yield" class="def">Linalg_Yield</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; [operand] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Linalg.html#Linalg_Yield" class="link">Source</a> <a href="#v:Linalg_Yield" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>linalg.yield</code>.</p></div></div><div class="top"><p class="src"><a id="v:yield" class="def">yield</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:EndOfBlock" title="MLIR.AST.Builder">EndOfBlock</a> <a href="src/MLIR.AST.Dialect.Generated.Linalg.html#yield" class="link">Source</a> <a href="#v:yield" class="selflink">#</a></p><div class="doc"><p>A builder for <code>linalg.yield</code>.</p></div></div><a href="#g:11" id="g:11"><h1>batch_matmul_i16_i16_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:12" id="g:12"><h1>batch_matmul_i32_i32_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:13" id="g:13"><h1>batch_matmul_i8_i8_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:14" id="g:14"><h1>batch_matmul</h1></a><div class="doc"><p>Numeric casting is performed on the operands to the inner multiply, promoting
+ them to the same data type as the accumulator/output.</p></div><a href="#g:15" id="g:15"><h1>conv_3d</h1></a><div class="doc empty">&nbsp;</div><a href="#g:16" id="g:16"><h1>conv_2d</h1></a><div class="doc empty">&nbsp;</div><a href="#g:17" id="g:17"><h1>conv_3d_input_ncdhw_filter_dhwcf</h1></a><div class="doc"><p>Computes a 3-D convolution given 5-D input and filter. The data layout
+ of input is NCDHW and the data layout of filter is DHWCF.</p><p>The indexing maps for these three tensors contain 9 dimensions, following the
+ order of (<code>N</code>, <code>F</code>, <code>D</code>, <code>H</code>, <code>W</code>, <code>KD</code>, <code>KH</code>, <code>KW</code>, <code>C</code>).</p></div><a href="#g:18" id="g:18"><h1>conv_2d_input_nchw_filter_hwcf</h1></a><div class="doc"><p>Computes a 2-D convolution given 4-D input and filter. The data layout
+ of input is NCHW and the data layout of filter is HWCF.</p><p>The indexing maps for these three tensors contain 7 dimensions, following the
+ order of (<code>N</code>, <code>F</code>, <code>H</code>, <code>W</code>, <code>KH</code>, <code>KW</code>, <code>C</code>).</p></div><a href="#g:19" id="g:19"><h1>conv_1d_input_ncw_filter_wcf</h1></a><div class="doc"><p>Computes a 1-D convolution given 3-D input and filter. The data layout
+ of input is NCW and the data layout of filter is WCF.</p><p>The indexing maps for these three tensors contain 5 dimensions, following the
+ order of (<code>N</code>, <code>F</code>, <code>W</code>, <code>KW</code>, <code>C</code>).</p></div><a href="#g:20" id="g:20"><h1>conv_3d_input_ndhwc_filter_dhwcf</h1></a><div class="doc"><p>Computes a 3-D convolution given 5-D input and filter. The data layout
+ of input is NDHWC and the data layout of filter is DHWCF.</p><p>The indexing maps for these three tensors contain 9 dimensions, following the
+ order of (<code>N</code>, <code>D</code>, <code>H</code>, <code>W</code>, <code>F</code>, <code>KD</code>, <code>KH</code>, <code>KW</code>, <code>C</code>).</p></div><a href="#g:21" id="g:21"><h1>conv_2d_input_nhwc_filter_hwcf</h1></a><div class="doc"><p>Computes a 2-D convolution given 4-D input and filter. The data layout
+ of input is NHWC and the data layout of filter is HWCF.</p><p>The indexing maps for these three tensors contain 7 dimensions, following the
+ order of (<code>N</code>, <code>H</code>, <code>W</code>, <code>F</code>, <code>KH</code>, <code>KW</code>, <code>C</code>).</p></div><a href="#g:22" id="g:22"><h1>conv_1d_input_nwc_filter_wcf</h1></a><div class="doc"><p>Computes a 1-D convolution given 3-D input and filter. The data layout
+ of input is NWC and the data layout of filter is WCF.</p><p>The indexing maps for these three tensors contain 5 dimensions, following the
+ order of (<code>N</code>, <code>W</code>, <code>F</code>, <code>KW</code>, <code>C</code>).</p></div><a href="#g:23" id="g:23"><h1>conv_3d_ncdhw</h1></a><div class="doc empty">&nbsp;</div><a href="#g:24" id="g:24"><h1>conv_2d_nchw</h1></a><div class="doc empty">&nbsp;</div><a href="#g:25" id="g:25"><h1>conv_1d_ncw</h1></a><div class="doc empty">&nbsp;</div><a href="#g:26" id="g:26"><h1>conv_3d_ndhwc</h1></a><div class="doc empty">&nbsp;</div><a href="#g:27" id="g:27"><h1>conv_2d_nhwc</h1></a><div class="doc empty">&nbsp;</div><a href="#g:28" id="g:28"><h1>conv_1d_nwc</h1></a><div class="doc empty">&nbsp;</div><a href="#g:29" id="g:29"><h1>conv</h1></a><div class="doc"><p>Generic n-D convolution as described in the TF documentation:
+ <a href="https://www.tensorflow.org/versions/r2.0/api_docs/python/tf/nn/convolution">https://www.tensorflow.org/versions/r2.0/api_docs/python/tf/nn/convolution</a></p><pre>  output[b, x[0], ..., x[N-1], k] =
+  sum_{z[0], ..., z[N-1], q}
+      filter[z[0], ..., z[N-1], q, k] *
+      padded_input[b,
+                   x[0] * strides[0] + dilation_rate[0] * z[0],
+                   ...,
+                   x[N-1] * strides[N-1] + dilation_rate[N-1] * z[N-1],
+                   q]
+</pre></div><a href="#g:30" id="g:30"><h1>conv_1d</h1></a><div class="doc empty">&nbsp;</div><a href="#g:31" id="g:31"><h1>copy</h1></a><div class="doc"><p>Copies the data in the input view into the output view.</p><p>Usage:</p><pre>linalg.copy(%arg0, %arg1) : memref&lt;?xf32, stride_specification&gt;,
+                            memref&lt;?xf32, stride_specification&gt;
+</pre><p>One possible lowering to loop form is:</p><pre>%0 = linalg.dim %arg0, 0 : index
+scf.for %i0 = %c0 to %0 step %c1 {
+  %1 = load %arg0[%i0] : memref&lt;?xf32, stride_specification&gt;
+  store %1, %arg1[%i0] : memref&lt;?xf32, stride_specification&gt;
+}
+</pre><p>Optionally, can take <code>input_permutation</code> and <code>output_permutation</code> attributes
+ to reorder the dimensions of the input and output views.</p><p>Usage:</p><pre>linalg.copy(%arg0, %arg1) {inputPermutation : (i, j, k) -&gt; (i, k, j),
+                           outputPermutation : (i, j, k) -&gt; (k, j, i)} :
+  memref&lt;?x?x?xf32, stride_specification&gt;,
+  memref&lt;?x?x?xf32, stride_specification&gt;
+</pre><p>One possible lowering to loop form is:</p><pre>%0 = linalg.dim %arg0, 0
+%1 = linalg.dim %arg0, 1
+%2 = linalg.dim %arg0, 2
+scf.for %i0 = %c0 to %{{.*}} step %c1 {
+  scf.for %i1 = %c0 to %{{.*}} step %c1 {
+    scf.for %i2 = %c0 to %{{.*}} step %c1 {
+      %3 = load %arg0[%i0, %i2, %i1] :
+              memref&lt;?x?x?xf32, stride_specification&gt;
+      store %3, %arg1[%i2, %i1, %i0] :
+              memref&lt;?x?x?xf32, stride_specification&gt;
+</pre><p>The views are expected to be compatible for correctness but this is not
+ enforced at the moment.</p></div><a href="#g:32" id="g:32"><h1>depthwise_conv_2d_input_nhwc_filter_hwcf</h1></a><div class="doc"><p>This operation performs depth-wise 2-D convolution over an input <code>I</code> and filter
+ <code>F</code> and generates output <code>O</code> using the following computation:</p><pre>  O(n, oh, ow, ci, co) = AddFOp&lt;kh, kw&gt;(
+      O(n, oh, ow, ci, co),
+      MulFOp(I(n, oh * strides[0] + kh * dilations[0], ow * strides[1] + kw * dilations[1], ci),
+       K(kh, kw, ci, co)));
+</pre><p>where</p><ul><li><code>I</code> is a 4-D tensor with shape <code>(N, IH, IW, CI)</code>.</li><li><code>F</code> is a 4-D tensor with shape <code>(KH, KW, CI, CO)</code>.</li><li><code>O</code> is a 5-D tensor with shape <code>(N, OH, OW, CI, CO)</code>.</li><li><code>strides</code> is a 2-element vector attribute for window strides along the
+   height/width dimension.</li></ul><p>The indexing maps for these three tensors contain 7 dimensions, following the
+ order of (<code>N</code>, <code>OH</code>, <code>OW</code>, <code>CI</code>, <code>CO</code>, <code>KH</code>, <code>KW</code>).</p><p>Note: this op only supports any channel multiplier, which is <code>CO</code>. To map back
+ to 4D result as DepthwiseConvInputNHWCFilterHWCOp, you will have to create a
+ Linalg reshape op which collapses <code>CI</code> and <code>CO</code> into one dimension.</p></div><a href="#g:33" id="g:33"><h1>depthwise_conv_2d_input_nhwc_filter_hwc</h1></a><div class="doc"><p>This operation performs depth-wise 2-D convolution over an input <code>I</code> and filter
+ <code>F</code> and generates output <code>O</code> using the following computation:</p><pre>O(n, oh, ow, c) = AddFOp&lt;kh, kw&gt;(
+    O(n, oh, ow, c),
+    MulFOp(I(n, oh * strides[0] + kh * dilations[0], ow * strides[1] + kw * dilations[1], c),
+     K(kh, kw, c)));
+</pre><p>where</p><ul><li><code>I</code> is a 4-D tensor with shape <code>(N, IH, IW, C)</code>.</li><li><code>F</code> is a 3-D tensor with shape <code>(KH, KW, C)</code>.</li><li><code>O</code> is a 4-D tensor with shape <code>(N, OH, OW, C)</code>.</li><li><code>strides</code> is a 2-element vector attribute for window strides along the
+   height/width dimension.</li></ul><p>The indexing maps for these three tensors contain 6 dimensions, following the
+ order of (<code>N</code>, <code>OH</code>, <code>OW</code>, <code>C</code>, <code>KH</code>, <code>KW</code>).</p><p>Note: this op only supports channel multiplier == 1.</p></div><a href="#g:34" id="g:34"><h1>dot_i16_i16_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:35" id="g:35"><h1>dot_i32_i32_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:36" id="g:36"><h1>dot_i8_i8_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:37" id="g:37"><h1>dot</h1></a><div class="doc"><p>Numeric casting is performed on the operands to the inner multiply, promoting
+ them to the same data type as the accumulator/output.</p></div><a href="#g:38" id="g:38"><h1>fill</h1></a><div class="doc empty">&nbsp;</div><a href="#g:39" id="g:39"><h1>fill_rng_2d</h1></a><div class="doc"><p>The operation generations pseudo random numbers using a linear congruential
+ generator. It provides no guarantees regarding the distribution of the
+ generated random numbers. Instead of generating the random numbers
+ sequentially, it instantiates one random number generator per data element
+ and runs them in parallel. The seed operand and the indices of the data
+ element seed the random number generation. The min and max operands limit
+ the range of the generated random numbers.</p></div><a href="#g:40" id="g:40"><h1>generic</h1></a><div class="doc"><p>Generic Linalg op form where the key properties of the computation are
+ specified as attributes. In pretty form, a <code>linalg.generic</code> op is written
+ as:</p><pre>  linalg.generic #trait_attribute
+      ins(%A, %B : memref&lt;?x?xf32, stride_specification&gt;,
+                   memref&lt;?x?xf32, stride_specification&gt;)
+      outs(%C : memref&lt;?x?xf32, stride_specification&gt;)
+      attrs = {other-optional-attributes}
+      {region}
+  </pre><p>Where #trait_attributes is an alias of a dictionary attribute containing:
+   - doc [optional]: a documentation string
+   - indexing_maps: a list of AffineMapAttr, one AffineMapAttr per each input
+     and output view. Such AffineMapAttr specifies the mapping between the
+     loops and the indexing within each view.
+   - library_call [optional]: a StringAttr containing the name of an
+     external library function that the linalg.generic operation maps to.
+     The external library is assumed to be dynamically linked and no strong
+     compile-time guarantees are provided. In the absence of such a library
+     call, linalg.generic will always lower to loops.
+   - iterator_types: an ArrayAttr specifying the type of the enclosing loops.
+     Each element of the list represents and iterator of one of the following
+     types:
+       parallel, reduction, window</p><p>Example:
+ Defining a #matmul_trait attribute in MLIR can be done as follows:
+   <code>
+   #matmul_accesses = [
+     (m, n, k) -&gt; (m, k),
+     (m, n, k) -&gt; (k, n),
+     (m, n, k) -&gt; (m, n)
+   ]
+   #matmul_trait = {
+     doc = &quot;C(m, n) += A(m, k) * B(k, n)&quot;,
+     indexing_maps = #matmul_accesses,
+     library_call = &quot;linalg_matmul&quot;,
+     iterator_types = [&quot;parallel&quot;, &quot;parallel&quot;, &quot;reduction&quot;]
+   }
+   </code></p><p>And can be reused in multiple places as:
+   <code>
+   linalg.generic #matmul_trait
+     ins(%A, %B : memref&lt;?x?xf32, stride_specification&gt;,
+                  memref&lt;?x?xf32, stride_specification&gt;)
+     outs(%C : memref&lt;?x?xf32, stride_specification&gt;)
+     {other-optional-attributes} {
+     ^bb0(%a: f32, %b: f32, %c: f32) :
+       %d = mulf %a, %b: f32
+       %e = addf %c, %d: f32
+       linalg.yield %e : f32
+   }
+   </code></p><p>This may lower to either:
+   <code>
+   call @linalg_matmul(%A, %B, %C) :
+     (memref&lt;?x?xf32, stride_specification&gt;,
+      memref&lt;?x?xf32, stride_specification&gt;,
+      memref&lt;?x?xf32, stride_specification&gt;)
+     -&gt; ()
+   </code></p><p>or IR resembling:
+ <code>
+ scf.for %m = %c0 to %M step %c1 {
+   scf.for %n = %c0 to %N step %c1 {
+     scf.for %k = %c0 to %K step %c1 {
+       %a = load %A[%m, %k] : memref&lt;?x?xf32, stride_specification&gt;
+       %b = load %B[%k, %n] : memref&lt;?x?xf32, stride_specification&gt;
+       %c = load %C[%m, %n] : memref&lt;?x?xf32, stride_specification&gt;
+       %d = mulf %a, %b: f32
+       %e = addf %c, %d: f32
+       store %e, %C[%m, %n] : memref&lt;?x?x?xf32, stride_specification&gt;
+     }
+   }
+ }
+ </code></p><p>To allow progressive lowering from the value world (a.k.a tensor values) to
+ the buffer world (a.k.a memref values), a <code>linalg.generic</code> op allows mixing
+ tensors and buffers operands and tensor results.</p><pre>%C = linalg.generic #trait_attribute
+  ins(%A, %B : tensor&lt;?x?xf32&gt;, memref&lt;?x?xf32, stride_specification&gt;)
+  outs(%C : tensor&lt;?x?xf32&gt;)
+  {other-optional-attributes}
+  {region}
+  -&gt; (tensor&lt;?x?xf32&gt;)
+</pre></div><a href="#g:41" id="g:41"><h1>matmul_column_major</h1></a><div class="doc empty">&nbsp;</div><a href="#g:42" id="g:42"><h1>matmul_i16_i16_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:43" id="g:43"><h1>matmul_i32_i32_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:44" id="g:44"><h1>matmul_i8_i8_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:45" id="g:45"><h1>matmul</h1></a><div class="doc"><p>Numeric casting is performed on the operands to the inner multiply, promoting
+ them to the same data type as the accumulator/output.</p></div><a href="#g:46" id="g:46"><h1>matvec_i16_i16_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:47" id="g:47"><h1>matvec_i32_i32_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:48" id="g:48"><h1>matvec_i8_i8_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:49" id="g:49"><h1>matvec</h1></a><div class="doc"><p>Numeric casting is performed on the operands to the inner multiply, promoting
+ them to the same data type as the accumulator/output.</p></div><a href="#g:50" id="g:50"><h1>pooling_max</h1></a><div class="doc"><p>Takes max op as pooling operation, i.e., it samples the maximum value in the
+ window.</p></div><a href="#g:51" id="g:51"><h1>pooling_min</h1></a><div class="doc"><p>Takes min op as pooling operation, i.e., it samples the minimum value in the
+ window.</p></div><a href="#g:52" id="g:52"><h1>pooling_nhwc_max</h1></a><div class="doc empty">&nbsp;</div><a href="#g:53" id="g:53"><h1>pooling_nhwc_i16_max</h1></a><div class="doc empty">&nbsp;</div><a href="#g:54" id="g:54"><h1>pooling_nhwc_i32_max</h1></a><div class="doc empty">&nbsp;</div><a href="#g:55" id="g:55"><h1>pooling_nhwc_i8_max</h1></a><div class="doc empty">&nbsp;</div><a href="#g:56" id="g:56"><h1>pooling_nhwc_min</h1></a><div class="doc empty">&nbsp;</div><a href="#g:57" id="g:57"><h1>pooling_nhwc_sum</h1></a><div class="doc empty">&nbsp;</div><a href="#g:58" id="g:58"><h1>pooling_sum</h1></a><div class="doc"><p>Takes add op as pooling operation, i.e., it accumulates the values in the
+ window.</p></div><a href="#g:59" id="g:59"><h1>vecmat_i16_i16_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:60" id="g:60"><h1>vecmat_i32_i32_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:61" id="g:61"><h1>vecmat_i8_i8_i32</h1></a><div class="doc empty">&nbsp;</div><a href="#g:62" id="g:62"><h1>vecmat</h1></a><div class="doc"><p>Numeric casting is performed on the operands to the inner multiply, promoting
+ them to the same data type as the accumulator/output.</p></div></div></div><div id="footer"><p>Produced by <a href="http://www.haskell.org/haddock/">Haddock</a> version 2.24.0</p></div></body></html>
