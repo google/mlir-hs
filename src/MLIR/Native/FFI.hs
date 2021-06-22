@@ -12,6 +12,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+{-# OPTIONS_HADDOCK hide #-}
 module MLIR.Native.FFI where
 
 import Foreign.Ptr
@@ -66,38 +67,60 @@ data MlirIdentifierObject
 data MlirAffineExprObject
 data MlirAffineMapObject
 
+-- | A native MLIR context.
 newtype Context = ContextPtr (Ptr MlirContextObject)
                   deriving Storable via (Ptr ())
+-- | A native MLIR pass instance.
 newtype Pass = PassPtr (Ptr MlirPassObject)
                deriving Storable via (Ptr ())
+-- | A native MLIR pass manager instance.
 newtype PassManager = PassManagerPtr (Ptr MlirPassManagerObject)
                       deriving Storable via (Ptr ())
+-- | A native MLIR location object.
 newtype Location = LocationPtr (Ptr MlirLocationObject)
                    deriving Storable via (Ptr ())
+-- | A native MLIR operation instance.
 newtype Operation = OperationPtr (Ptr MlirOperationObject)
                     deriving Storable via (Ptr ())
+-- | A native MLIR module operation.
+-- Since every module is an operation, it can be converted to
+-- an 'Operation' using 'MLIR.Native.moduleAsOperation'.
 newtype Module = ModulePtr (Ptr MlirModuleObject)
                  deriving Storable via (Ptr ())
+-- | A native MLIR execution engine.
 newtype ExecutionEngine = ExecutionEnginePtr (Ptr MlirExecutionEngineObject)
                           deriving Storable via (Ptr ())
+-- | A native MLIR type object.
 newtype Type = TypePtr (Ptr MlirTypeObject)
                deriving Storable via (Ptr ())
+-- | A native MLIR block object.
+-- Every block is a list of 'Operation's.
 newtype Block = BlockPtr (Ptr MlirBlockObject)
                 deriving Storable via (Ptr ())
+-- | A native MLIR region.
 newtype Region = RegionPtr (Ptr MlirRegionObject)
                  deriving Storable via (Ptr ())
+-- | A native MLIR attribute.
 newtype Attribute = AttributePtr (Ptr MlirAttributeObject)
                     deriving Storable via (Ptr ())
+-- | A native MLIR value object.
+-- Every 'Value' is either a 'Block' argument or an output from an 'Operation'.
 newtype Value = ValuePtr (Ptr MlirValueObject)
                 deriving Storable via (Ptr ())
+-- | A native MLIR identifier.
+-- Identifiers are strings interned in the MLIR context.
 newtype Identifier = IdentifierPtr (Ptr MlirIdentifierObject)
                      deriving Storable via (Ptr ())
+-- | A native MLIR affine expression object.
 newtype AffineExpr = AffineExprPtr (Ptr MlirAffineExprObject)
                      deriving Storable via (Ptr ())
+-- | A native MLIR affine map object.
 newtype AffineMap = AffineMapPtr (Ptr MlirAffineMapObject)
                     deriving Storable via (Ptr ())
 data NamedAttribute  -- C structs cannot be represented in Haskell
 
+-- | A result code for many failable MLIR operations.
+-- The only valid cases are 'Success' and 'Failure'.
 newtype LogicalResult = UnsafeMkLogicalResult Int8
                         deriving Storable via Int8
                         deriving Eq
@@ -106,8 +129,11 @@ instance Show LogicalResult where
   show Success = "Success"
   show Failure = "Failure"
 
+-- | Indicates a successful completion of an MLIR operation.
 pattern Success :: LogicalResult
 pattern Success = UnsafeMkLogicalResult 1
+-- | Indicates a filure of an MLIR operation. Inspect the diagnostics output
+-- to find the cause of the issue.
 pattern Failure :: LogicalResult
 pattern Failure = UnsafeMkLogicalResult 0
 

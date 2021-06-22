@@ -12,31 +12,34 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+{-|
+This module defines a set of Haskell types wrapping references to native C++
+MLIR objects along with some basic operations on them. See the submodules for
+more specialized components such as an 'MLIR.Native.ExecutionEngine.ExecutionEngine'
+or 'MLIR.Native.Pass.PassManager'.
+-}
 module MLIR.Native (
-    LogicalResult,
-    pattern Failure,
-    pattern Success,
-    -- Contexts
+    -- * Contexts
     Context,
     createContext,
     destroyContext,
     withContext,
     HasContext(..),
-    -- Dialect registration
+    -- ** Dialect registration
     registerAllDialects,
     getNumLoadedDialects,
-    -- Location
+    -- * Location
     Location,
     getUnknownLocation,
-    -- Operation
+    -- * Operation
     Operation,
     getOperationName,
     showOperation,
     verifyOperation,
-    -- Block
+    -- * Block
     Block,
     showBlock,
-    -- Module
+    -- * Module
     Module,
     createEmptyModule,
     parseModule,
@@ -45,14 +48,18 @@ module MLIR.Native (
     moduleAsOperation,
     moduleFromOperation,
     showModule,
-    -- StringRef
+    -- * StringRef
     StringRef(..),
     withStringRef,
-    -- Identifier
+    -- * Identifier
     Identifier,
     createIdentifier,
     identifierString,
-    -- Debugging
+    -- * LogicalResult
+    LogicalResult,
+    pattern Failure,
+    pattern Success,
+    -- * Debugging utilities
     setDebugMode,
     HasDump(..),
   ) where
@@ -89,25 +96,32 @@ C.verbatim stringCallbackDecl
 --------------------------------------------------------------------------------
 -- Context management
 
+-- | Creates a native MLIR context.
 createContext :: IO Context
 createContext = [C.exp| MlirContext { mlirContextCreate() } |]
 
+-- | Destroys a native MLIR context.
 destroyContext :: Context -> IO ()
 destroyContext ctx = [C.exp| void { mlirContextDestroy($(MlirContext ctx)) } |]
 
+-- | Wraps an IO action that gets access to a fresh MLIR context.
 withContext :: (Context -> IO a) -> IO a
 withContext = bracket createContext destroyContext
 
 -- TODO(apaszke): Can this be pure?
+-- | A typeclass for retrieving MLIR contexts managing other native types.
 class HasContext a where
+  -- | Retrieve the MLIR context that manages the storage of the native value.
   getContext :: a -> IO Context
 
 --------------------------------------------------------------------------------
 -- Dialect registration
 
+-- | Register all builtin MLIR dialects in the specified 'Context'.
 registerAllDialects :: Context -> IO ()
 registerAllDialects ctx = [C.exp| void { mlirRegisterAllDialects($(MlirContext ctx)) } |]
 
+-- | Retrieve the count of dialects currently registered in the 'Context'.
 getNumLoadedDialects :: Context -> IO Int
 getNumLoadedDialects ctx = fromIntegral <$>
   [C.exp| intptr_t { mlirContextGetNumLoadedDialects($(MlirContext ctx)) } |]
@@ -115,6 +129,7 @@ getNumLoadedDialects ctx = fromIntegral <$>
 --------------------------------------------------------------------------------
 -- Locations
 
+-- | Create an unknown source location.
 getUnknownLocation :: Context -> IO Location
 getUnknownLocation ctx =
   [C.exp| MlirLocation { mlirLocationUnknownGet($(MlirContext ctx)) } |]
@@ -124,10 +139,12 @@ getUnknownLocation ctx =
 --------------------------------------------------------------------------------
 -- Operation
 
+-- | Retrieve the name of the given operation.
 getOperationName :: Operation -> IO Identifier
 getOperationName op =
   [C.exp| MlirIdentifier { mlirOperationGetName($(MlirOperation op)) } |]
 
+-- | Show the operation using the MLIR printer.
 showOperation :: Operation -> IO BS.ByteString
 showOperation op = showSomething \ctx ->
   [C.block| void {
@@ -137,6 +154,7 @@ showOperation op = showSomething \ctx ->
     mlirOpPrintingFlagsDestroy(flags);
   } |]
 
+-- | Check validity of the operation.
 verifyOperation :: Operation -> IO Bool
 verifyOperation op =
   (1==) <$> [C.exp| bool { mlirOperationVerify($(MlirOperation op)) } |]
@@ -144,6 +162,7 @@ verifyOperation op =
 --------------------------------------------------------------------------------
 -- Block
 
+-- | Show the block using the MLIR printer.
 showBlock :: Block -> IO BS.ByteString
 showBlock block = showSomething \ctx -> [C.exp| void {
     mlirBlockPrint($(MlirBlock block), HaskellMlirStringCallback, $(void* ctx))
@@ -155,10 +174,12 @@ showBlock block = showSomething \ctx -> [C.exp| void {
 instance HasContext Module where
   getContext m = [C.exp| MlirContext { mlirModuleGetContext($(MlirModule m)) } |]
 
+-- | Create an empty module.
 createEmptyModule :: Location -> IO Module
 createEmptyModule loc =
   [C.exp| MlirModule { mlirModuleCreateEmpty($(MlirLocation loc)) } |]
 
+-- | Parse a module from a string. Returns 'Nothing' in case of parse failure.
 parseModule :: Context -> StringRef -> IO (Maybe Module)
 parseModule ctx (StringRef sPtr len) = nullable <$>
   [C.exp| MlirModule {
@@ -166,22 +187,28 @@ parseModule ctx (StringRef sPtr len) = nullable <$>
                           (MlirStringRef){$(char* sPtr), $(size_t len)})
   } |]
 
+-- | Destroy all resources associated with a 'Module'.
 destroyModule :: Module -> IO ()
 destroyModule m =
   [C.exp| void { mlirModuleDestroy($(MlirModule m)) } |]
 
+-- | Retrieve the block containg all module definitions.
 getModuleBody :: Module -> IO Block
 getModuleBody m = [C.exp| MlirBlock { mlirModuleGetBody($(MlirModule m)) } |]
 
 -- TODO(apaszke): Can this be pure?
+-- | Convert a module to an 'Operation'.
 moduleAsOperation :: Module -> IO Operation
 moduleAsOperation m =
   [C.exp| MlirOperation { mlirModuleGetOperation($(MlirModule m)) } |]
 
+-- | Inverse of 'moduleAsOperation'. Returns 'Nothing' if the operation is not a
+-- builtin MLIR module operation.
 moduleFromOperation :: Operation -> IO (Maybe Module)
 moduleFromOperation op =
   nullable <$> [C.exp| MlirModule { mlirModuleFromOperation($(MlirOperation op)) } |]
 
+-- | Show the module using the MLIR printer.
 showModule :: Module -> IO BS.ByteString
 showModule = moduleAsOperation >=> showOperation
 
@@ -192,15 +219,20 @@ data StringRef = StringRef (Ptr C.CChar) C.CSize
 
 -- MLIR sometimes expects null-terminated StringRefs, so we can't use
 -- unsafeUseAsCStringLen, because ByteStrings are not guaranteed to have a terminator
+-- | Use a 'BS.ByteString' as a 'StringRef'. This is O(n) due to MLIR sometimes
+-- requiring the 'StringRef's to be null-terminated.
 withStringRef :: BS.ByteString -> (StringRef -> IO a) -> IO a
 withStringRef s f = BS.useAsCString s \ptr -> f $ StringRef ptr $ fromIntegral $ BS.length s
 
+-- | Copy a 'StringRef' as a 'BS.ByteString'. This is an O(n) operation.
 peekStringRef :: StringRef -> IO BS.ByteString
 peekStringRef (StringRef ref size) = BS.packCStringLen (ref, fromIntegral size)
 
 --------------------------------------------------------------------------------
 -- Identifier
 
+-- | View an identifier as a 'StringRef'. The result is valid for as long as the
+-- 'Context' managing the identifier.
 identifierString :: Identifier -> IO StringRef
 identifierString ident = evalContT $ do
   namePtrPtr <- ContT alloca
@@ -213,6 +245,7 @@ identifierString ident = evalContT $ do
     } |]
     StringRef <$> peek namePtrPtr <*> peek sizePtr
 
+-- | Create an identifier from a 'StringRef'.
 createIdentifier :: Context -> StringRef -> IO Identifier
 createIdentifier ctx (StringRef ref size) =
   [C.exp| MlirIdentifier {
@@ -240,12 +273,16 @@ showSomething action = do
 --------------------------------------------------------------------------------
 -- Debugging utilities
 
+-- | Enable or disable debug logging in MLIR.
 setDebugMode :: Bool -> IO ()
 setDebugMode enable = do
   let nativeEnable = if enable then 1 else 0
   [C.exp| void { mlirEnableGlobalDebug($(bool nativeEnable)) } |]
 
+
+-- | A class for native objects that can be dumped to standard error output.
 class HasDump a where
+  -- | Display the value in the standard error output.
   dump :: a -> IO ()
 
 instance HasDump Operation where
