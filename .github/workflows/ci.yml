@@ -15,12 +15,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
-    - uses: actions/setup-haskell@048c29979717135f04282c42c2186bb5945b2d8f
+    - name: Checkout the repository
+      uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+
+    - name: Install GHC & Cabal
+      uses: actions/setup-haskell@048c29979717135f04282c42c2186bb5945b2d8f
       with:
         ghc-version: '9.0.1'
         cabal-version: '3.4'
-    - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
 
     - name: Cache
       uses: actions/cache@70655ec8323daeeaa7ef06d7c56e1b9191396cbe
@@ -33,23 +35,25 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
+
     - name: Install Ninja
       uses: llvm/actions/install-ninja@55d844821959226fab4911f96f37071c1d4c3268
-    - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
-      with:
-        fetch-depth: 1
+
     - name: Clone LLVM repo
       uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
       with:
         repository: llvm/llvm-project
         ref: 'main'
         path: 'llvm_src'
+
     - name: Ccache for C++ compilation
       uses: hendrikmuhs/ccache-action@4687d037e4d7cf725512d9b819137a3af34d39b3
+
     - name: Install dependencies (Haskell)
       run: |
         cabal update
         cabal build --only-dependencies --enable-tests --enable-benchmarks
+
     - name: Install dependencies (LLVM & MLIR)
       run: |
         export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
@@ -62,10 +66,12 @@ jobs:
         CC: clang
         CXX: clang++
         CMAKE_GENERATOR: Ninja
+
     - name: Build mlir-hs
       run: |
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/mlir_shared/lib
         cabal build --enable-tests --enable-benchmarks all
+
     - name: Run mlir-hs tests
       run: |
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/mlir_shared/lib
