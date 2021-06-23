@@ -62,7 +62,7 @@ data Type =
                , opaqueTypeData :: Name }
   | RankedTensorType { rankedTensorTypeShape :: [Maybe Int]
                      , rankedTensorTypeElement :: Type
-                     , rankedTensorTypeEncoding :: Attribute }
+                     , rankedTensorTypeEncoding :: Maybe Attribute }
   | TupleType [Type]
   | UnrankedMemRefType { unrankedMemrefTypeElement :: Type
                        , unrankedMemrefTypeMemorySpace :: Attribute }
@@ -228,7 +228,9 @@ instance FromAST Type Native.Type where
       (rank, nativeShape) <- packArray shapeI64
       liftIO $ do
         nativeElTy <- fromAST ctx env elTy
-        nativeEncoding <- fromAST ctx env encoding
+        nativeEncoding <- case encoding of
+          Just enc -> fromAST ctx env enc
+          Nothing  -> return $ coerce nullPtr
         [C.exp| MlirType {
           mlirRankedTensorTypeGet($(intptr_t rank), $(int64_t* nativeShape),
                                   $(MlirType nativeElTy), $(MlirAttribute nativeEncoding))
