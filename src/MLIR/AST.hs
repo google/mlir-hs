@@ -19,11 +19,12 @@ import qualified Data.ByteString as BS
 import Data.Int
 import Data.Word
 import Data.Coerce
+import Data.Ix
+import Data.Array.IArray
 import Foreign.Ptr
 import Foreign.Marshal.Alloc
 import Foreign.Marshal.Array
 import qualified Language.C.Inline as C
-import qualified Data.Vector.Storable as V
 import qualified Data.ByteString.Unsafe as BS
 import Control.Monad
 import Control.Monad.IO.Class
@@ -34,6 +35,7 @@ import qualified MLIR.Native as Native
 import qualified MLIR.Native.FFI as Native
 import qualified MLIR.AST.Dialect.Affine as Affine
 import MLIR.AST.Serialize
+import MLIR.AST.IStorableArray
 
 type Name = BS.ByteString
 type UInt = Word
@@ -105,9 +107,32 @@ data Attribute =
   | TypeAttr       Type
   | AffineMapAttr  Affine.Map
   | UnitAttr
-  | DenseElementsAttr Type (V.Vector Word32) -- TODO: Generalize to other types too!
+  | DenseElementsAttr Type DenseElements
   deriving Eq
-  -- TODO(apaszke): (Flat) SymbolRef, IntegerSet, Opaque, DenseElements
+  -- TODO(apaszke): (Flat) SymbolRef, IntegerSet, Opaque
+
+data DenseElements
+  = forall i. (Show i, Ix i) => DenseUInt8  (IStorableArray i Word8 )
+  | forall i. (Show i, Ix i) => DenseInt8   (IStorableArray i Int8  )
+  | forall i. (Show i, Ix i) => DenseUInt32 (IStorableArray i Word32)
+  | forall i. (Show i, Ix i) => DenseInt32  (IStorableArray i Int32 )
+  | forall i. (Show i, Ix i) => DenseUInt64 (IStorableArray i Word64)
+  | forall i. (Show i, Ix i) => DenseInt64  (IStorableArray i Int64 )
+  | forall i. (Show i, Ix i) => DenseFloat  (IStorableArray i Float )
+  | forall i. (Show i, Ix i) => DenseDouble (IStorableArray i Double)
+
+-- Note that we use a relaxed notion of equality, where the indices don't matter!
+-- TODO: Use a faster comparison? We could really just use memcmp here.
+instance Eq DenseElements where
+  a == b = case (a, b) of
+    (DenseUInt8  da, DenseUInt8  db) -> elems da == elems db
+    (DenseInt8   da, DenseInt8   db) -> elems da == elems db
+    (DenseUInt32 da, DenseUInt32 db) -> elems da == elems db
+    (DenseInt32  da, DenseInt32  db) -> elems da == elems db
+    (DenseUInt64 da, DenseUInt64 db) -> elems da == elems db
+    (DenseInt64  da, DenseInt64  db) -> elems da == elems db
+    (DenseFloat  da, DenseFloat  db) -> elems da == elems db
+    (DenseDouble da, DenseDouble db) -> elems da == elems db
 
 data ResultTypes = Explicit [Type] | Inferred
 
@@ -367,14 +392,67 @@ instance FromAST Attribute Native.Attribute where
       nativeMap <- fromAST ctx env afMap
       [C.exp| MlirAttribute { mlirAffineMapAttrGet($(MlirAffineMap nativeMap)) } |]
     UnitAttr -> [C.exp| MlirAttribute { mlirUnitAttrGet($(MlirContext ctx)) } |]
-    DenseElementsAttr ty values -> do
+    DenseElementsAttr ty storage -> do
       nativeType <- fromAST ctx env ty
-      let size = fromIntegral $ V.length values
-      V.unsafeWith values \valuesPtr ->
-        [C.exp| MlirAttribute {
-          mlirDenseElementsAttrUInt32Get($(MlirType nativeType), $(intptr_t size),
-                                         $(const uint32_t* valuesPtr))
-        } |]
+      case storage of
+        DenseUInt8  arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseElementsAttrUInt8Get($(MlirType nativeType), $(intptr_t size),
+                                            $(const uint8_t* valuesPtr))
+            } |]
+        DenseInt8   arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseElementsAttrInt8Get($(MlirType nativeType), $(intptr_t size),
+                                           $(const int8_t* valuesPtr))
+            } |]
+        DenseUInt32 arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseElementsAttrUInt32Get($(MlirType nativeType), $(intptr_t size),
+                                             $(const uint32_t* valuesPtr))
+            } |]
+        DenseInt32  arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseElementsAttrInt32Get($(MlirType nativeType), $(intptr_t size),
+                                            $(const int32_t* valuesPtr))
+            } |]
+        DenseUInt64 arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseElementsAttrUInt64Get($(MlirType nativeType), $(intptr_t size),
+                                             $(const uint64_t* valuesPtr))
+            } |]
+        DenseInt64  arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseElementsAttrInt64Get($(MlirType nativeType), $(intptr_t size),
+                                            $(const int64_t* valuesPtr))
+            } |]
+        DenseFloat arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtrHs -> do
+            let valuesPtr = castPtr valuesPtrHs
+            [C.exp| MlirAttribute {
+              mlirDenseElementsAttrFloatGet($(MlirType nativeType), $(intptr_t size),
+                                            $(const float* valuesPtr))
+            } |]
+        DenseDouble arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtrHs -> do
+            let valuesPtr = castPtr valuesPtrHs
+            [C.exp| MlirAttribute {
+              mlirDenseElementsAttrDoubleGet($(MlirType nativeType), $(intptr_t size),
+                                             $(const double* valuesPtr))
+            } |]
 
 
 instance FromAST Operation Native.Operation where

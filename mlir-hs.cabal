@@ -64,6 +64,7 @@ library
     , MLIR.AST.Dialect.Std
     , MLIR.AST.Dialect.Vector
     , MLIR.AST.Dialect.X86Vector
+    , MLIR.AST.IStorableArray
     , MLIR.AST.PatternUtil
     , MLIR.AST.Rewrite
     , MLIR.AST.Serialize
@@ -76,7 +77,7 @@ library
     , inline-c
     , mtl
     , raw-strings-qq
-    , vector
+    , array
     , containers
     , bytestring
     , transformers
@@ -92,6 +93,7 @@ test-suite spec
   build-depends:
       base >=4.7 && <5
     , mlir-hs
+    , array
     , hspec
     , transformers
     , bytestring

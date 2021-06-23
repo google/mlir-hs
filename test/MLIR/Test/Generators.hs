@@ -19,9 +19,9 @@ import Control.Monad
 import Test.QuickCheck
 import GHC.Generics
 import Generic.Random
+import Data.Array.IArray
 import qualified Data.Map.Strict as M
 import qualified Data.ByteString.Char8 as BS8
-import qualified Data.Vector.Storable as V
 
 import MLIR.AST
 import qualified MLIR.AST.Dialect.Affine as Affine
@@ -41,10 +41,10 @@ instance Arbitrary Attribute where
         , AffineMapAttr <$> arbitrary
         , pure UnitAttr
         , do
-            elems <- arbitrary
+            values <- arbitrary
             return $ DenseElementsAttr
-              (VectorType [length elems] (IntegerType Signless 32))
-              (V.fromList elems)
+              (VectorType [length values] (IntegerType Signless 32))
+              (DenseUInt32 $ listArray (1, length values) $ values)
         ]
       recGenerators =
         [ ArrayAttr <$> arbitrarySubtrees
@@ -144,6 +144,7 @@ deriving instance Show Type
 deriving instance Show Signedness
 deriving instance Show Affine.Map
 deriving instance Show Affine.Expr
+deriving instance Show DenseElements
 
 deriving instance Generic Signedness
 deriving instance Generic Affine.Map

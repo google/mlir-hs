@@ -18,7 +18,7 @@ module MLIR.AST.Dialect.Std
   ) where
 
 import Prelude hiding (return)
-import qualified Data.Vector.Storable as V
+import Data.Array.IArray
 
 import MLIR.AST
 import MLIR.AST.Builder
@@ -50,6 +50,6 @@ cond_br cond trueBlock trueArgs falseBlock falseArgs = do
     , opSuccessors = [trueBlock, falseBlock]
     , opAttributes = namedAttribute "operand_segment_sizes" $
                        DenseElementsAttr (VectorType [3] $ IntegerType Unsigned 32) $
-                         V.fromList $ fromIntegral <$> [1, length trueArgs, length falseArgs]
+                         DenseUInt32 $ listArray (0, 2) $ fromIntegral <$> [1, length trueArgs, length falseArgs]
     }
   terminateBlock
