@@ -6,6 +6,13 @@
 @package mlir-hs
 @version 0.1.0.0
 
+module MLIR.AST.IStorableArray
+data IStorableArray i e
+unsafeWithIStorableArray :: IStorableArray i e -> (Ptr e -> IO c) -> IO c
+instance Foreign.Storable.Storable e => Data.Array.Base.IArray MLIR.AST.IStorableArray.IStorableArray e
+instance (GHC.Ix.Ix i, GHC.Show.Show i, GHC.Show.Show e, Foreign.Storable.Storable e) => GHC.Show.Show (MLIR.AST.IStorableArray.IStorableArray i e)
+instance (GHC.Ix.Ix i, GHC.Classes.Eq e, Foreign.Storable.Storable e) => GHC.Classes.Eq (MLIR.AST.IStorableArray.IStorableArray i e)
+
 
 -- | This module defines a set of Haskell types wrapping references to
 --   native C++ MLIR objects along with some basic operations on them. See
@@ -135,14 +142,14 @@ instance MLIR.Native.HasContext MLIR.Native.FFI.Module
 
 module MLIR.Native.ExecutionEngine
 createExecutionEngine :: Module -> IO (Maybe ExecutionEngine)
-inline_c_ffi_6989586621679060063 :: Module -> IO ExecutionEngine
+inline_c_ffi_6989586621679064053 :: Module -> IO ExecutionEngine
 destroyExecutionEngine :: ExecutionEngine -> IO ()
-inline_c_ffi_6989586621679060072 :: ExecutionEngine -> IO ()
+inline_c_ffi_6989586621679064062 :: ExecutionEngine -> IO ()
 withExecutionEngine :: Module -> (Maybe ExecutionEngine -> IO a) -> IO a
 data SomeStorable
 SomeStorable :: a -> SomeStorable
 executionEngineInvoke :: forall result. Storable result => ExecutionEngine -> StringRef -> [SomeStorable] -> IO (Maybe result)
-inline_c_ffi_6989586621679060661 :: ExecutionEngine -> Ptr CChar -> CSize -> Ptr (Ptr ()) -> IO LogicalResult
+inline_c_ffi_6989586621679064098 :: ExecutionEngine -> Ptr CChar -> CSize -> Ptr (Ptr ()) -> IO LogicalResult
 packStruct64 :: [SomeStorable] -> (Ptr () -> IO a) -> IO a
 
 module MLIR.AST.Serialize
@@ -170,15 +177,15 @@ Map :: Int -> Int -> [Expr] -> Map
 [mapDimensionCount] :: Map -> Int
 [mapSymbolCount] :: Map -> Int
 [mapExprs] :: Map -> [Expr]
-inline_c_ffi_6989586621679066564 :: Context -> CIntPtr -> IO AffineExpr
-inline_c_ffi_6989586621679066576 :: Context -> CIntPtr -> IO AffineExpr
-inline_c_ffi_6989586621679066588 :: Context -> Int64 -> IO AffineExpr
-inline_c_ffi_6989586621679066602 :: AffineExpr -> AffineExpr -> IO AffineExpr
-inline_c_ffi_6989586621679066616 :: AffineExpr -> AffineExpr -> IO AffineExpr
-inline_c_ffi_6989586621679066630 :: AffineExpr -> AffineExpr -> IO AffineExpr
-inline_c_ffi_6989586621679066644 :: AffineExpr -> AffineExpr -> IO AffineExpr
-inline_c_ffi_6989586621679066658 :: AffineExpr -> AffineExpr -> IO AffineExpr
-inline_c_ffi_6989586621679066549 :: Context -> CIntPtr -> CIntPtr -> CIntPtr -> Ptr AffineExpr -> IO AffineMap
+inline_c_ffi_6989586621679069637 :: Context -> CIntPtr -> IO AffineExpr
+inline_c_ffi_6989586621679069649 :: Context -> CIntPtr -> IO AffineExpr
+inline_c_ffi_6989586621679069661 :: Context -> Int64 -> IO AffineExpr
+inline_c_ffi_6989586621679069675 :: AffineExpr -> AffineExpr -> IO AffineExpr
+inline_c_ffi_6989586621679069689 :: AffineExpr -> AffineExpr -> IO AffineExpr
+inline_c_ffi_6989586621679069703 :: AffineExpr -> AffineExpr -> IO AffineExpr
+inline_c_ffi_6989586621679069717 :: AffineExpr -> AffineExpr -> IO AffineExpr
+inline_c_ffi_6989586621679069731 :: AffineExpr -> AffineExpr -> IO AffineExpr
+inline_c_ffi_6989586621679069622 :: Context -> CIntPtr -> CIntPtr -> CIntPtr -> Ptr AffineExpr -> IO AffineMap
 instance GHC.Classes.Eq MLIR.AST.Dialect.Affine.Expr
 instance GHC.Classes.Eq MLIR.AST.Dialect.Affine.Map
 instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.Affine.Map MLIR.Native.FFI.AffineMap
@@ -248,7 +255,16 @@ StringAttr :: ByteString -> Attribute
 TypeAttr :: Type -> Attribute
 AffineMapAttr :: Map -> Attribute
 UnitAttr :: Attribute
-DenseElementsAttr :: Type -> Vector Word32 -> Attribute
+DenseElementsAttr :: Type -> DenseElements -> Attribute
+data DenseElements
+DenseUInt8 :: IStorableArray i Word8 -> DenseElements
+DenseInt8 :: IStorableArray i Int8 -> DenseElements
+DenseUInt32 :: IStorableArray i Word32 -> DenseElements
+DenseInt32 :: IStorableArray i Int32 -> DenseElements
+DenseUInt64 :: IStorableArray i Word64 -> DenseElements
+DenseInt64 :: IStorableArray i Int64 -> DenseElements
+DenseFloat :: IStorableArray i Float -> DenseElements
+DenseDouble :: IStorableArray i Double -> DenseElements
 data ResultTypes
 Explicit :: [Type] -> ResultTypes
 Inferred :: ResultTypes
@@ -268,46 +284,53 @@ namedAttribute :: Name -> Attribute -> NamedAttributes
 pattern ModuleOp :: Block -> Operation
 pattern FuncAttrs :: Name -> Type -> Map Name Attribute
 pattern FuncOp :: Location -> Name -> Type -> Region -> Operation
-inline_c_ffi_6989586621679076373 :: Context -> IO Type
-inline_c_ffi_6989586621679076381 :: Context -> IO Type
-inline_c_ffi_6989586621679076389 :: Context -> IO Type
-inline_c_ffi_6989586621679076397 :: Context -> IO Type
-inline_c_ffi_6989586621679076407 :: Type -> IO Type
-inline_c_ffi_6989586621679076429 :: Context -> CIntPtr -> Ptr Type -> CIntPtr -> Ptr Type -> IO Type
-inline_c_ffi_6989586621679076437 :: Context -> IO Type
-inline_c_ffi_6989586621679076450 :: Context -> CUInt -> IO Type
-inline_c_ffi_6989586621679076460 :: Context -> CUInt -> IO Type
-inline_c_ffi_6989586621679076470 :: Context -> CUInt -> IO Type
-inline_c_ffi_6989586621679076510 :: Type -> CIntPtr -> Ptr Int64 -> Attribute -> IO Type
-inline_c_ffi_6989586621679076518 :: Context -> IO Type
-inline_c_ffi_6989586621679076540 :: CIntPtr -> Ptr Int64 -> Type -> Attribute -> IO Type
-inline_c_ffi_6989586621679076555 :: Context -> CIntPtr -> Ptr Type -> IO Type
-inline_c_ffi_6989586621679076569 :: Type -> Attribute -> IO Type
-inline_c_ffi_6989586621679076579 :: Type -> IO Type
-inline_c_ffi_6989586621679076597 :: CIntPtr -> Ptr Int64 -> Type -> IO Type
-inline_c_ffi_6989586621679076360 :: IO Region
-inline_c_ffi_6989586621679076338 :: Region -> Block -> IO ()
-inline_c_ffi_6989586621679076354 :: CIntPtr -> Ptr Type -> IO Block
-inline_c_ffi_6989586621679076267 :: Block -> Operation -> IO ()
-inline_c_ffi_6989586621679076277 :: Block -> IO CIntPtr
-inline_c_ffi_6989586621679076291 :: CIntPtr -> Ptr Value -> Block -> IO ()
-inline_c_ffi_6989586621679076300 :: Operation -> IO CIntPtr
-inline_c_ffi_6989586621679076314 :: CIntPtr -> Ptr Value -> Operation -> IO ()
-inline_c_ffi_6989586621679076126 :: Context -> CIntPtr -> Ptr Attribute -> IO Attribute
-inline_c_ffi_6989586621679076141 :: Context -> CIntPtr -> Ptr NamedAttribute -> IO Attribute
-inline_c_ffi_6989586621679076157 :: Context -> Type -> CDouble -> IO Attribute
-inline_c_ffi_6989586621679076171 :: Type -> Int64 -> IO Attribute
-inline_c_ffi_6989586621679076183 :: Context -> CInt -> IO Attribute
-inline_c_ffi_6989586621679076198 :: Context -> Ptr CChar -> CSize -> IO Attribute
-inline_c_ffi_6989586621679076208 :: Type -> IO Attribute
-inline_c_ffi_6989586621679076218 :: AffineMap -> IO Attribute
-inline_c_ffi_6989586621679076226 :: Context -> IO Attribute
-inline_c_ffi_6989586621679076243 :: Type -> CIntPtr -> Ptr Word32 -> IO Attribute
-inline_c_ffi_6989586621679076106 :: Ptr CChar -> CSize -> Location -> CBool -> CIntPtr -> Ptr Type -> CIntPtr -> Ptr Value -> CIntPtr -> Ptr Region -> CIntPtr -> Ptr Block -> CIntPtr -> Ptr NamedAttribute -> IO Operation
+inline_c_ffi_6989586621679079472 :: Context -> IO Type
+inline_c_ffi_6989586621679079480 :: Context -> IO Type
+inline_c_ffi_6989586621679079488 :: Context -> IO Type
+inline_c_ffi_6989586621679079496 :: Context -> IO Type
+inline_c_ffi_6989586621679079506 :: Type -> IO Type
+inline_c_ffi_6989586621679079528 :: Context -> CIntPtr -> Ptr Type -> CIntPtr -> Ptr Type -> IO Type
+inline_c_ffi_6989586621679079536 :: Context -> IO Type
+inline_c_ffi_6989586621679079549 :: Context -> CUInt -> IO Type
+inline_c_ffi_6989586621679079559 :: Context -> CUInt -> IO Type
+inline_c_ffi_6989586621679079569 :: Context -> CUInt -> IO Type
+inline_c_ffi_6989586621679079609 :: Type -> CIntPtr -> Ptr Int64 -> Attribute -> IO Type
+inline_c_ffi_6989586621679079617 :: Context -> IO Type
+inline_c_ffi_6989586621679079639 :: CIntPtr -> Ptr Int64 -> Type -> Attribute -> IO Type
+inline_c_ffi_6989586621679079654 :: Context -> CIntPtr -> Ptr Type -> IO Type
+inline_c_ffi_6989586621679079668 :: Type -> Attribute -> IO Type
+inline_c_ffi_6989586621679079678 :: Type -> IO Type
+inline_c_ffi_6989586621679079696 :: CIntPtr -> Ptr Int64 -> Type -> IO Type
+inline_c_ffi_6989586621679079459 :: IO Region
+inline_c_ffi_6989586621679079437 :: Region -> Block -> IO ()
+inline_c_ffi_6989586621679079453 :: CIntPtr -> Ptr Type -> IO Block
+inline_c_ffi_6989586621679079366 :: Block -> Operation -> IO ()
+inline_c_ffi_6989586621679079376 :: Block -> IO CIntPtr
+inline_c_ffi_6989586621679079390 :: CIntPtr -> Ptr Value -> Block -> IO ()
+inline_c_ffi_6989586621679079399 :: Operation -> IO CIntPtr
+inline_c_ffi_6989586621679079413 :: CIntPtr -> Ptr Value -> Operation -> IO ()
+inline_c_ffi_6989586621679079117 :: Context -> CIntPtr -> Ptr Attribute -> IO Attribute
+inline_c_ffi_6989586621679079132 :: Context -> CIntPtr -> Ptr NamedAttribute -> IO Attribute
+inline_c_ffi_6989586621679079148 :: Context -> Type -> CDouble -> IO Attribute
+inline_c_ffi_6989586621679079162 :: Type -> Int64 -> IO Attribute
+inline_c_ffi_6989586621679079174 :: Context -> CInt -> IO Attribute
+inline_c_ffi_6989586621679079189 :: Context -> Ptr CChar -> CSize -> IO Attribute
+inline_c_ffi_6989586621679079199 :: Type -> IO Attribute
+inline_c_ffi_6989586621679079209 :: AffineMap -> IO Attribute
+inline_c_ffi_6989586621679079217 :: Context -> IO Attribute
+inline_c_ffi_6989586621679079235 :: Type -> CIntPtr -> Ptr Word8 -> IO Attribute
+inline_c_ffi_6989586621679079250 :: Type -> CIntPtr -> Ptr Int8 -> IO Attribute
+inline_c_ffi_6989586621679079265 :: Type -> CIntPtr -> Ptr Word32 -> IO Attribute
+inline_c_ffi_6989586621679079280 :: Type -> CIntPtr -> Ptr Int32 -> IO Attribute
+inline_c_ffi_6989586621679079295 :: Type -> CIntPtr -> Ptr Word64 -> IO Attribute
+inline_c_ffi_6989586621679079310 :: Type -> CIntPtr -> Ptr Int64 -> IO Attribute
+inline_c_ffi_6989586621679079326 :: Type -> CIntPtr -> Ptr CFloat -> IO Attribute
+inline_c_ffi_6989586621679079342 :: Type -> CIntPtr -> Ptr CDouble -> IO Attribute
+inline_c_ffi_6989586621679079097 :: Ptr CChar -> CSize -> Location -> CBool -> CIntPtr -> Ptr Type -> CIntPtr -> Ptr Value -> CIntPtr -> Ptr Region -> CIntPtr -> Ptr Block -> CIntPtr -> Ptr NamedAttribute -> IO Operation
 packNamedAttrs :: Context -> ValueAndBlockMapping -> Map Name Attribute -> ContT r IO (CIntPtr, Ptr NamedAttribute)
-inline_c_ffi_6989586621679076610 :: IO CSize
-inline_c_ffi_6989586621679076617 :: IO CSize
-inline_c_ffi_6989586621679076639 :: Ptr NamedAttribute -> CInt -> Identifier -> Attribute -> IO ()
+inline_c_ffi_6989586621679079709 :: IO CSize
+inline_c_ffi_6989586621679079716 :: IO CSize
+inline_c_ffi_6989586621679079738 :: Ptr NamedAttribute -> CInt -> Identifier -> Attribute -> IO ()
 pattern CTrue :: CBool
 pattern CFalse :: CBool
 notImplemented :: forall a. a
@@ -320,6 +343,7 @@ instance MLIR.AST.Serialize.FromAST MLIR.AST.Operation MLIR.Native.FFI.Operation
 instance GHC.Classes.Eq MLIR.AST.Signedness
 instance GHC.Classes.Eq MLIR.AST.Type
 instance GHC.Classes.Eq MLIR.AST.Attribute
+instance GHC.Classes.Eq MLIR.AST.DenseElements
 
 module MLIR.AST.PatternUtil
 pattern MaybeToList :: Maybe a -> [a]
@@ -1167,13 +1191,13 @@ yield :: MonadBlockBuilder m => [Value] -> m EndOfBlock
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679282302 :: Context -> IO PassManager
+inline_c_ffi_6989586621679294803 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679282311 :: PassManager -> IO ()
+inline_c_ffi_6989586621679294812 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679282324 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679294825 :: PassManager -> Module -> IO LogicalResult
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679282333 :: PassManager -> IO ()
+inline_c_ffi_6989586621679294834 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679282342 :: PassManager -> IO ()
+inline_c_ffi_6989586621679294843 :: PassManager -> IO ()
