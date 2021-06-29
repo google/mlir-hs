@@ -133,6 +133,7 @@ instance Eq DenseElements where
     (DenseInt64  da, DenseInt64  db) -> elems da == elems db
     (DenseFloat  da, DenseFloat  db) -> elems da == elems db
     (DenseDouble da, DenseDouble db) -> elems da == elems db
+    _ -> False
 
 data ResultTypes = Explicit [Type] | Inferred
 

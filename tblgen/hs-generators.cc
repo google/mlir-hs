@@ -393,8 +393,6 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
     projection = "";
   }
 
-  size_t dialect_sep_loc = op.getOperationName().find('.');
-  assert(dialect_sep_loc != std::string::npos);
   std::string builder_name = legalizeBuilderName(stripDialect(op.getOperationName()));
 
   std::vector<std::string> builder_arg_types;

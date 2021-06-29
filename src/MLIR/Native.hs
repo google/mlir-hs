@@ -65,7 +65,6 @@ module MLIR.Native (
   ) where
 
 import qualified Data.ByteString as BS
-import qualified Data.ByteString.Unsafe as BS
 
 import Foreign.Ptr
 import Foreign.Storable

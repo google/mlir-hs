@@ -3,7 +3,6 @@ module MLIR.AST.IStorableArray (IStorableArray, unsafeWithIStorableArray) where
 import Data.Ix
 import Data.Array.Storable
 import Data.Array.Base
-import Data.Array.MArray
 import Foreign.Ptr
 import Foreign.Storable
 import System.IO.Unsafe
@@ -16,9 +15,9 @@ unsafeWithIStorableArray (UnsafeIStorableArray arr) = withStorableArray arr
 instance Storable e => IArray IStorableArray e where
   bounds (UnsafeIStorableArray arr) = unsafeDupablePerformIO $ getBounds arr
   numElements = rangeSize . bounds
-  unsafeArray bounds inits = unsafeDupablePerformIO $ do
-    arr <- newArray_ bounds
-    mapM (uncurry $ unsafeWrite arr) inits
+  unsafeArray bs inits = unsafeDupablePerformIO $ do
+    arr <- newArray_ bs
+    mapM_ (uncurry $ unsafeWrite arr) inits
     return $ UnsafeIStorableArray arr
   unsafeAt (UnsafeIStorableArray arr) i = unsafeDupablePerformIO $ unsafeRead arr i
 
