@@ -50,6 +50,6 @@ cond_br cond trueBlock trueArgs falseBlock falseArgs = do
     , opSuccessors = [trueBlock, falseBlock]
     , opAttributes = namedAttribute "operand_segment_sizes" $
                        DenseElementsAttr (VectorType [3] $ IntegerType Unsigned 32) $
-                         DenseUInt32 $ listArray (0, 2) $ fromIntegral <$> [1, length trueArgs, length falseArgs]
+                         DenseUInt32 $ listArray (0 :: Int, 2) $ fromIntegral <$> [1, length trueArgs, length falseArgs]
     }
   terminateBlock

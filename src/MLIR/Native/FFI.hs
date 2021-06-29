@@ -139,6 +139,7 @@ pattern Failure = UnsafeMkLogicalResult 0
 
 {-# COMPLETE Success, Failure #-}
 
+mlirCtx :: C.Context
 mlirCtx = mempty {
   -- This is a lie...
   -- All of those types are really C structs that hold a single pointer, but
