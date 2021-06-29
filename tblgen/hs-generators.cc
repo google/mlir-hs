@@ -85,8 +85,12 @@ void warn(const mlir::tblgen::Operator& op, const std::string& reason) {
 }
 
 struct AttrHandler {
-  const char* pattern;
-  const char* type;
+  std::string _pattern;
+  std::string type;
+
+  std::string pattern(std::string name) {
+    return llvm::formatv(_pattern.c_str(), name);
+  }
 };
 using attr_handler_map = llvm::StringMap<AttrHandler>;
 
@@ -143,87 +147,129 @@ std::string getDialectName(llvm::ArrayRef<llvm::Record*> op_defs) {
   return dialect_name;
 }
 
-struct AttrPattern {
-  AttrPattern() = default;
-  AttrPattern(std::string name, std::vector<std::string> types,
-              std::vector<std::string> binders,
-              std::vector<llvm::StringRef> attr_names,
-              std::vector<std::string> attr_patterns)
+class AttrPattern {
+  AttrPattern(std::string name, std::vector<std::string> binders,
+              std::vector<mlir::tblgen::NamedAttribute> attrs)
       : name(std::move(name)),
-        types(std::move(types)),
         binders(std::move(binders)),
-        attr_names(std::move(attr_names)),
-        attr_patterns(std::move(attr_patterns)) {}
+        attrs(std::move(attrs)) {
+    for (const auto& nattr : this->attrs) {
+      types.push_back(getHandlerType(nattr));
+    }
+  }
 
-  void print(llvm::raw_ostream& os) {
+ public:
+  static llvm::Optional<AttrPattern> buildFor(mlir::tblgen::Operator& op) {
+    if (op.getNumAttributes() == 0) return AttrPattern("NoAttrs", {}, {});
+
+    const auto& attr_handlers = getAttrHandlers();
+    std::vector<std::string> binders;
+    std::vector<mlir::tblgen::NamedAttribute> attrs;
+    for (const auto& named_attr : op.getAttributes()) {
+      // Derived attributes are never materialized and don't have to be
+      // specified.
+      if (named_attr.attr.isDerivedAttr()) continue;
+
+      auto handler_it = attr_handlers.find(named_attr.attr.getAttrDefName());
+      if (handler_it == attr_handlers.end()) {
+        if (named_attr.attr.hasDefaultValue()) {
+          warn(op, llvm::formatv("unsupported attr {0} (but has default value)",
+                                 named_attr.attr.getAttrDefName()));
+          continue;
+        }
+        if (named_attr.attr.isOptional()) {
+          warn(op, llvm::formatv("unsupported attr {0} (but is optional)",
+                                 named_attr.attr.getAttrDefName()));
+          continue;
+        }
+        warn(op, llvm::formatv("unsupported attr ({0})",
+                               named_attr.attr.getAttrDefName()));
+        return llvm::None;
+      }
+      std::string attr_arg_name = sanitizeName(named_attr.name.str());
+      binders.push_back(attr_arg_name);
+      attrs.push_back(named_attr);
+    }
+    if (binders.empty()) return AttrPattern("NoAttrs", {}, {});
+    std::string name = "Internal" + op.getCppClassName().str() + "Attributes";
+    return AttrPattern(std::move(name), std::move(binders), std::move(attrs));
+  }
+
+  using print_state = llvm::StringSet<>;
+
+  void print(llvm::raw_ostream& os, print_state& optional_attr_defs) {
     if (name == "NoAttrs") return;
+    // `M.lookup "attr_name" m` for every attribute
+    std::vector<std::string> lookups;
+    // Patterns from handlers, but wrapped in "Just (...)" when non-optional
+    std::vector<std::string> lookup_patterns;
+    // `[("attr_name", attr_pattern)]` for every non-optional attribute
+    std::vector<std::string> singleton_pairs;
+    for (size_t i = 0; i < attrs.size(); ++i) {
+      const mlir::tblgen::NamedAttribute& nattr = attrs[i];
+      AttrHandler handler = getHandler(nattr, os, optional_attr_defs);
+      lookups.push_back(llvm::formatv("M.lookup \"{0}\" m", nattr.name));
+      std::string pattern = handler.pattern(binders[i]);
+      if (nattr.attr.isOptional()) {
+        lookup_patterns.push_back(pattern);
+        singleton_pairs.push_back(llvm::formatv(
+            "(maybeToList $ (\"{0}\",) <$> {1})", nattr.name, pattern));
+      } else {
+        lookup_patterns.push_back(llvm::formatv("Just ({0})", pattern));
+        singleton_pairs.push_back(
+            llvm::formatv("[(\"{0}\", {1})]", nattr.name, pattern));
+      }
+    }
     const char* kAttributePattern = R"(
 pattern {0} :: {1:$[ -> ]} -> NamedAttributes
 pattern {0} {2:$[ ]} <- ((\m -> ({3:$[, ]})) -> ({4:$[, ]}))
-  where {0} {2:$[ ]} = M.fromList [{5:$[, ]}]
+  where {0} {2:$[ ]} = M.fromList $ {5:$[ ++ ]}
 )";
-    os << llvm::formatv(
-        kAttributePattern, name, make_range(types), make_range(binders),
-        // `M.lookup "attr_name" m` for every attr_name
-        make_range(
-            map_vector(attr_names,
-                       [](const llvm::StringRef& name) {
-                         return llvm::formatv("M.lookup \"{0}\" m", name).str();
-                       })),
-        // Like attr_patterns, but wrapped in "Just (...)"
-        make_range(map_vector(attr_patterns,
-                              [](const std::string& pat) {
-                                return llvm::formatv("Just ({0})", pat).str();
-                              })),
-        // `("attr_name", attr_pattern)` for every attribute
-        make_range(
-            map_vector(llvm::zip(attr_names, attr_patterns),
-                       [](const std::tuple<llvm::StringRef, std::string>& p) {
-                         return llvm::formatv("(\"{0}\", {1})", std::get<0>(p),
-                                              std::get<1>(p))
-                             .str();
-                       })));
+    os << llvm::formatv(kAttributePattern,
+                        name,                          // 0
+                        make_range(types),             // 1
+                        make_range(binders),           // 2
+                        make_range(lookups),           // 3
+                        make_range(lookup_patterns),   // 4
+                        make_range(singleton_pairs));  // 5
+  }
+
+  std::string getHandlerType(const mlir::tblgen::NamedAttribute& nattr) {
+    llvm::StringRef attr_kind = nattr.attr.getAttrDefName();
+    assert(getAttrHandlers().count(attr_kind) == 1);
+    AttrHandler handler = getAttrHandlers().lookup(attr_kind);
+    if (!nattr.attr.isOptional()) return handler.type;
+    return "Maybe (" + handler.type + ")";
+  }
+
+  AttrHandler getHandler(const mlir::tblgen::NamedAttribute& nattr,
+                         llvm::raw_ostream& os,
+                         print_state& optional_attr_defs) {
+    llvm::StringRef attr_kind = nattr.attr.getAttrDefName();
+    assert(getAttrHandlers().count(attr_kind) == 1);
+    AttrHandler handler = getAttrHandlers().lookup(attr_kind);
+    if (!nattr.attr.isOptional()) return handler;
+    if (!optional_attr_defs.contains(attr_kind)) {
+      const char* kOptionalHandler = R"(
+pattern Optional{0} :: Maybe {1} -> Maybe Attribute
+pattern Optional{0} x <- ((\case Just ({2}) -> Just y; Nothing -> Nothing) -> x)
+  where Optional{0} x = case x of Just y -> Just ({2}); Nothing -> Nothing
+)";
+      os << llvm::formatv(kOptionalHandler, attr_kind, handler.type,
+                          handler.pattern("y"));
+      optional_attr_defs.insert(attr_kind);
+    }
+    return {"Optional" + attr_kind.str() + " {0}",
+            "Maybe (" + handler.type + ")"};
   }
 
   std::string name;
-  std::vector<std::string> types;
   std::vector<std::string> binders;
+  std::vector<std::string> types;
 
-  std::vector<llvm::StringRef> attr_names;
-  std::vector<std::string> attr_patterns;
+ private:
+  std::vector<mlir::tblgen::NamedAttribute> attrs;
 };
-
-llvm::Optional<AttrPattern> buildAttrPattern(mlir::tblgen::Operator& op) {
-  if (op.getNumAttributes() == 0) return AttrPattern("NoAttrs", {}, {}, {}, {});
-
-  const auto& attr_handlers = getAttrHandlers();
-  AttrPattern pattern;
-  pattern.name = "Internal" + op.getCppClassName().str() + "Attributes";
-  for (const auto& named_attr : op.getAttributes()) {
-    // Derived attributes are never materialized and don't have to be specified.
-    if (named_attr.attr.isDerivedAttr()) continue;
-
-    auto handler_it = attr_handlers.find(named_attr.attr.getAttrDefName());
-    if (handler_it == attr_handlers.end()) {
-      if (named_attr.attr.hasDefaultValue()) {
-        warn(op, llvm::formatv("unsupported attr {0} (but has default value)",
-                               named_attr.attr.getAttrDefName()));
-        continue;
-      }
-      warn(op, llvm::formatv("unsupported attr ({0})",
-                             named_attr.attr.getAttrDefName()));
-      return llvm::None;
-    }
-    std::string attr_arg_name = sanitizeName(named_attr.name.str());
-    AttrHandler handler = handler_it->second;
-    pattern.binders.push_back(attr_arg_name);
-    pattern.types.push_back(handler.type);
-    pattern.attr_names.push_back(named_attr.name);
-    pattern.attr_patterns.push_back(llvm::formatv(handler.pattern, attr_arg_name));
-  }
-  if (pattern.types.empty()) return AttrPattern("NoAttrs", {}, {}, {}, {});
-  return pattern;
-}
 
 llvm::Optional<std::string> buildOperation(
     const llvm::Record* def, bool is_pattern, const std::string& what_for,
@@ -612,6 +658,7 @@ import MLIR.AST.PatternUtil
 import qualified MLIR.AST.Dialect.Affine as Affine
 )";
 
+  AttrPattern::print_state attr_pattern_state;
   for (const auto* def : defs) {
     mlir::tblgen::Operator op(*def);
     if (op.hasDescription()) {
@@ -619,9 +666,9 @@ import qualified MLIR.AST.Dialect.Affine as Affine
       os << formatDescription(op);
       os << "\n";
     }
-    llvm::Optional<AttrPattern> attr_pattern = buildAttrPattern(op);
+    llvm::Optional<AttrPattern> attr_pattern = AttrPattern::buildFor(op);
     if (!attr_pattern) continue;
-    attr_pattern->print(os);
+    attr_pattern->print(os, attr_pattern_state);
     emitPattern(def, *attr_pattern, os);
     emitBuilderMethod(op, *attr_pattern, os);
   }
@@ -656,7 +703,7 @@ spec = do
   os << llvm::formatv(module_header, dialect_name);
   for (const auto* def : defs) {
     mlir::tblgen::Operator op(*def);
-    llvm::Optional<AttrPattern> attr_pattern = buildAttrPattern(op);
+    llvm::Optional<AttrPattern> attr_pattern = AttrPattern::buildFor(op);
     if (!attr_pattern) continue;
     os << "\n  describe \"" << op.getOperationName() << "\" $ do";
     const char* bidirectional_test_template = R"(
