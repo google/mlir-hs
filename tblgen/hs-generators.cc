@@ -333,8 +333,29 @@ llvm::Optional<std::string> buildOperation(
     return fail("unsupported variable length operands");
   }
 
+  std::string extra_attrs;
   if (op.getTrait("::mlir::OpTrait::AttrSizedOperandSegments")) {
-    return fail("operand_segment_sizes not implemented");
+    std::vector<std::string> segment_sizes;
+    for (int i = 0; i < op.getNumOperands(); ++i) {
+      auto& operand = op.getOperand(i);
+      if (operand.isOptional()) {
+        segment_sizes.push_back(llvm::formatv(
+            "case {0} of Just _ -> 1; Nothing -> 0", operand_exprs[i]));
+      } else if (operand.isVariadic()) {
+        segment_sizes.push_back("length " + operand_exprs[i]);
+      } else {
+        assert(!operand.isVariableLength());
+        segment_sizes.push_back("1");
+      }
+    }
+    const char* kOperandSegmentsAttr = R"(
+              <> namedAttribute "operand_segment_sizes"
+                   (DenseElementsAttr (VectorType [{0}] $ IntegerType Unsigned 32) $
+                      DenseUInt32 $ listArray (1, {0}) $ fromIntegral <$> [{1:$[, ]}])
+)";
+    extra_attrs = llvm::formatv(kOperandSegmentsAttr,
+                                segment_sizes.size(),
+                                make_range(segment_sizes));
   }
 
   const char* kPatternExplicitType = R"(Operation
@@ -344,7 +365,7 @@ llvm::Optional<std::string> buildOperation(
           , opOperands = {3}
           , opRegions = [{4:$[ ]}]
           , opSuccessors = []
-          , opAttributes = {5}{6}{7:$[ ]}
+          , opAttributes = ({5}{6}{7:$[ ]}){8}
           })";
   return llvm::formatv(kPatternExplicitType,
                        op.getOperationName(),                    // 0
@@ -354,7 +375,8 @@ llvm::Optional<std::string> buildOperation(
                        make_range(region_exprs),                 // 4
                        attr_pattern.name,                        // 5
                        attr_pattern.binders.empty() ? "" : " ",  // 6
-                       make_range(attr_pattern.binders))         // 7
+                       make_range(attr_pattern.binders),         // 7
+                       extra_attrs)                              // 8
       .str();
 }
 
@@ -610,6 +632,7 @@ bool emitOpTableDefs(const llvm::RecordKeeper& recordKeeper,
   os << R"(
 import Prelude hiding (return, min, max)
 import Data.Maybe (maybeToList)
+import Data.Array.IArray (listArray)
 import qualified Data.ByteString as BS
 import qualified Data.Map.Strict as M
 import Control.Monad (liftM, void)
