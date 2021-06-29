@@ -819,6 +819,9 @@ pattern FmaF :: Location -> Type -> operand -> operand -> operand -> AbstractOpe
 -- | A builder for <tt>std.fmaf</tt>.
 fmaf :: MonadBlockBuilder m => Value -> Value -> Value -> m Value
 
+-- | A builder for <tt>std.generic_atomic_rmw</tt>.
+generic_atomic_rmw :: MonadBlockBuilder m => Type -> Value -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A pattern for <tt>std.index_cast</tt>.
 pattern IndexCast :: Location -> Type -> operand -> AbstractOperation operand
 
@@ -1001,6 +1004,9 @@ pattern AssumingAll :: Location -> Type -> [operand] -> AbstractOperation operan
 -- | A builder for <tt>shape.assuming_all</tt>.
 assuming_all :: MonadBlockBuilder m => Type -> [Value] -> m Value
 
+-- | A builder for <tt>shape.assuming</tt>.
+assuming :: MonadBlockBuilder m => [Type] -> Value -> RegionBuilderT m () -> m Value
+
 -- | A pattern for <tt>shape.assuming_yield</tt>.
 pattern AssumingYield :: Location -> [operand] -> AbstractOperation operand
 
@@ -1073,6 +1079,9 @@ pattern FromExtents :: Location -> Type -> [operand] -> AbstractOperation operan
 -- | A builder for <tt>shape.from_extents</tt>.
 from_extents :: MonadBlockBuilder m => Type -> [Value] -> m Value
 
+-- | A builder for <tt>shape.function_library</tt>.
+function_library :: MonadBlockBuilder m => Map Name Attribute -> RegionBuilderT m () -> m ()
+
 -- | A pattern for <tt>shape.get_extent</tt>.
 pattern GetExtent :: Location -> Type -> operand -> operand -> AbstractOperation operand
 
@@ -1126,6 +1135,9 @@ pattern Rank :: Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.rank</tt>.
 rank :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>shape.reduce</tt>.
+reduce :: MonadBlockBuilder m => [Type] -> Value -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>shape.shape_eq</tt>.
 pattern ShapeEq :: Location -> Type -> [operand] -> AbstractOperation operand
@@ -1189,15 +1201,21 @@ pattern Linalg_Yield :: Location -> [operand] -> AbstractOperation operand
 -- | A builder for <tt>linalg.yield</tt>.
 yield :: MonadBlockBuilder m => [Value] -> m EndOfBlock
 
+-- | A builder for <tt>linalg.copy</tt>.
+copy :: MonadBlockBuilder m => Value -> Value -> Map -> Map -> RegionBuilderT m () -> m ()
+
+-- | A builder for <tt>linalg.fill</tt>.
+fill :: MonadBlockBuilder m => Maybe Type -> Value -> Value -> RegionBuilderT m () -> m Value
+
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679294869 :: Context -> IO PassManager
+inline_c_ffi_6989586621679297234 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679294878 :: PassManager -> IO ()
+inline_c_ffi_6989586621679297243 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679294891 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679297256 :: PassManager -> Module -> IO LogicalResult
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679294900 :: PassManager -> IO ()
+inline_c_ffi_6989586621679297265 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679294909 :: PassManager -> IO ()
+inline_c_ffi_6989586621679297274 :: PassManager -> IO ()
