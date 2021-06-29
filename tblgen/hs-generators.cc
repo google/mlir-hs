@@ -84,54 +84,24 @@ void warn(const mlir::tblgen::Operator& op, const std::string& reason) {
   warn(op.getOperationName(), reason);
 }
 
-using attr_handler =
-    std::function<std::pair<std::string, std::string>(llvm::StringRef)>;
-using attr_handler_map = llvm::StringMap<attr_handler>;
+struct AttrHandler {
+  const char* pattern;
+  const char* type;
+};
+using attr_handler_map = llvm::StringMap<AttrHandler>;
 
 const attr_handler_map& getAttrHandlers() {
   static const attr_handler_map* kAttrHandlers = new attr_handler_map{
-      {"AnyAttr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(arg.str(), "Attribute");
-       })},
-      {"AffineMapArrayAttr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(
-             llvm::formatv("(AffineMapArrayAttr {0})", arg).str(),
-             "[Affine.Map]");
-       })},
-      {"AffineMapAttr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(llvm::formatv("(AffineMapAttr {0})", arg).str(),
-                               "Affine.Map");
-       })},
-      {"ArrayAttr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(llvm::formatv("(ArrayAttr {0})", arg).str(),
-                               "[Attribute]");
-       })},
-      {"BoolAttr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(llvm::formatv("(BoolAttr {0})", arg).str(),
-                               "Bool");
-       })},
-      {"DictionaryAttr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(llvm::formatv("(DictionaryAttr {0})", arg).str(),
-                               "(M.Map Name Attribute)");
-       })},
-      {"I32Attr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(
-             llvm::formatv("(IntegerAttr (IntegerType Signless 32) {0})", arg)
-                 .str(),
-             "Int");
-       })},
-      {"I64ArrayAttr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(llvm::formatv("(I64ArrayAttr {0})", arg).str(),
-                               "[Int]");
-       })},
-      {"IndexAttr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(
-             llvm::formatv("(IntegerAttr IndexType {0})", arg).str(), "Int");
-       })},
-      {"StrAttr", attr_handler([](llvm::StringRef arg) {
-         return std::make_pair(llvm::formatv("(StringAttr {0})", arg).str(),
-                               "BS.ByteString");
-       })},
+      {"AnyAttr", {"{0}", "Attribute"}},
+      {"AffineMapArrayAttr", {"AffineMapArrayAttr {0}", "[Affine.Map]"}},
+      {"AffineMapAttr", {"AffineMapAttr {0}", "Affine.Map"}},
+      {"ArrayAttr", {"ArrayAttr {0}", "[Attribute]"}},
+      {"BoolAttr", {"BoolAttr {0}", "Bool"}},
+      {"DictionaryAttr", {"DictionaryAttr {0}", "(M.Map Name Attribute)"}},
+      {"I32Attr", {"IntegerAttr (IntegerType Signless 32) {0}", "Int"}},
+      {"I64ArrayAttr", {"I64ArrayAttr {0}", "[Int]"}},
+      {"IndexAttr", {"IntegerAttr IndexType {0}", "Int"}},
+      {"StrAttr", {"StringAttr {0}", "BS.ByteString"}},
   };
   return *kAttrHandlers;
 }
@@ -245,12 +215,11 @@ llvm::Optional<AttrPattern> buildAttrPattern(mlir::tblgen::Operator& op) {
       return llvm::None;
     }
     std::string attr_arg_name = sanitizeName(named_attr.name.str());
-    std::string attr_pattern, attr_arg_type;
-    std::tie(attr_pattern, attr_arg_type) = handler_it->second(attr_arg_name);
+    AttrHandler handler = handler_it->second;
     pattern.binders.push_back(attr_arg_name);
-    pattern.types.push_back(attr_arg_type);
+    pattern.types.push_back(handler.type);
     pattern.attr_names.push_back(named_attr.name);
-    pattern.attr_patterns.push_back(attr_pattern);
+    pattern.attr_patterns.push_back(llvm::formatv(handler.pattern, attr_arg_name));
   }
   if (pattern.types.empty()) return AttrPattern("NoAttrs", {}, {}, {}, {});
   return pattern;
