@@ -39,6 +39,7 @@
 #include "mlir/TableGen/Interfaces.h"
 #include "mlir/TableGen/OpClass.h"
 #include "mlir/TableGen/Operator.h"
+#include "mlir/TableGen/Region.h"
 #include "mlir/TableGen/SideEffects.h"
 #include "mlir/TableGen/Trait.h"
 
@@ -260,6 +261,7 @@ llvm::Optional<std::string> buildOperation(
     const std::string& location_expr,
     const std::vector<std::string>& type_exprs,
     const std::vector<std::string>& operand_exprs,
+    const std::vector<std::string>& region_exprs,
     const AttrPattern& attr_pattern) {
   mlir::tblgen::Operator op(def);
   auto fail = [&op, &what_for](std::string reason) {
@@ -268,12 +270,13 @@ llvm::Optional<std::string> buildOperation(
   };
 
   // Skip currently unsupported cases
-  if (op.getNumRegions() != 0) return fail("regions");
+  if (op.getNumVariadicRegions() != 0) return fail("variadic regions");
   if (op.getNumSuccessors() != 0) return fail("successors");
 
   // Prepare results
   std::string type_expr;
   if (op.getNumResults() == 0) {
+    assert(type_exprs.size() == op.getNumResults());
     type_expr = "[]";
   } else if (op.getNumVariableLengthResults() == 0 &&
              op.getTrait("::mlir::OpTrait::SameOperandsAndResultType")) {
@@ -282,8 +285,10 @@ llvm::Optional<std::string> buildOperation(
                               make_range(std::vector<llvm::StringRef>(
                                   op.getNumResults(), type_exprs.front())));
   } else if (op.getNumVariableLengthResults() == 0) {
+    assert(type_exprs.size() == op.getNumResults());
     type_expr = llvm::formatv("[{0:$[, ]}]", make_range(type_exprs));
   } else if (!is_pattern) {
+    assert(type_exprs.size() == op.getNumResults());
     std::vector<std::string> list_type_exprs;
     for (int i = 0; i < op.getNumResults(); ++i) {
       auto& result = op.getResult(i);
@@ -303,6 +308,7 @@ llvm::Optional<std::string> buildOperation(
 
   // Prepare operands
   std::string operand_expr;
+  assert(operand_exprs.size() == op.getNumOperands());
   if (op.getNumOperands() == 1 && op.getOperand(0).isVariadic()) {
     // Note that this expr already should represent a list
     operand_expr = operand_exprs.front();
@@ -336,18 +342,19 @@ llvm::Optional<std::string> buildOperation(
           , opLocation = {1}
           , opResultTypes = Explicit {2}
           , opOperands = {3}
-          , opRegions = []
+          , opRegions = [{4:$[ ]}]
           , opSuccessors = []
-          , opAttributes = {4}{5}{6:$[ ]}
+          , opAttributes = {5}{6}{7:$[ ]}
           })";
   return llvm::formatv(kPatternExplicitType,
                        op.getOperationName(),                    // 0
                        location_expr,                            // 1
                        type_expr,                                // 2
                        operand_expr,                             // 3
-                       attr_pattern.name,                        // 4
-                       attr_pattern.binders.empty() ? "" : " ",  // 5
-                       make_range(attr_pattern.binders))         // 6
+                       make_range(region_exprs),                 // 4
+                       attr_pattern.name,                        // 5
+                       attr_pattern.binders.empty() ? "" : " ",  // 6
+                       make_range(attr_pattern.binders))         // 7
       .str();
 }
 
@@ -371,14 +378,14 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
     warn(op, "couldn't construct builder: " + reason);
   };
 
-  if (op.getNumRegions() != 0) return fail("regions");
+  if (op.getNumVariadicRegions() != 0) return fail("variadic regions");
   if (op.getNumSuccessors() != 0) return fail("successors");
 
   const char* result_type;
-  const char* projection;
+  std::string prologue;
   const char* continuation = "";
   if (op.getNumResults() == 0) {
-    projection = "void";
+    prologue = "void ";
     if (op.getTrait("::mlir::OpTrait::IsTerminator")) {
       result_type = "EndOfBlock";
       continuation = "\n  terminateBlock";
@@ -387,10 +394,10 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
     }
   } else if (op.getNumResults() == 1) {
     result_type = "Value";
-    projection = "liftM head";
+    prologue = "liftM head ";
   } else {
     result_type = "[Value]";
-    projection = "";
+    prologue = "";
   }
 
   std::string builder_name = legalizeBuilderName(stripDialect(op.getOperationName()));
@@ -447,30 +454,48 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
 
   builder_arg_types.insert(builder_arg_types.end(), attr_pattern.types.begin(),
                            attr_pattern.types.end());
+
+  std::vector<std::string> region_builder_binders;
+  std::vector<std::string> region_binders;
+  if (op.getNumRegions() > 0) {
+    std::string region_prologue;
+    for (const mlir::tblgen::NamedRegion& region : op.getRegions()) {
+      region_builder_binders.push_back(sanitizeName(region.name) + "Builder");
+      region_binders.push_back(sanitizeName(region.name));
+      builder_arg_types.push_back("RegionBuilderT m ()");
+      region_prologue += llvm::formatv(
+          "{0} <- buildRegion {1}\n  ",
+          region_binders.back(), region_builder_binders.back());
+    }
+    prologue = region_prologue + prologue;
+  }
+
   builder_arg_types.push_back("");  // To add the arrow before m
 
   llvm::Optional<std::string> operation =
       buildOperation(&op.getDef(), false, "builder", "UnknownLocation",
-                     type_exprs, operand_name_exprs, attr_pattern);
+                     type_exprs, operand_name_exprs, region_binders,
+                     attr_pattern);
   if (!operation) return;
 
   const char* kBuilder = R"(
--- | A builder for @{9}@.
+-- | A builder for @{10}@.
 {0} :: MonadBlockBuilder m => {1:$[ -> ]}m {2}
-{0} {3:$[ ]} {4:$[ ]} {5:$[ ]} = do
-  {6} (emitOp ({7})){8}
+{0} {3:$[ ]} {4:$[ ]} {5:$[ ]} {6:$[ ]} = do
+  {7}(emitOp ({8})){9}
 )";
   os << llvm::formatv(kBuilder,
-                      builder_name,                      // 0
-                      make_range(builder_arg_types),     // 1
-                      result_type,                       // 2
-                      make_range(type_binders),          // 3
-                      make_range(operand_binders),       // 4
-                      make_range(attr_pattern.binders),  // 5
-                      projection,                        // 6
-                      *operation,                        // 7
-                      continuation,                      // 8
-                      op.getOperationName());            // 9
+                      builder_name,                        // 0
+                      make_range(builder_arg_types),       // 1
+                      result_type,                         // 2
+                      make_range(type_binders),            // 3
+                      make_range(operand_binders),         // 4
+                      make_range(attr_pattern.binders),    // 5
+                      make_range(region_builder_binders),  // 6
+                      prologue,                            // 7
+                      *operation,                          // 8
+                      continuation,                        // 9
+                      op.getOperationName());              // 10
 }
 
 void emitPattern(const llvm::Record* def, const AttrPattern& attr_pattern,
@@ -529,7 +554,8 @@ void emitPattern(const llvm::Record* def, const AttrPattern& attr_pattern,
                            attr_pattern.types.end());
 
   llvm::Optional<std::string> operation = buildOperation(
-      def, true, "pattern", "loc", type_binders, operand_binders, attr_pattern);
+      def, true, "pattern", "loc",
+      type_binders, operand_binders, {}, attr_pattern);
   if (!operation) return;
 
   const char* kPatternExplicitType = R"(
@@ -583,6 +609,7 @@ bool emitOpTableDefs(const llvm::RecordKeeper& recordKeeper,
   os << "module MLIR.AST.Dialect.Generated." << dialect_name << " where\n";
   os << R"(
 import Prelude hiding (return, min, max)
+import Data.Maybe (maybeToList)
 import qualified Data.ByteString as BS
 import qualified Data.Map.Strict as M
 import Control.Monad (liftM, void)
