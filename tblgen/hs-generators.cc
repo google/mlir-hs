@@ -366,7 +366,7 @@ llvm::Optional<std::string> buildOperation(
     const char* kOperandSegmentsAttr = R"(
               <> namedAttribute "operand_segment_sizes"
                    (DenseElementsAttr (VectorType [{0}] $ IntegerType Unsigned 32) $
-                      DenseUInt32 $ listArray (1, {0}) $ fromIntegral <$> [{1:$[, ]}])
+                      DenseUInt32 $ listArray (1 :: Int, {0}) $ fromIntegral <$> [{1:$[, ]}])
 )";
     extra_attrs = llvm::formatv(kOperandSegmentsAttr,
                                 segment_sizes.size(),
