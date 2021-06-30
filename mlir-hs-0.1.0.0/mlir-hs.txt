@@ -474,6 +474,9 @@ pattern MaskCompressIntr :: Location -> Type -> operand -> operand -> operand ->
 -- | A builder for <tt>x86vector.avx512.intr.mask.compress</tt>.
 avx512_intr_mask_compress :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
+-- | A builder for <tt>x86vector.avx512.mask.compress</tt>.
+avx512_mask_compress :: MonadBlockBuilder m => Type -> Value -> Value -> Maybe Value -> m Value
+
 -- | A pattern for <tt>x86vector.avx512.mask.rndscale</tt>.
 pattern MaskRndScale :: Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
@@ -699,6 +702,12 @@ shuffle :: MonadBlockBuilder m => Type -> Value -> Value -> [Int] -> m Value
 
 -- | A builder for <tt>vector.store</tt>.
 store :: MonadBlockBuilder m => Value -> Value -> [Value] -> m ()
+
+-- | A builder for <tt>vector.transfer_read</tt>.
+transfer_read :: MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Maybe Value -> Map -> m Value
+
+-- | A builder for <tt>vector.transfer_write</tt>.
+transfer_write :: MonadBlockBuilder m => Maybe Type -> Value -> Value -> [Value] -> Maybe Value -> Map -> m Value
 
 -- | A pattern for <tt>vector.transpose</tt>.
 pattern Transpose :: Location -> Type -> operand -> [Int] -> AbstractOperation operand
@@ -1017,10 +1026,10 @@ pattern AssumingYield :: Location -> [operand] -> AbstractOperation operand
 assuming_yield :: MonadBlockBuilder m => [Value] -> m EndOfBlock
 
 -- | A pattern for <tt>shape.broadcast</tt>.
-pattern Broadcast :: Location -> Type -> [operand] -> ByteString -> AbstractOperation operand
+pattern Broadcast :: Location -> Type -> [operand] -> Maybe ByteString -> AbstractOperation operand
 
 -- | A builder for <tt>shape.broadcast</tt>.
-broadcast :: MonadBlockBuilder m => Type -> [Value] -> ByteString -> m Value
+broadcast :: MonadBlockBuilder m => Type -> [Value] -> Maybe ByteString -> m Value
 
 -- | A pattern for <tt>shape.concat</tt>.
 pattern Concat :: Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -1104,10 +1113,10 @@ pattern IsBroadcastable :: Location -> Type -> [operand] -> AbstractOperation op
 is_broadcastable :: MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A pattern for <tt>shape.join</tt>.
-pattern Join :: Location -> Type -> operand -> operand -> ByteString -> AbstractOperation operand
+pattern Join :: Location -> Type -> operand -> operand -> Maybe ByteString -> AbstractOperation operand
 
 -- | A builder for <tt>shape.join</tt>.
-join :: MonadBlockBuilder m => Type -> Value -> Value -> ByteString -> m Value
+join :: MonadBlockBuilder m => Type -> Value -> Value -> Maybe ByteString -> m Value
 
 -- | A pattern for <tt>shape.max</tt>.
 pattern Max :: Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -1202,7 +1211,7 @@ pattern Linalg_Range :: Location -> Type -> operand -> operand -> operand -> Abs
 range :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A builder for <tt>linalg.tiled_loop</tt>.
-tiled_loop :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Value] -> [Value] -> [Value] -> [Attribute] -> [Attribute] -> RegionBuilderT m () -> m Value
+tiled_loop :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Value] -> [Value] -> [Value] -> [Attribute] -> Maybe [Attribute] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>linalg.yield</tt>.
 pattern Linalg_Yield :: Location -> [operand] -> AbstractOperation operand
@@ -1246,11 +1255,17 @@ conv_2d_nhwc :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBui
 -- | A builder for <tt>linalg.conv_1d_nwc</tt>.
 conv_1d_nwc :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A pattern for <tt>linalg.conv</tt>.
+pattern Conv :: Location -> operand -> operand -> operand -> Maybe [Int] -> Maybe [Int] -> AbstractOperation operand
+
+-- | A builder for <tt>linalg.conv</tt>.
+conv :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
+
 -- | A builder for <tt>linalg.conv_1d</tt>.
 conv_1d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.copy</tt>.
-copy :: MonadBlockBuilder m => Value -> Value -> Map -> Map -> RegionBuilderT m () -> m ()
+copy :: MonadBlockBuilder m => Value -> Value -> Maybe Map -> Maybe Map -> RegionBuilderT m () -> m ()
 
 -- | A builder for <tt>linalg.dot_i16_i16_i32</tt>.
 dot_i16_i16_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1271,7 +1286,7 @@ fill :: MonadBlockBuilder m => Maybe Type -> Value -> Value -> RegionBuilderT m 
 fill_rng_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.generic</tt>.
-generic :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> [Attribute] -> ByteString -> ByteString -> RegionBuilderT m () -> m Value
+generic :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> [Attribute] -> Maybe ByteString -> Maybe ByteString -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matmul_column_major</tt>.
 matmul_column_major :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1300,6 +1315,24 @@ matvec_i8_i8_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> Regio
 -- | A builder for <tt>linalg.matvec</tt>.
 matvec :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A pattern for <tt>linalg.pooling_max</tt>.
+pattern PoolingMax :: Location -> operand -> operand -> operand -> Maybe [Int] -> Maybe [Int] -> AbstractOperation operand
+
+-- | A builder for <tt>linalg.pooling_max</tt>.
+pooling_max :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
+
+-- | A pattern for <tt>linalg.pooling_min</tt>.
+pattern PoolingMin :: Location -> operand -> operand -> operand -> Maybe [Int] -> Maybe [Int] -> AbstractOperation operand
+
+-- | A builder for <tt>linalg.pooling_min</tt>.
+pooling_min :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
+
+-- | A pattern for <tt>linalg.pooling_sum</tt>.
+pattern PoolingSum :: Location -> operand -> operand -> operand -> Maybe [Int] -> Maybe [Int] -> AbstractOperation operand
+
+-- | A builder for <tt>linalg.pooling_sum</tt>.
+pooling_sum :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
+
 -- | A builder for <tt>linalg.vecmat_i16_i16_i32</tt>.
 vecmat_i16_i16_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1314,13 +1347,13 @@ vecmat :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT 
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679335276 :: Context -> IO PassManager
+inline_c_ffi_6989586621679349998 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679335285 :: PassManager -> IO ()
+inline_c_ffi_6989586621679350007 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679335298 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679350020 :: PassManager -> Module -> IO LogicalResult
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679335307 :: PassManager -> IO ()
+inline_c_ffi_6989586621679350029 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679335316 :: PassManager -> IO ()
+inline_c_ffi_6989586621679350038 :: PassManager -> IO ()
