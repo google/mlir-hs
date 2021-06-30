@@ -12,18 +12,15 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-module MLIR.AST.PatternUtil where
+module MLIR.AST.PatternUtil
+  ( pattern I64ArrayAttr
+  , pattern AffineMapArrayAttr
+  ) where
 
 import Data.Traversable
 
 import MLIR.AST
 import qualified MLIR.AST.Dialect.Affine as Affine
-
-pattern MaybeToList :: Maybe a -> [a]
-pattern MaybeToList m <- ((\case []  -> Just Nothing
-                                 [x] -> Just (Just x)
-                                 _   -> Nothing) -> Just m)
-  where MaybeToList m = case m of Nothing -> []; Just x -> [x]
 
 unwrapI64ArrayAttr :: Attribute -> Maybe [Int]
 unwrapI64ArrayAttr (ArrayAttr vals) = for vals \case

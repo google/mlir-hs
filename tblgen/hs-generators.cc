@@ -97,13 +97,13 @@ using attr_handler_map = llvm::StringMap<AttrHandler>;
 const attr_handler_map& getAttrHandlers() {
   static const attr_handler_map* kAttrHandlers = new attr_handler_map{
       {"AnyAttr", {"{0}", "Attribute"}},
-      {"AffineMapArrayAttr", {"AffineMapArrayAttr {0}", "[Affine.Map]"}},
+      {"AffineMapArrayAttr", {"PatternUtil.AffineMapArrayAttr {0}", "[Affine.Map]"}},
       {"AffineMapAttr", {"AffineMapAttr {0}", "Affine.Map"}},
       {"ArrayAttr", {"ArrayAttr {0}", "[Attribute]"}},
       {"BoolAttr", {"BoolAttr {0}", "Bool"}},
       {"DictionaryAttr", {"DictionaryAttr {0}", "(M.Map Name Attribute)"}},
       {"I32Attr", {"IntegerAttr (IntegerType Signless 32) {0}", "Int"}},
-      {"I64ArrayAttr", {"I64ArrayAttr {0}", "[Int]"}},
+      {"I64ArrayAttr", {"PatternUtil.I64ArrayAttr {0}", "[Int]"}},
       {"IndexAttr", {"IntegerAttr IndexType {0}", "Int"}},
       {"StrAttr", {"StringAttr {0}", "BS.ByteString"}},
   };
@@ -115,11 +115,6 @@ const std::string sanitizeName(llvm::StringRef name) {
       // TODO(apaszke): Add more keywords
       // Haskell keywords
       "in",
-      // Haskell functions used in the generated code.
-      "error",
-      "operand",
-      "operands",
-      "pred",
   };
   if (kReservedNames->contains(name)) {
     auto new_name = name.str();
@@ -213,7 +208,7 @@ class AttrPattern {
       if (nattr.attr.isOptional()) {
         lookup_patterns.push_back(pattern);
         singleton_pairs.push_back(llvm::formatv(
-            "(maybeToList $ (\"{0}\",) <$> {1})", nattr.name, pattern));
+            "(Data.Maybe.maybeToList $ (\"{0}\",) <$> {1})", nattr.name, pattern));
       } else {
         lookup_patterns.push_back(llvm::formatv("Just ({0})", pattern));
         singleton_pairs.push_back(
@@ -308,7 +303,7 @@ llvm::Optional<std::string> buildOperation(
     for (int i = 0; i < op.getNumResults(); ++i) {
       auto& result = op.getResult(i);
       if (result.isOptional()) {
-        list_type_exprs.push_back("(maybeToList " + type_exprs[i] + ")");
+        list_type_exprs.push_back("(Data.Maybe.maybeToList " + type_exprs[i] + ")");
       } else if (result.isVariadic()) {
         list_type_exprs.push_back(type_exprs[i]);
       } else {
@@ -334,7 +329,7 @@ llvm::Optional<std::string> buildOperation(
     for (int i = 0; i < op.getNumOperands(); ++i) {
       auto& operand = op.getOperand(i);
       if (operand.isOptional()) {
-        operand_list_exprs.push_back("(maybeToList " + operand_exprs[i] + ")");
+        operand_list_exprs.push_back("(Data.Maybe.maybeToList " + operand_exprs[i] + ")");
       } else if (operand.isVariadic()) {
         operand_list_exprs.push_back(operand_exprs[i]);
       } else {
@@ -357,16 +352,16 @@ llvm::Optional<std::string> buildOperation(
         segment_sizes.push_back(llvm::formatv(
             "case {0} of Just _ -> 1; Nothing -> 0", operand_exprs[i]));
       } else if (operand.isVariadic()) {
-        segment_sizes.push_back("length " + operand_exprs[i]);
+        segment_sizes.push_back("Prelude.length " + operand_exprs[i]);
       } else {
         assert(!operand.isVariableLength());
         segment_sizes.push_back("1");
       }
     }
     const char* kOperandSegmentsAttr = R"(
-              <> namedAttribute "operand_segment_sizes"
+              <> AST.namedAttribute "operand_segment_sizes"
                    (DenseElementsAttr (VectorType [{0}] $ IntegerType Unsigned 32) $
-                      DenseUInt32 $ listArray (1 :: Int, {0}) $ fromIntegral <$> [{1:$[, ]}])
+                      DenseUInt32 $ IArray.listArray (1 :: Int, {0}) $ Prelude.fromIntegral <$> [{1:$[, ]}])
 )";
     extra_attrs = llvm::formatv(kOperandSegmentsAttr,
                                 segment_sizes.size(),
@@ -422,16 +417,16 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
   std::string prologue;
   const char* continuation = "";
   if (op.getNumResults() == 0) {
-    prologue = "void ";
+    prologue = "Control.Monad.void ";
     if (op.getTrait("::mlir::OpTrait::IsTerminator")) {
       result_type = "EndOfBlock";
-      continuation = "\n  terminateBlock";
+      continuation = "\n  AST.terminateBlock";
     } else {
       result_type = "()";
     }
   } else if (op.getNumResults() == 1) {
     result_type = "Value";
-    prologue = "liftM head ";
+    prologue = "Control.Monad.liftM Prelude.head ";
   } else {
     result_type = "[Value]";
     prologue = "";
@@ -450,7 +445,7 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
              op.getTrait("::mlir::OpTrait::SameOperandsAndResultType")) {
     for (const mlir::tblgen::NamedTypeConstraint& operand : op.getOperands()) {
       if (operand.isVariableLength()) continue;
-      type_exprs.push_back("(typeOf " + sanitizeName(operand.name) + ")");
+      type_exprs.push_back("(AST.typeOf " + sanitizeName(operand.name) + ")");
       break;
     }
     if (type_exprs.empty()) return fail("type inference failed");
@@ -478,14 +473,14 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
     operand_binders.push_back(operand_name);
     if (operand.isOptional()) {
       builder_arg_types.push_back("Maybe Value");
-      operand_name_exprs.push_back("(fmap operand " + operand_name + ")");
+      operand_name_exprs.push_back("(AST.operand <$> " + operand_name + ")");
     } else if (operand.isVariadic()) {
       builder_arg_types.push_back("[Value]");
-      operand_name_exprs.push_back("(operands " + operand_name + ")");
+      operand_name_exprs.push_back("(AST.operands " + operand_name + ")");
     } else {
       assert(!operand.isVariableLength());
       builder_arg_types.push_back("Value");
-      operand_name_exprs.push_back("(operand " + operand_name + ")");
+      operand_name_exprs.push_back("(AST.operand " + operand_name + ")");
     }
   }
 
@@ -501,7 +496,7 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
       region_binders.push_back(sanitizeName(region.name));
       builder_arg_types.push_back("RegionBuilderT m ()");
       region_prologue += llvm::formatv(
-          "{0} <- buildRegion {1}\n  ",
+          "{0} <- AST.buildRegion {1}\n  ",
           region_binders.back(), region_builder_binders.back());
     }
     prologue = region_prologue + prologue;
@@ -519,7 +514,7 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
 -- | A builder for @{10}@.
 {0} :: MonadBlockBuilder m => {1:$[ -> ]}m {2}
 {0} {3:$[ ]} {4:$[ ]} {5:$[ ]} {6:$[ ]} = do
-  {7}(emitOp ({8})){9}
+  {7}(AST.emitOp ({8})){9}
 )";
   os << llvm::formatv(kBuilder,
                       builder_name,                        // 0
@@ -645,16 +640,22 @@ bool emitOpTableDefs(const llvm::RecordKeeper& recordKeeper,
   os << "{-# OPTIONS_HADDOCK hide, prune, not-home #-}\n\n";
   os << "module MLIR.AST.Dialect.Generated." << dialect_name << " where\n";
   os << R"(
-import Prelude hiding (return, min, max)
-import Data.Maybe (maybeToList)
-import Data.Array.IArray (listArray)
+import Prelude (Int, Maybe(..), Bool(..), (++), (<$>), ($), (<>))
+import qualified Prelude
+import qualified Data.Maybe
+import qualified Data.Array.IArray as IArray
 import qualified Data.ByteString as BS
 import qualified Data.Map.Strict as M
-import Control.Monad (liftM, void)
+import qualified Control.Monad
 
-import MLIR.AST
-import MLIR.AST.Builder
-import MLIR.AST.PatternUtil
+import MLIR.AST ( Attribute(..), Type(..), AbstractOperation(..), ResultTypes(..)
+                , Location(..), Signedness(..), DenseElements(..)
+                , NamedAttributes, Name
+                , pattern NoAttrs )
+import qualified MLIR.AST as AST
+import MLIR.AST.Builder (Value, EndOfBlock, MonadBlockBuilder, RegionBuilderT)
+import qualified MLIR.AST.Builder as AST
+import qualified MLIR.AST.PatternUtil as PatternUtil
 import qualified MLIR.AST.Dialect.Affine as Affine
 )";
 
@@ -686,16 +687,20 @@ bool emitTestTableDefs(const llvm::RecordKeeper& recordKeeper,
   const char* module_header = R"(
 module MLIR.AST.Dialect.Generated.{0}Spec where
 
-import Test.Hspec
-import Test.QuickCheck
+import Prelude (IO, Maybe(..), ($), (<>))
+import qualified Prelude
+import Test.Hspec (Spec)
+import qualified Test.Hspec as Hspec
+import Test.QuickCheck ((===))
+import qualified Test.QuickCheck as QC
 
-import MLIR.AST
+import MLIR.AST (pattern NoAttrs)
 import MLIR.AST.Dialect.{0}
 
 import MLIR.Test.Generators ()
 
 main :: IO ()
-main = hspec spec
+main = Hspec.hspec spec
 
 spec :: Spec
 spec = do
@@ -705,13 +710,13 @@ spec = do
     mlir::tblgen::Operator op(*def);
     llvm::Optional<AttrPattern> attr_pattern = AttrPattern::buildFor(op);
     if (!attr_pattern) continue;
-    os << "\n  describe \"" << op.getOperationName() << "\" $ do";
+    os << "\n  Hspec.describe \"" << op.getOperationName() << "\" $ do";
     const char* bidirectional_test_template = R"(
-    it "has a bidirectional attr pattern" $ do
-      let wrapUnwrap ({1:$[, ]}) = case ({0} {1:$[ ]}) <> mempty of
+    Hspec.it "has a bidirectional attr pattern" $ do
+      let wrapUnwrap ({1:$[, ]}) = case ({0} {1:$[ ]}) <> Prelude.mempty of
               {0} {2:$[ ]} -> Just ({2:$[, ]})
               _ -> Nothing
-      property $ \args -> wrapUnwrap args === Just args
+      QC.property $ \args -> wrapUnwrap args === Just args
 )";
     os << llvm::formatv(
         bidirectional_test_template, attr_pattern->name,
@@ -720,10 +725,10 @@ spec = do
           return b + "_match";
         })));
     const char* pattern_extensibility_test_template = R"(
-    it "accepts additional attributes" $ do
-      property $ do
-        ({1:$[, ]}) <- arbitrary
-        extraAttrs <- arbitrary
+    Hspec.it "accepts additional attributes" $ do
+      QC.property $ do
+        ({1:$[, ]}) <- QC.arbitrary
+        extraAttrs <- QC.arbitrary
         let match = case ({0} {1:$[ ]}) <> extraAttrs of
               {0} {2:$[ ]} -> Just ({2:$[, ]})
               _ -> Nothing
