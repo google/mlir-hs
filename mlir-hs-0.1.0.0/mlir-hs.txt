@@ -346,10 +346,7 @@ instance GHC.Classes.Eq MLIR.AST.Attribute
 instance GHC.Classes.Eq MLIR.AST.DenseElements
 
 module MLIR.AST.PatternUtil
-pattern MaybeToList :: Maybe a -> [a]
-unwrapI64ArrayAttr :: Attribute -> Maybe [Int]
 pattern I64ArrayAttr :: [Int] -> Attribute
-unwrapAffineMapArrayAttr :: Attribute -> Maybe [Map]
 pattern AffineMapArrayAttr :: [Map] -> Attribute
 
 module MLIR.AST.Dialect.MemRef
@@ -1347,13 +1344,13 @@ vecmat :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT 
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679348245 :: Context -> IO PassManager
+inline_c_ffi_6989586621679347934 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679348254 :: PassManager -> IO ()
+inline_c_ffi_6989586621679347943 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679348267 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679347956 :: PassManager -> Module -> IO LogicalResult
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679348276 :: PassManager -> IO ()
+inline_c_ffi_6989586621679347965 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679348285 :: PassManager -> IO ()
+inline_c_ffi_6989586621679347974 :: PassManager -> IO ()
