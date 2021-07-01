@@ -28,6 +28,8 @@ module MLIR.Native (
     -- ** Dialect registration
     registerAllDialects,
     getNumLoadedDialects,
+    -- * Type
+    Type,
     -- * Location
     Location,
     getFileLineColLocation,

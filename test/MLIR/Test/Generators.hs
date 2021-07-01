@@ -140,11 +140,13 @@ instance Arbitrary Affine.Expr where
       smallerArbitrary2 l r f = f <$> (resize l arbitrary) <*> (resize r arbitrary)
 
 deriving instance Show Attribute
-deriving instance Show Type
 deriving instance Show Signedness
 deriving instance Show Affine.Map
 deriving instance Show Affine.Expr
 deriving instance Show DenseElements
+
+instance Show Type where
+  show _ = "<MLIR type>"
 
 deriving instance Generic Signedness
 deriving instance Generic Affine.Map
