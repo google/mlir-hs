@@ -400,8 +400,8 @@ buildBlock :: Monad m => BlockBuilderT m EndOfBlock -> RegionBuilderT m BlockNam
 soleBlock :: Monad m => BlockBuilderT m EndOfBlock -> m Block
 buildModule :: Monad m => BlockBuilderT m () -> m Operation
 declareFunction :: MonadBlockDecl m => Name -> Type -> m ()
-buildFunction :: MonadBlockDecl m => Name -> [Type] -> RegionBuilderT (NameSupplyT m) () -> m ()
-buildSimpleFunction :: MonadBlockDecl m => Name -> [Type] -> BlockBuilderT (NameSupplyT m) EndOfBlock -> m ()
+buildFunction :: MonadBlockDecl m => Name -> [Type] -> NamedAttributes -> RegionBuilderT (NameSupplyT m) () -> m ()
+buildSimpleFunction :: MonadBlockDecl m => Name -> [Type] -> NamedAttributes -> BlockBuilderT (NameSupplyT m) EndOfBlock -> m ()
 newtype SnocList a
 SnocList :: [a] -> SnocList a
 (.:.) :: SnocList a -> a -> SnocList a
@@ -1228,6 +1228,9 @@ batch_matmul_i8_i8_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] ->
 -- | A builder for <tt>linalg.batch_matmul</tt>.
 batch_matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A builder for <tt>linalg.batch_matvec</tt>.
+batch_matvec :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A builder for <tt>linalg.conv_3d</tt>.
 conv_3d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1344,13 +1347,13 @@ vecmat :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT 
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679347934 :: Context -> IO PassManager
+inline_c_ffi_6989586621679349277 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679347943 :: PassManager -> IO ()
+inline_c_ffi_6989586621679349286 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679347956 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679349299 :: PassManager -> Module -> IO LogicalResult
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679347965 :: PassManager -> IO ()
+inline_c_ffi_6989586621679349308 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679347974 :: PassManager -> IO ()
+inline_c_ffi_6989586621679349317 :: PassManager -> IO ()
