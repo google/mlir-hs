@@ -38,7 +38,7 @@ spec :: Spec
 spec = do
   describe "Builder API" $ do
     let combineFunc name ty combine =
-          buildSimpleFunction name [ty] do
+          buildSimpleFunction name [ty] NoAttrs do
             x <- blockArgument ty
             y <- blockArgument ty
             z <- combine x y
@@ -58,7 +58,7 @@ spec = do
       let f32 = Float32Type
       let i1  = IntegerType Signless 1
       let m = runIdentity $ buildModule $ do
-                buildFunction "one_shot_loop" [f32] mdo
+                buildFunction "one_shot_loop" [f32] NoAttrs mdo
                   _entry <- buildBlock do
                     false <- Std.constant i1 $ IntegerAttr i1 0
                     Std.br header [false]

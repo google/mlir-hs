@@ -192,23 +192,27 @@ declareFunction :: MonadBlockDecl m => Name -> Type -> m ()
 declareFunction name funcTy =
   emitOp_ $ FuncOp UnknownLocation name funcTy $ Region []
 
-buildFunction :: MonadBlockDecl m => Name -> [Type] -> RegionBuilderT (NameSupplyT m) () -> m ()
-buildFunction name retTypes bodyBuilder = do
+buildFunction :: MonadBlockDecl m
+              => Name -> [Type] -> NamedAttributes
+              -> RegionBuilderT (NameSupplyT m) () -> m ()
+buildFunction name retTypes attrs bodyBuilder = do
   body@(Region blocks) <- evalNameSupplyT $ buildRegion bodyBuilder
   let argTypes = case blocks of
         [] -> error $ "buildFunction cannot be used for function declarations! " ++
                       "Build at least one block!"
         (Block _ args _) : _ -> fmap snd args
-  emitOp_ $ FuncOp UnknownLocation name (FunctionType argTypes retTypes) body
+  let op = FuncOp UnknownLocation name (FunctionType argTypes retTypes) body
+  emitOp_ $ op { opAttributes = opAttributes op <> attrs }
 
 buildSimpleFunction :: MonadBlockDecl m
-                    => Name -> [Type]
+                    => Name -> [Type] -> NamedAttributes
                     -> BlockBuilderT (NameSupplyT m) EndOfBlock -> m ()
-buildSimpleFunction name retTypes bodyBuilder = do
+buildSimpleFunction name retTypes attrs bodyBuilder = do
   block <- evalNameSupplyT $ soleBlock bodyBuilder
   let argTypes = fmap snd $ blockArgs block
   let fTy = FunctionType argTypes retTypes
-  emitOp_ $ FuncOp UnknownLocation name fTy $ Region [block]
+  let op = FuncOp UnknownLocation name fTy $ Region [block]
+  emitOp_ $ op { opAttributes = opAttributes op <> attrs }
 
 --------------------------------------------------------------------------------
 -- Utilities
