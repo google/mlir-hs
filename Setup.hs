@@ -130,6 +130,7 @@ main = defaultMainWithHooks simpleUserHooks
             [ ("Std"             , "mlir/Dialect/StandardOps/IR/Ops.td", [])
             , ("Vector"          , "mlir/Dialect/Vector/VectorOps.td", ["-strip-prefix", "Vector_"])
             , ("Shape"           , "mlir/Dialect/Shape/IR/ShapeOps.td", ["-strip-prefix", "Shape_"])
+            , ("LLVM"            , "mlir/Dialect/LLVMIR/LLVMOps.td", ["-strip-prefix", "LLVM_", "-dialect-name", "LLVM"])
             , ("Linalg"          , "mlir/Dialect/Linalg/IR/LinalgOps.td", [])
             , ("LinalgStructured", "mlir/Dialect/Linalg/IR/LinalgStructuredOps.td", ["-dialect-name", "LinalgStructured"])
             , ("X86Vector"       , "mlir/Dialect/X86Vector/X86Vector.td", ["-dialect-name", "X86Vector"])

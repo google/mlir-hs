@@ -16,6 +16,7 @@ module MLIR.AST where
 
 import qualified Data.ByteString as BS
 
+import Data.Typeable
 import Data.Int
 import Data.Word
 import Data.Coerce
@@ -46,34 +47,59 @@ data Type =
   -- Builtin types
   -- See <https://mlir.llvm.org/docs/Dialects/Builtin/#types>
     BFloat16Type
-  | ComplexType Type
-  | Float128Type
   | Float16Type
   | Float32Type
   | Float64Type
   | Float80Type
-  | FunctionType [Type] [Type]
+  | Float128Type
+  | ComplexType Type
   | IndexType
   | IntegerType Signedness UInt
+  | TupleType [Type]
+  | NoneType
+  | FunctionType [Type] [Type]
   | MemRefType { memrefTypeShape :: [Maybe Int]
                , memrefTypeElement :: Type
                , memrefTypeAffineMaps :: [Affine.Map]
                , memrefTypeMemorySpace :: Maybe Attribute }
-  | NoneType
-  | OpaqueType { opaqueTypeNamespace :: Name
-               , opaqueTypeData :: Name }
   | RankedTensorType { rankedTensorTypeShape :: [Maybe Int]
                      , rankedTensorTypeElement :: Type
                      , rankedTensorTypeEncoding :: Maybe Attribute }
-  | TupleType [Type]
+  | VectorType { vectorTypeShape :: [Int]
+               , vectorTypeElement :: Type }
   | UnrankedMemRefType { unrankedMemrefTypeElement :: Type
                        , unrankedMemrefTypeMemorySpace :: Attribute }
   | UnrankedTensorType { unrankedTensorTypeElement :: Type }
-  | VectorType { vectorTypeShape :: [Int]
-               , vectorTypeElement :: Type }
-  -- TODO(apaszke): Types for other standard dialects
-  -- TODO(apaszke): Existential package for arbitrary user-defined types
-  deriving Eq
+  | OpaqueType { opaqueTypeNamespace :: Name
+               , opaqueTypeData :: BS.ByteString }
+  | forall t. (Typeable t, Eq t, FromAST t Native.Type) => DialectType t
+  -- GHC cannot derive Eq due to the existential case, so we implement Eq below
+  -- deriving Eq
+
+instance Eq Type where
+  a == b = case (a, b) of
+    (BFloat16Type      , BFloat16Type      ) -> True
+    (Float16Type       , Float16Type       ) -> True
+    (Float32Type       , Float32Type       ) -> True
+    (Float64Type       , Float64Type       ) -> True
+    (Float80Type       , Float80Type       ) -> True
+    (Float128Type      , Float128Type      ) -> True
+    (ComplexType a1    , ComplexType b1    ) -> a1 == b1
+    (IndexType         , IndexType         ) -> True
+    (IntegerType a1 a2 , IntegerType b1 b2 ) -> (a1, a2) == (b1, b2)
+    (TupleType a1      , TupleType b1      ) -> a1 == b1
+    (NoneType          , NoneType          ) -> True
+    (FunctionType a1 a2, FunctionType b1 b2) -> (a1, a2) == (b1, b2)
+    (MemRefType a1 a2 a3 a4   , MemRefType b1 b2 b3 b4   ) -> (a1, a2, a3, a4) == (b1, b2, b3, b4)
+    (RankedTensorType a1 a2 a3, RankedTensorType b1 b2 b3) -> (a1, a2, a3    ) == (b1, b2, b3    )
+    (VectorType a1 a2  , VectorType b1 b2  )               -> (a1, a2) == (b1, b2)
+    (UnrankedMemRefType a1 a2, UnrankedMemRefType b1 b2  ) -> (a1, a2) == (b1, b2)
+    (UnrankedTensorType a1   , UnrankedTensorType b1     ) -> (a1    ) == (b1    )
+    (OpaqueType a1 a2  , OpaqueType b1 b2  )               -> (a1, a2) == (b1, b2)
+    (DialectType a1    , DialectType b1    ) -> case cast a1 of
+      Just a1' -> a1' == b1
+      Nothing  -> False
+    _ -> False
 
 -- TODO(apaszke): Flesh this out
 data Location = UnknownLocation
@@ -286,6 +312,7 @@ instance FromAST Type Native.Type where
           mlirVectorTypeGet($(intptr_t rank), $(int64_t* nativeShape), $(MlirType nativeElTy))
         } |]
       where shapeI64 = fmap fromIntegral shape :: [Int64]
+    DialectType t -> fromAST ctx env t
 
 
 instance FromAST Region Native.Region where

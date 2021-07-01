@@ -110,13 +110,16 @@ const attr_handler_map& getAttrHandlers() {
   return *kAttrHandlers;
 }
 
-const std::string sanitizeName(llvm::StringRef name) {
+const std::string sanitizeName(llvm::StringRef name, llvm::Optional<int> idx = llvm::None) {
   static const llvm::StringSet<>* kReservedNames = new llvm::StringSet<>{
       // TODO(apaszke): Add more keywords
       // Haskell keywords
-      "in",
+      "in", "data",
   };
-  if (kReservedNames->contains(name)) {
+  if (name.empty()) {
+    assert(idx);
+    return llvm::formatv("_unnamed{0}", *idx);
+  } else if (kReservedNames->contains(name)) {
     auto new_name = name.str();
     new_name.push_back('_');
     return new_name;
@@ -181,7 +184,7 @@ class AttrPattern {
                                named_attr.attr.getAttrDefName()));
         return llvm::None;
       }
-      std::string attr_arg_name = sanitizeName(named_attr.name.str());
+      std::string attr_arg_name = sanitizeName(named_attr.name);
       binders.push_back(attr_arg_name);
       attrs.push_back(named_attr);
     }
@@ -468,8 +471,9 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
   std::vector<std::string> operand_binders;
   std::vector<std::string> operand_name_exprs;
   operand_name_exprs.reserve(op.getNumOperands());
-  for (const auto& operand : op.getOperands()) {
-    std::string operand_name = sanitizeName(operand.name);
+  for (int i = 0; i < op.getNumOperands(); ++i) {
+    const auto& operand = op.getOperand(i);
+    std::string operand_name = sanitizeName(operand.name, i);
     operand_binders.push_back(operand_name);
     if (operand.isOptional()) {
       builder_arg_types.push_back("Maybe Value");
@@ -570,14 +574,15 @@ void emitPattern(const llvm::Record* def, const AttrPattern& attr_pattern,
   if (op.getNumOperands() == 1 && op.getOperand(0).isVariadic()) {
     // Single variadic arg is easy to handle
     pattern_arg_types.push_back("[operand]");
-    operand_binders.push_back(sanitizeName(op.getOperand(0).name));
+    operand_binders.push_back(sanitizeName(op.getOperand(0).name, 0));
   } else {
     // Non-variadic case
-    for (auto operand : op.getOperands()) {
+    for (int i = 0; i < op.getNumOperands(); ++i) {
+      const auto& operand = op.getOperand(i);
       if (operand.isVariableLength())
         return fail("unsupported variable length operand");
       pattern_arg_types.push_back("operand");
-      operand_binders.push_back(sanitizeName(operand.name));
+      operand_binders.push_back(sanitizeName(operand.name, i));
     }
   }
 
