@@ -40,7 +40,7 @@ spec = do
   describe "Rewrite API" $ do
     it "Can replace adds with multiplies" $ do
       let m = runIdentity $ buildModule $
-                buildSimpleFunction "f" [Float32Type] do
+                buildSimpleFunction "f" [Float32Type] NoAttrs do
                   x <- blockArgument Float32Type
                   y <- blockArgument Float32Type
                   z <- Std.addf x y
