@@ -213,7 +213,8 @@ instance FromAST Location Native.Location where
         Native.getFileLineColLocation ctx fileStrRef cline ccol
           where cline = fromIntegral line
                 ccol = fromIntegral col
-
+    -- TODO(jpienaar): Fix
+    _ -> error "Unimplemented Location case"
 
 instance FromAST Type Native.Type where
   fromAST ctx env ty = case ty of
