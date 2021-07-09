@@ -63,6 +63,7 @@ library
     , MLIR.AST.Dialect.MemRef
     , MLIR.AST.Dialect.Shape
     , MLIR.AST.Dialect.Std
+    , MLIR.AST.Dialect.Tensor
     , MLIR.AST.Dialect.Vector
     , MLIR.AST.Dialect.X86Vector
     , MLIR.AST.IStorableArray
