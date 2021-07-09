@@ -75,10 +75,14 @@ data Type =
   -- TODO(apaszke): Existential package for arbitrary user-defined types
   deriving Eq
 
--- TODO(apaszke): Flesh this out
 data Location =
     UnknownLocation
-  | FileLineColLocation BS.ByteString UInt UInt
+  | FileLocation { locPath :: BS.ByteString, locLine :: UInt, locColumn :: UInt }
+  -- TODO(jpienaar): Add support C API side and implement these
+  | CallSiteLocation
+  | FusedLocation
+  | NameLocation
+  | OpaqueLocation
 
 data Binding = Bind [Name] Operation
 
@@ -204,9 +208,9 @@ C.include "mlir-c/BuiltinAttributes.h"
 instance FromAST Location Native.Location where
   fromAST ctx _ loc = case loc of
     UnknownLocation -> Native.getUnknownLocation ctx
-    FileLineColLocation file line col -> do
-      Native.withStringRef file \(Native.StringRef ptr len) ->
-        Native.getFileLineColLocation ctx (Native.StringRef ptr len) cline ccol
+    FileLocation file line col -> do
+      Native.withStringRef file \fileStrRef ->
+        Native.getFileLineColLocation ctx fileStrRef cline ccol
           where cline = fromIntegral line
                 ccol = fromIntegral col
 
