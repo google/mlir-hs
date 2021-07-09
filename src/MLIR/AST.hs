@@ -76,7 +76,9 @@ data Type =
   deriving Eq
 
 -- TODO(apaszke): Flesh this out
-data Location = UnknownLocation
+data Location =
+    UnknownLocation
+  | FileLineColLocation BS.ByteString UInt UInt
 
 data Binding = Bind [Name] Operation
 
@@ -200,7 +202,13 @@ C.include "mlir-c/BuiltinTypes.h"
 C.include "mlir-c/BuiltinAttributes.h"
 
 instance FromAST Location Native.Location where
-  fromAST ctx _ UnknownLocation = Native.getUnknownLocation ctx
+  fromAST ctx _ loc = case loc of
+    UnknownLocation -> Native.getUnknownLocation ctx
+    FileLineColLocation file line col -> do
+      Native.withStringRef file \(Native.StringRef ptr len) ->
+        Native.getFileLineColLocation ctx (Native.StringRef ptr len) cline ccol
+          where cline = fromIntegral line
+                ccol = fromIntegral col
 
 
 instance FromAST Type Native.Type where
