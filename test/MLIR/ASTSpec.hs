@@ -81,6 +81,7 @@ shouldImplementMatmul op = evalContT $ do
     MLIR.registerAllDialects ctx
     Just m <- MLIR.moduleFromOperation =<< fromAST ctx (mempty, mempty) op
     MLIR.withPassManager ctx \pm -> do
+      MLIR.addConvertMemRefToLLVMPass   pm
       MLIR.addConvertVectorToLLVMPass   pm
       MLIR.addConvertStandardToLLVMPass pm
       result <- MLIR.runPasses pm m

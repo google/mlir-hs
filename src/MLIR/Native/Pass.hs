@@ -52,6 +52,12 @@ runPasses pm m =
 --------------------------------------------------------------------------------
 -- Conversion passes
 
+addConvertMemRefToLLVMPass :: PassManager -> IO ()
+addConvertMemRefToLLVMPass pm =
+  [C.exp| void {
+    mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionConvertMemRefToLLVM())
+  } |]
+
 addConvertStandardToLLVMPass :: PassManager -> IO ()
 addConvertStandardToLLVMPass pm =
   [C.exp| void {
