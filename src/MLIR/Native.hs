@@ -30,11 +30,13 @@ module MLIR.Native (
     getNumLoadedDialects,
     -- * Location
     Location,
+    getFileLineColLocation,
     getUnknownLocation,
     -- * Operation
     Operation,
     getOperationName,
     showOperation,
+    showOperationWithLocation,
     verifyOperation,
     -- * Block
     Block,
@@ -133,6 +135,15 @@ getUnknownLocation :: Context -> IO Location
 getUnknownLocation ctx =
   [C.exp| MlirLocation { mlirLocationUnknownGet($(MlirContext ctx)) } |]
 
+getFileLineColLocation :: Context -> StringRef -> C.CUInt -> C.CUInt -> IO Location
+getFileLineColLocation ctx (StringRef sPtr len) line col  =
+  [C.exp| MlirLocation {
+    mlirLocationFileLineColGet(
+      $(MlirContext ctx),
+      (MlirStringRef){$(char* sPtr), $(size_t len)},
+      $(unsigned int line),
+      $(unsigned int col)) } |]
+
 -- TODO(apaszke): No destructor for locations?
 
 --------------------------------------------------------------------------------
@@ -148,6 +159,18 @@ showOperation :: Operation -> IO BS.ByteString
 showOperation op = showSomething \ctx ->
   [C.block| void {
     MlirOpPrintingFlags flags = mlirOpPrintingFlagsCreate();
+    mlirOperationPrintWithFlags($(MlirOperation op), flags,
+                                HaskellMlirStringCallback, $(void* ctx));
+    mlirOpPrintingFlagsDestroy(flags);
+  } |]
+
+-- TODO(jpienaar): This should probably be more general options supported.
+-- | Show the operation with location using the MLIR printer.
+showOperationWithLocation :: Operation -> IO BS.ByteString
+showOperationWithLocation op = showSomething \ctx ->
+  [C.block| void {
+    MlirOpPrintingFlags flags = mlirOpPrintingFlagsCreate();
+    mlirOpPrintingFlagsEnableDebugInfo(flags, /*prettyForm=*/false);
     mlirOperationPrintWithFlags($(MlirOperation op), flags,
                                 HaskellMlirStringCallback, $(void* ctx));
     mlirOpPrintingFlagsDestroy(flags);

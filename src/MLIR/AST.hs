@@ -75,8 +75,14 @@ data Type =
   -- TODO(apaszke): Existential package for arbitrary user-defined types
   deriving Eq
 
--- TODO(apaszke): Flesh this out
-data Location = UnknownLocation
+data Location =
+    UnknownLocation
+  | FileLocation { locPath :: BS.ByteString, locLine :: UInt, locColumn :: UInt }
+  -- TODO(jpienaar): Add support C API side and implement these
+  | CallSiteLocation
+  | FusedLocation
+  | NameLocation
+  | OpaqueLocation
 
 data Binding = Bind [Name] Operation
 
@@ -200,8 +206,15 @@ C.include "mlir-c/BuiltinTypes.h"
 C.include "mlir-c/BuiltinAttributes.h"
 
 instance FromAST Location Native.Location where
-  fromAST ctx _ UnknownLocation = Native.getUnknownLocation ctx
-
+  fromAST ctx _ loc = case loc of
+    UnknownLocation -> Native.getUnknownLocation ctx
+    FileLocation file line col -> do
+      Native.withStringRef file \fileStrRef ->
+        Native.getFileLineColLocation ctx fileStrRef cline ccol
+          where cline = fromIntegral line
+                ccol = fromIntegral col
+    -- TODO(jpienaar): Fix
+    _ -> error "Unimplemented Location case"
 
 instance FromAST Type Native.Type where
   fromAST ctx env ty = case ty of

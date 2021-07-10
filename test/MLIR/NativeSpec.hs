@@ -79,6 +79,14 @@ spec = do
       maybeModule <- MLIR.withStringRef "asdf" $ MLIR.parseModule ctx
       (isNothing maybeModule) `shouldBe` True
 
+    it "Can create an empty module with location" $ \ctx -> do
+      MLIR.withStringRef "test.cc" $ \nameRef -> do
+        loc <- MLIR.getFileLineColLocation ctx nameRef 21 45
+        m <- MLIR.createEmptyModule loc
+        str <- (MLIR.moduleAsOperation >=> MLIR.showOperationWithLocation) m
+        MLIR.destroyModule m
+        str `shouldBe` "module  {\n} loc(#loc)\n#loc = loc(\"test.cc\":21:45)\n"
+
   describe "Evaluation engine" $ beforeAll prepareContext $ do
     it "Can evaluate the example module" $ \ctx -> do
       m <- liftM fromJust $
