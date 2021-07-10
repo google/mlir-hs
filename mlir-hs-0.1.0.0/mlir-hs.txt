@@ -1353,13 +1353,15 @@ vecmat :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT 
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679349899 :: Context -> IO PassManager
+inline_c_ffi_6989586621679349900 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679349908 :: PassManager -> IO ()
+inline_c_ffi_6989586621679349909 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679349921 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679349922 :: PassManager -> Module -> IO LogicalResult
+addConvertMemRefToLLVMPass :: PassManager -> IO ()
+inline_c_ffi_6989586621679349931 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679349930 :: PassManager -> IO ()
+inline_c_ffi_6989586621679349940 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679349939 :: PassManager -> IO ()
+inline_c_ffi_6989586621679349949 :: PassManager -> IO ()
