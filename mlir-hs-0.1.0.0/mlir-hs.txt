@@ -46,6 +46,9 @@ registerAllDialects :: Context -> IO ()
 --   <a>Context</a>.
 getNumLoadedDialects :: Context -> IO Int
 
+-- | A native MLIR type object.
+data Type
+
 -- | A native MLIR location object.
 data Location
 getFileLineColLocation :: Context -> StringRef -> CUInt -> CUInt -> IO Location
@@ -204,37 +207,38 @@ Unsigned :: Signedness
 Signless :: Signedness
 data Type
 BFloat16Type :: Type
-ComplexType :: Type -> Type
-Float128Type :: Type
 Float16Type :: Type
 Float32Type :: Type
 Float64Type :: Type
 Float80Type :: Type
-FunctionType :: [Type] -> [Type] -> Type
+Float128Type :: Type
+ComplexType :: Type -> Type
 IndexType :: Type
 IntegerType :: Signedness -> UInt -> Type
+TupleType :: [Type] -> Type
+NoneType :: Type
+FunctionType :: [Type] -> [Type] -> Type
 MemRefType :: [Maybe Int] -> Type -> [Map] -> Maybe Attribute -> Type
 [memrefTypeShape] :: Type -> [Maybe Int]
 [memrefTypeElement] :: Type -> Type
 [memrefTypeAffineMaps] :: Type -> [Map]
 [memrefTypeMemorySpace] :: Type -> Maybe Attribute
-NoneType :: Type
-OpaqueType :: Name -> Name -> Type
-[opaqueTypeNamespace] :: Type -> Name
-[opaqueTypeData] :: Type -> Name
 RankedTensorType :: [Maybe Int] -> Type -> Maybe Attribute -> Type
 [rankedTensorTypeShape] :: Type -> [Maybe Int]
 [rankedTensorTypeElement] :: Type -> Type
 [rankedTensorTypeEncoding] :: Type -> Maybe Attribute
-TupleType :: [Type] -> Type
+VectorType :: [Int] -> Type -> Type
+[vectorTypeShape] :: Type -> [Int]
+[vectorTypeElement] :: Type -> Type
 UnrankedMemRefType :: Type -> Attribute -> Type
 [unrankedMemrefTypeElement] :: Type -> Type
 [unrankedMemrefTypeMemorySpace] :: Type -> Attribute
 UnrankedTensorType :: Type -> Type
 [unrankedTensorTypeElement] :: Type -> Type
-VectorType :: [Int] -> Type -> Type
-[vectorTypeShape] :: Type -> [Int]
-[vectorTypeElement] :: Type -> Type
+OpaqueType :: Name -> ByteString -> Type
+[opaqueTypeNamespace] :: Type -> Name
+[opaqueTypeData] :: Type -> ByteString
+DialectType :: t -> Type
 data Location
 UnknownLocation :: Location
 FileLocation :: ByteString -> UInt -> UInt -> Location
@@ -296,53 +300,53 @@ namedAttribute :: Name -> Attribute -> NamedAttributes
 pattern ModuleOp :: Block -> Operation
 pattern FuncAttrs :: Name -> Type -> Map Name Attribute
 pattern FuncOp :: Location -> Name -> Type -> Region -> Operation
-inline_c_ffi_6989586621679080559 :: Context -> IO Type
-inline_c_ffi_6989586621679080567 :: Context -> IO Type
-inline_c_ffi_6989586621679080575 :: Context -> IO Type
-inline_c_ffi_6989586621679080583 :: Context -> IO Type
-inline_c_ffi_6989586621679080593 :: Type -> IO Type
-inline_c_ffi_6989586621679080615 :: Context -> CIntPtr -> Ptr Type -> CIntPtr -> Ptr Type -> IO Type
-inline_c_ffi_6989586621679080623 :: Context -> IO Type
-inline_c_ffi_6989586621679080636 :: Context -> CUInt -> IO Type
-inline_c_ffi_6989586621679080646 :: Context -> CUInt -> IO Type
-inline_c_ffi_6989586621679080656 :: Context -> CUInt -> IO Type
-inline_c_ffi_6989586621679080696 :: Type -> CIntPtr -> Ptr Int64 -> Attribute -> IO Type
-inline_c_ffi_6989586621679080704 :: Context -> IO Type
-inline_c_ffi_6989586621679080727 :: CIntPtr -> Ptr Int64 -> Type -> Attribute -> IO Type
-inline_c_ffi_6989586621679080742 :: Context -> CIntPtr -> Ptr Type -> IO Type
-inline_c_ffi_6989586621679080756 :: Type -> Attribute -> IO Type
-inline_c_ffi_6989586621679080766 :: Type -> IO Type
-inline_c_ffi_6989586621679080784 :: CIntPtr -> Ptr Int64 -> Type -> IO Type
-inline_c_ffi_6989586621679080546 :: IO Region
-inline_c_ffi_6989586621679080524 :: Region -> Block -> IO ()
-inline_c_ffi_6989586621679080540 :: CIntPtr -> Ptr Type -> IO Block
-inline_c_ffi_6989586621679080453 :: Block -> Operation -> IO ()
-inline_c_ffi_6989586621679080463 :: Block -> IO CIntPtr
-inline_c_ffi_6989586621679080477 :: CIntPtr -> Ptr Value -> Block -> IO ()
-inline_c_ffi_6989586621679080486 :: Operation -> IO CIntPtr
-inline_c_ffi_6989586621679080500 :: CIntPtr -> Ptr Value -> Operation -> IO ()
-inline_c_ffi_6989586621679080204 :: Context -> CIntPtr -> Ptr Attribute -> IO Attribute
-inline_c_ffi_6989586621679080219 :: Context -> CIntPtr -> Ptr NamedAttribute -> IO Attribute
-inline_c_ffi_6989586621679080235 :: Context -> Type -> CDouble -> IO Attribute
-inline_c_ffi_6989586621679080249 :: Type -> Int64 -> IO Attribute
-inline_c_ffi_6989586621679080261 :: Context -> CInt -> IO Attribute
-inline_c_ffi_6989586621679080276 :: Context -> Ptr CChar -> CSize -> IO Attribute
-inline_c_ffi_6989586621679080286 :: Type -> IO Attribute
-inline_c_ffi_6989586621679080296 :: AffineMap -> IO Attribute
-inline_c_ffi_6989586621679080304 :: Context -> IO Attribute
-inline_c_ffi_6989586621679080322 :: Type -> CIntPtr -> Ptr Word8 -> IO Attribute
-inline_c_ffi_6989586621679080337 :: Type -> CIntPtr -> Ptr Int8 -> IO Attribute
-inline_c_ffi_6989586621679080352 :: Type -> CIntPtr -> Ptr Word32 -> IO Attribute
-inline_c_ffi_6989586621679080367 :: Type -> CIntPtr -> Ptr Int32 -> IO Attribute
-inline_c_ffi_6989586621679080382 :: Type -> CIntPtr -> Ptr Word64 -> IO Attribute
-inline_c_ffi_6989586621679080397 :: Type -> CIntPtr -> Ptr Int64 -> IO Attribute
-inline_c_ffi_6989586621679080413 :: Type -> CIntPtr -> Ptr CFloat -> IO Attribute
-inline_c_ffi_6989586621679080429 :: Type -> CIntPtr -> Ptr CDouble -> IO Attribute
-inline_c_ffi_6989586621679080184 :: Ptr CChar -> CSize -> Location -> CBool -> CIntPtr -> Ptr Type -> CIntPtr -> Ptr Value -> CIntPtr -> Ptr Region -> CIntPtr -> Ptr Block -> CIntPtr -> Ptr NamedAttribute -> IO Operation
+inline_c_ffi_6989586621679080824 :: Context -> IO Type
+inline_c_ffi_6989586621679080832 :: Context -> IO Type
+inline_c_ffi_6989586621679080840 :: Context -> IO Type
+inline_c_ffi_6989586621679080848 :: Context -> IO Type
+inline_c_ffi_6989586621679080858 :: Type -> IO Type
+inline_c_ffi_6989586621679080880 :: Context -> CIntPtr -> Ptr Type -> CIntPtr -> Ptr Type -> IO Type
+inline_c_ffi_6989586621679080888 :: Context -> IO Type
+inline_c_ffi_6989586621679080901 :: Context -> CUInt -> IO Type
+inline_c_ffi_6989586621679080911 :: Context -> CUInt -> IO Type
+inline_c_ffi_6989586621679080921 :: Context -> CUInt -> IO Type
+inline_c_ffi_6989586621679080961 :: Type -> CIntPtr -> Ptr Int64 -> Attribute -> IO Type
+inline_c_ffi_6989586621679080969 :: Context -> IO Type
+inline_c_ffi_6989586621679080992 :: CIntPtr -> Ptr Int64 -> Type -> Attribute -> IO Type
+inline_c_ffi_6989586621679081007 :: Context -> CIntPtr -> Ptr Type -> IO Type
+inline_c_ffi_6989586621679081021 :: Type -> Attribute -> IO Type
+inline_c_ffi_6989586621679081031 :: Type -> IO Type
+inline_c_ffi_6989586621679081049 :: CIntPtr -> Ptr Int64 -> Type -> IO Type
+inline_c_ffi_6989586621679080811 :: IO Region
+inline_c_ffi_6989586621679080789 :: Region -> Block -> IO ()
+inline_c_ffi_6989586621679080805 :: CIntPtr -> Ptr Type -> IO Block
+inline_c_ffi_6989586621679080718 :: Block -> Operation -> IO ()
+inline_c_ffi_6989586621679080728 :: Block -> IO CIntPtr
+inline_c_ffi_6989586621679080742 :: CIntPtr -> Ptr Value -> Block -> IO ()
+inline_c_ffi_6989586621679080751 :: Operation -> IO CIntPtr
+inline_c_ffi_6989586621679080765 :: CIntPtr -> Ptr Value -> Operation -> IO ()
+inline_c_ffi_6989586621679080469 :: Context -> CIntPtr -> Ptr Attribute -> IO Attribute
+inline_c_ffi_6989586621679080484 :: Context -> CIntPtr -> Ptr NamedAttribute -> IO Attribute
+inline_c_ffi_6989586621679080500 :: Context -> Type -> CDouble -> IO Attribute
+inline_c_ffi_6989586621679080514 :: Type -> Int64 -> IO Attribute
+inline_c_ffi_6989586621679080526 :: Context -> CInt -> IO Attribute
+inline_c_ffi_6989586621679080541 :: Context -> Ptr CChar -> CSize -> IO Attribute
+inline_c_ffi_6989586621679080551 :: Type -> IO Attribute
+inline_c_ffi_6989586621679080561 :: AffineMap -> IO Attribute
+inline_c_ffi_6989586621679080569 :: Context -> IO Attribute
+inline_c_ffi_6989586621679080587 :: Type -> CIntPtr -> Ptr Word8 -> IO Attribute
+inline_c_ffi_6989586621679080602 :: Type -> CIntPtr -> Ptr Int8 -> IO Attribute
+inline_c_ffi_6989586621679080617 :: Type -> CIntPtr -> Ptr Word32 -> IO Attribute
+inline_c_ffi_6989586621679080632 :: Type -> CIntPtr -> Ptr Int32 -> IO Attribute
+inline_c_ffi_6989586621679080647 :: Type -> CIntPtr -> Ptr Word64 -> IO Attribute
+inline_c_ffi_6989586621679080662 :: Type -> CIntPtr -> Ptr Int64 -> IO Attribute
+inline_c_ffi_6989586621679080678 :: Type -> CIntPtr -> Ptr CFloat -> IO Attribute
+inline_c_ffi_6989586621679080694 :: Type -> CIntPtr -> Ptr CDouble -> IO Attribute
+inline_c_ffi_6989586621679080449 :: Ptr CChar -> CSize -> Location -> CBool -> CIntPtr -> Ptr Type -> CIntPtr -> Ptr Value -> CIntPtr -> Ptr Region -> CIntPtr -> Ptr Block -> CIntPtr -> Ptr NamedAttribute -> IO Operation
 packNamedAttrs :: Context -> ValueAndBlockMapping -> Map Name Attribute -> ContT r IO (CIntPtr, Ptr NamedAttribute)
-inline_c_ffi_6989586621679080804 :: IO CSize
-inline_c_ffi_6989586621679080811 :: IO CSize
-inline_c_ffi_6989586621679080833 :: Ptr NamedAttribute -> CInt -> Identifier -> Attribute -> IO ()
+inline_c_ffi_6989586621679081070 :: IO CSize
+inline_c_ffi_6989586621679081077 :: IO CSize
+inline_c_ffi_6989586621679081099 :: Ptr NamedAttribute -> CInt -> Identifier -> Attribute -> IO ()
 pattern CTrue :: CBool
 pattern CFalse :: CBool
 notImplemented :: forall a. a
@@ -353,8 +357,8 @@ instance MLIR.AST.Serialize.FromAST MLIR.AST.Block MLIR.Native.FFI.Block
 instance MLIR.AST.Serialize.FromAST MLIR.AST.Attribute MLIR.Native.FFI.Attribute
 instance MLIR.AST.Serialize.FromAST MLIR.AST.Operation MLIR.Native.FFI.Operation
 instance GHC.Classes.Eq MLIR.AST.Signedness
-instance GHC.Classes.Eq MLIR.AST.Type
 instance GHC.Classes.Eq MLIR.AST.Attribute
+instance GHC.Classes.Eq MLIR.AST.Type
 instance GHC.Classes.Eq MLIR.AST.DenseElements
 
 module MLIR.AST.PatternUtil
@@ -1351,17 +1355,669 @@ vecmat_i8_i8_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> Regio
 -- | A builder for <tt>linalg.vecmat</tt>.
 vecmat :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+module MLIR.AST.Dialect.LLVM
+data Type
+PointerType :: Type -> Type
+pattern Ptr :: Type -> Type
+
+-- | A pattern for <tt>llvm.ashr</tt>.
+pattern AShr :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.ashr</tt>.
+ashr :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.add</tt>.
+pattern Add :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.add</tt>.
+add :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.addrspacecast</tt>.
+pattern AddrSpaceCast :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.addrspacecast</tt>.
+addrspacecast :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.alloca</tt>.
+pattern Alloca :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.alloca</tt>.
+alloca :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.and</tt>.
+pattern And :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.and</tt>.
+and :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.assume</tt>.
+pattern Assume :: Location -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.assume</tt>.
+intr_assume :: MonadBlockBuilder m => Value -> m ()
+
+-- | A pattern for <tt>llvm.intr.bitreverse</tt>.
+pattern BitReverse :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.bitreverse</tt>.
+intr_bitreverse :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.bitcast</tt>.
+pattern Bitcast :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.bitcast</tt>.
+bitcast :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.call</tt>.
+call :: MonadBlockBuilder m => [Type] -> [Value] -> m Value
+
+-- | A pattern for <tt>llvm.mlir.constant</tt>.
+pattern Constant :: Location -> Type -> Attribute -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.mlir.constant</tt>.
+mlir_constant :: MonadBlockBuilder m => Type -> Attribute -> m Value
+
+-- | A pattern for <tt>llvm.intr.copysign</tt>.
+pattern CopySign :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.copysign</tt>.
+intr_copysign :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.coro.begin</tt>.
+pattern CoroBegin :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.coro.begin</tt>.
+intr_coro_begin :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.coro.end</tt>.
+pattern CoroEnd :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.coro.end</tt>.
+intr_coro_end :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.coro.free</tt>.
+pattern CoroFree :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.coro.free</tt>.
+intr_coro_free :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.coro.id</tt>.
+pattern CoroId :: Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.coro.id</tt>.
+intr_coro_id :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.coro.resume</tt>.
+pattern CoroResume :: Location -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.coro.resume</tt>.
+intr_coro_resume :: MonadBlockBuilder m => Value -> m ()
+
+-- | A pattern for <tt>llvm.intr.coro.save</tt>.
+pattern CoroSave :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.coro.save</tt>.
+intr_coro_save :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.coro.size</tt>.
+pattern CoroSize :: Location -> Type -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.coro.size</tt>.
+intr_coro_size :: MonadBlockBuilder m => Type -> m Value
+
+-- | A pattern for <tt>llvm.intr.coro.suspend</tt>.
+pattern CoroSuspend :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.coro.suspend</tt>.
+intr_coro_suspend :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.cos</tt>.
+pattern Cos :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.cos</tt>.
+intr_cos :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.ctpop</tt>.
+pattern CtPop :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.ctpop</tt>.
+intr_ctpop :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.mlir.cast</tt>.
+pattern DialectCast :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.mlir.cast</tt>.
+mlir_cast :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.exp2</tt>.
+pattern Exp2 :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.exp2</tt>.
+intr_exp2 :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.exp</tt>.
+pattern Exp :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.exp</tt>.
+intr_exp :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.extractelement</tt>.
+pattern ExtractElement :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.extractelement</tt>.
+extractelement :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.extractvalue</tt>.
+pattern ExtractValue :: Location -> Type -> operand -> [Attribute] -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.extractvalue</tt>.
+extractvalue :: MonadBlockBuilder m => Type -> Value -> [Attribute] -> m Value
+
+-- | A pattern for <tt>llvm.intr.fabs</tt>.
+pattern FAbs :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.fabs</tt>.
+intr_fabs :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.fadd</tt>.
+pattern FAdd :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.fadd</tt>.
+fadd :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.ceil</tt>.
+pattern FCeil :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.ceil</tt>.
+intr_ceil :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.fdiv</tt>.
+pattern FDiv :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.fdiv</tt>.
+fdiv :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.floor</tt>.
+pattern FFloor :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.floor</tt>.
+intr_floor :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.fma</tt>.
+pattern FMA :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.fma</tt>.
+intr_fma :: MonadBlockBuilder m => Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.fmuladd</tt>.
+pattern FMulAdd :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.fmuladd</tt>.
+intr_fmuladd :: MonadBlockBuilder m => Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.fmul</tt>.
+pattern FMul :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.fmul</tt>.
+fmul :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.fneg</tt>.
+pattern FNeg :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.fneg</tt>.
+fneg :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.fpext</tt>.
+pattern FPExt :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.fpext</tt>.
+fpext :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.fptosi</tt>.
+pattern FPToSI :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.fptosi</tt>.
+fptosi :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.fptoui</tt>.
+pattern FPToUI :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.fptoui</tt>.
+fptoui :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.fptrunc</tt>.
+pattern FPTrunc :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.fptrunc</tt>.
+fptrunc :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.frem</tt>.
+pattern FRem :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.frem</tt>.
+frem :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.fsub</tt>.
+pattern FSub :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.fsub</tt>.
+fsub :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.freeze</tt>.
+pattern Freeze :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.freeze</tt>.
+freeze :: MonadBlockBuilder m => Value -> m Value
+
+-- | A builder for <tt>llvm.getelementptr</tt>.
+getelementptr :: MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
+
+-- | A pattern for <tt>llvm.intr.get.active.lane.mask</tt>.
+pattern GetActiveLaneMask :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.get.active.lane.mask</tt>.
+intr_get_active_lane_mask :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A builder for <tt>llvm.inline_asm</tt>.
+inline_asm :: MonadBlockBuilder m => Maybe Type -> [Value] -> ByteString -> ByteString -> m Value
+
+-- | A pattern for <tt>llvm.insertelement</tt>.
+pattern InsertElement :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.insertelement</tt>.
+insertelement :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.insertvalue</tt>.
+pattern InsertValue :: Location -> Type -> operand -> operand -> [Attribute] -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.insertvalue</tt>.
+insertvalue :: MonadBlockBuilder m => Type -> Value -> Value -> [Attribute] -> m Value
+
+-- | A pattern for <tt>llvm.inttoptr</tt>.
+pattern IntToPtr :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.inttoptr</tt>.
+inttoptr :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.func</tt>.
+func :: MonadBlockBuilder m => Maybe [Attribute] -> RegionBuilderT m () -> m ()
+
+-- | A pattern for <tt>llvm.lshr</tt>.
+pattern LShr :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.lshr</tt>.
+lshr :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.landingpad</tt>.
+pattern Landingpad :: Location -> Type -> [operand] -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.landingpad</tt>.
+landingpad :: MonadBlockBuilder m => Type -> [Value] -> m Value
+
+-- | A pattern for <tt>llvm.load</tt>.
+pattern Load :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.load</tt>.
+load :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.log10</tt>.
+pattern Log10 :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.log10</tt>.
+intr_log10 :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.log2</tt>.
+pattern Log2 :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.log2</tt>.
+intr_log2 :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.log</tt>.
+pattern Log :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.log</tt>.
+intr_log :: MonadBlockBuilder m => Value -> m Value
+
+-- | A builder for <tt>llvm.intr.masked.load</tt>.
+intr_masked_load :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> Int -> m Value
+
+-- | A pattern for <tt>llvm.intr.masked.store</tt>.
+pattern MaskedStore :: Location -> operand -> operand -> operand -> Int -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.masked.store</tt>.
+intr_masked_store :: MonadBlockBuilder m => Value -> Value -> Value -> Int -> m ()
+
+-- | A pattern for <tt>llvm.intr.matrix.multiply</tt>.
+pattern MatrixMultiply :: Location -> Type -> operand -> operand -> Int -> Int -> Int -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.matrix.multiply</tt>.
+intr_matrix_multiply :: MonadBlockBuilder m => Type -> Value -> Value -> Int -> Int -> Int -> m Value
+
+-- | A pattern for <tt>llvm.intr.matrix.transpose</tt>.
+pattern MatrixTranspose :: Location -> Type -> operand -> Int -> Int -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.matrix.transpose</tt>.
+intr_matrix_transpose :: MonadBlockBuilder m => Type -> Value -> Int -> Int -> m Value
+
+-- | A pattern for <tt>llvm.intr.maxnum</tt>.
+pattern MaxNum :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.maxnum</tt>.
+intr_maxnum :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.maximum</tt>.
+pattern Maximum :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.maximum</tt>.
+intr_maximum :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.memcpy.inline</tt>.
+pattern MemcpyInline :: Location -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.memcpy.inline</tt>.
+intr_memcpy_inline :: MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
+
+-- | A pattern for <tt>llvm.intr.memcpy</tt>.
+pattern Memcpy :: Location -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.memcpy</tt>.
+intr_memcpy :: MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
+
+-- | A pattern for <tt>llvm.intr.minnum</tt>.
+pattern MinNum :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.minnum</tt>.
+intr_minnum :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.minimum</tt>.
+pattern Minimum :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.minimum</tt>.
+intr_minimum :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.mul</tt>.
+pattern Mul :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.mul</tt>.
+mul :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.mlir.null</tt>.
+pattern Null :: Location -> Type -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.mlir.null</tt>.
+mlir_null :: MonadBlockBuilder m => Type -> m Value
+
+-- | A pattern for <tt>llvm.or</tt>.
+pattern Or :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.or</tt>.
+or :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.pow</tt>.
+pattern Pow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.pow</tt>.
+intr_pow :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.prefetch</tt>.
+intr_prefetch :: MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
+
+-- | A pattern for <tt>llvm.ptrtoint</tt>.
+pattern PtrToInt :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.ptrtoint</tt>.
+ptrtoint :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.resume</tt>.
+pattern Resume :: Location -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.resume</tt>.
+resume :: MonadBlockBuilder m => Value -> m EndOfBlock
+
+-- | A pattern for <tt>llvm.return</tt>.
+pattern Return :: Location -> [operand] -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.return</tt>.
+return :: MonadBlockBuilder m => [Value] -> m EndOfBlock
+
+-- | A pattern for <tt>llvm.intr.sadd.with.overflow</tt>.
+pattern SAddWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.sadd.with.overflow</tt>.
+intr_sadd_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.sdiv</tt>.
+pattern SDiv :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.sdiv</tt>.
+sdiv :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.sext</tt>.
+pattern SExt :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.sext</tt>.
+sext :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.sitofp</tt>.
+pattern SIToFP :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.sitofp</tt>.
+sitofp :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.smax</tt>.
+pattern SMax :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.smax</tt>.
+intr_smax :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.smin</tt>.
+pattern SMin :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.smin</tt>.
+intr_smin :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.smul.with.overflow</tt>.
+pattern SMulWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.smul.with.overflow</tt>.
+intr_smul_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.srem</tt>.
+pattern SRem :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.srem</tt>.
+srem :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.ssub.with.overflow</tt>.
+pattern SSubWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.ssub.with.overflow</tt>.
+intr_ssub_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.select</tt>.
+pattern Select :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.select</tt>.
+select :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.shl</tt>.
+pattern Shl :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.shl</tt>.
+shl :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.shufflevector</tt>.
+pattern ShuffleVector :: Location -> Type -> operand -> operand -> [Attribute] -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.shufflevector</tt>.
+shufflevector :: MonadBlockBuilder m => Type -> Value -> Value -> [Attribute] -> m Value
+
+-- | A pattern for <tt>llvm.intr.sin</tt>.
+pattern Sin :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.sin</tt>.
+intr_sin :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.sqrt</tt>.
+pattern Sqrt :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.sqrt</tt>.
+intr_sqrt :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.stackrestore</tt>.
+pattern StackRestore :: Location -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.stackrestore</tt>.
+intr_stackrestore :: MonadBlockBuilder m => Value -> m ()
+
+-- | A pattern for <tt>llvm.intr.stacksave</tt>.
+pattern StackSave :: Location -> Type -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.stacksave</tt>.
+intr_stacksave :: MonadBlockBuilder m => Type -> m Value
+
+-- | A pattern for <tt>llvm.store</tt>.
+pattern Store :: Location -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.store</tt>.
+store :: MonadBlockBuilder m => Value -> Value -> m ()
+
+-- | A pattern for <tt>llvm.sub</tt>.
+pattern Sub :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.sub</tt>.
+sub :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.trunc</tt>.
+pattern Trunc :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.trunc</tt>.
+trunc :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.uadd.with.overflow</tt>.
+pattern UAddWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.uadd.with.overflow</tt>.
+intr_uadd_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.udiv</tt>.
+pattern UDiv :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.udiv</tt>.
+udiv :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.uitofp</tt>.
+pattern UIToFP :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.uitofp</tt>.
+uitofp :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.umul.with.overflow</tt>.
+pattern UMulWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.umul.with.overflow</tt>.
+intr_umul_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.urem</tt>.
+pattern URem :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.urem</tt>.
+urem :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.usub.with.overflow</tt>.
+pattern USubWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.usub.with.overflow</tt>.
+intr_usub_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.mlir.undef</tt>.
+pattern Undef :: Location -> Type -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.mlir.undef</tt>.
+mlir_undef :: MonadBlockBuilder m => Type -> m Value
+
+-- | A pattern for <tt>llvm.unreachable</tt>.
+pattern Unreachable :: Location -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.unreachable</tt>.
+unreachable :: MonadBlockBuilder m => m EndOfBlock
+
+-- | A pattern for <tt>llvm.xor</tt>.
+pattern XOr :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.xor</tt>.
+xor :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.zext</tt>.
+pattern ZExt :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.zext</tt>.
+zext :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.masked.compressstore</tt>.
+intr_masked_compressstore :: MonadBlockBuilder m => Value -> Value -> Value -> m ()
+
+-- | A builder for <tt>llvm.intr.masked.expandload</tt>.
+intr_masked_expandload :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.masked.gather</tt>.
+intr_masked_gather :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> Int -> m Value
+
+-- | A builder for <tt>llvm.intr.masked.scatter</tt>.
+intr_masked_scatter :: MonadBlockBuilder m => Value -> Value -> Value -> Int -> m ()
+
+-- | A builder for <tt>llvm.intr.vector.reduce.add</tt>.
+intr_vector_reduce_add :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.and</tt>.
+intr_vector_reduce_and :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.fadd</tt>.
+intr_vector_reduce_fadd :: MonadBlockBuilder m => Type -> Value -> Value -> Bool -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.fmax</tt>.
+intr_vector_reduce_fmax :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.fmin</tt>.
+intr_vector_reduce_fmin :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.fmul</tt>.
+intr_vector_reduce_fmul :: MonadBlockBuilder m => Type -> Value -> Value -> Bool -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.mul</tt>.
+intr_vector_reduce_mul :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.or</tt>.
+intr_vector_reduce_or :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.smax</tt>.
+intr_vector_reduce_smax :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.smin</tt>.
+intr_vector_reduce_smin :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.umax</tt>.
+intr_vector_reduce_umax :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.umin</tt>.
+intr_vector_reduce_umin :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A builder for <tt>llvm.intr.vector.reduce.xor</tt>.
+intr_vector_reduce_xor :: MonadBlockBuilder m => Type -> Value -> m Value
+instance GHC.Classes.Eq MLIR.AST.Dialect.LLVM.Type
+instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.Type
+
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679349900 :: Context -> IO PassManager
+inline_c_ffi_6989586621679458804 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679349909 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458813 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679349922 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679458826 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679349931 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458835 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679349940 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458844 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679349949 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458853 :: PassManager -> IO ()
