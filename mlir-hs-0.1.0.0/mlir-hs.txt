@@ -728,6 +728,53 @@ pattern TypeCast :: Location -> Type -> operand -> AbstractOperation operand
 -- | A builder for <tt>vector.type_cast</tt>.
 type_cast :: MonadBlockBuilder m => Type -> Value -> m Value
 
+module MLIR.AST.Dialect.Tensor
+
+-- | A pattern for <tt>tensor.cast</tt>.
+pattern Cast :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>tensor.cast</tt>.
+cast :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>tensor.dim</tt>.
+pattern Dim :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>tensor.dim</tt>.
+dim :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A builder for <tt>tensor.extract</tt>.
+extract :: MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
+
+-- | A builder for <tt>tensor.extract_slice</tt>.
+extract_slice :: MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Value] -> [Int] -> [Int] -> [Int] -> m Value
+
+-- | A pattern for <tt>tensor.from_elements</tt>.
+pattern FromElements :: Location -> Type -> [operand] -> AbstractOperation operand
+
+-- | A builder for <tt>tensor.from_elements</tt>.
+from_elements :: MonadBlockBuilder m => Type -> [Value] -> m Value
+
+-- | A builder for <tt>tensor.generate</tt>.
+generate :: MonadBlockBuilder m => Type -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>tensor.insert</tt>.
+insert :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Value
+
+-- | A builder for <tt>tensor.insert_slice</tt>.
+insert_slice :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> [Value] -> [Value] -> [Int] -> [Int] -> [Int] -> m Value
+
+-- | A pattern for <tt>tensor.reshape</tt>.
+pattern Reshape :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>tensor.reshape</tt>.
+reshape :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>tensor.yield</tt>.
+pattern Yield :: Location -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>tensor.yield</tt>.
+yield :: MonadBlockBuilder m => Value -> m EndOfBlock
+
 module MLIR.AST.Dialect.Std
 pattern Branch :: Location -> BlockName -> [Name] -> Operation
 br :: MonadBlockBuilder m => BlockName -> [Value] -> m EndOfBlock
@@ -2009,15 +2056,15 @@ instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.T
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679458804 :: Context -> IO PassManager
+inline_c_ffi_6989586621679469245 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679458813 :: PassManager -> IO ()
+inline_c_ffi_6989586621679469254 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679458826 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679469267 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458835 :: PassManager -> IO ()
+inline_c_ffi_6989586621679469276 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458844 :: PassManager -> IO ()
+inline_c_ffi_6989586621679469285 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458853 :: PassManager -> IO ()
+inline_c_ffi_6989586621679469294 :: PassManager -> IO ()
