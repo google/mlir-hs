@@ -386,9 +386,10 @@ evalNameSupplyT :: Monad m => NameSupplyT m a -> m a
 freshValue :: MonadNameSupply m => Type -> m Value
 freshBlockArg :: MonadNameSupply m => Type -> m Value
 data BlockBindings
-BlockBindings :: SnocList Binding -> SnocList Value -> BlockBindings
+BlockBindings :: SnocList Binding -> SnocList Value -> Location -> BlockBindings
 [blockBindings] :: BlockBindings -> SnocList Binding
 [blockArguments] :: BlockBindings -> SnocList Value
+[blockDefaultLocation] :: BlockBindings -> Location
 newtype BlockBuilderT m a
 BlockBuilderT :: StateT BlockBindings m a -> BlockBuilderT m a
 class Monad m => MonadBlockDecl m
@@ -396,6 +397,7 @@ emitOp_ :: MonadBlockDecl m => Operation -> m ()
 class MonadBlockDecl m => MonadBlockBuilder m
 emitOp :: MonadBlockBuilder m => Operation -> m [Value]
 blockArgument :: MonadBlockBuilder m => Type -> m Value
+setDefaultLocation :: MonadBlockBuilder m => Location -> m ()
 data EndOfBlock
 EndOfBlock :: EndOfBlock
 terminateBlock :: Monad m => m EndOfBlock
@@ -715,12 +717,6 @@ pattern Transpose :: Location -> Type -> operand -> [Int] -> AbstractOperation o
 
 -- | A builder for <tt>vector.transpose</tt>.
 transpose :: MonadBlockBuilder m => Type -> Value -> [Int] -> m Value
-
--- | A pattern for <tt>vector.tuple</tt>.
-pattern Tuple :: Location -> Type -> [operand] -> AbstractOperation operand
-
--- | A builder for <tt>vector.tuple</tt>.
-tuple :: MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A pattern for <tt>vector.type_cast</tt>.
 pattern TypeCast :: Location -> Type -> operand -> AbstractOperation operand
@@ -1250,7 +1246,7 @@ pattern Linalg_InitTensor :: Location -> Type -> [operand] -> [Int] -> AbstractO
 init_tensor :: MonadBlockBuilder m => Type -> [Value] -> [Int] -> m Value
 
 -- | A builder for <tt>linalg.pad_tensor</tt>.
-pad_tensor :: MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Int] -> [Int] -> RegionBuilderT m () -> m Value
+pad_tensor :: MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> Maybe Value -> [Int] -> [Int] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>linalg.range</tt>.
 pattern Linalg_Range :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
@@ -1529,12 +1525,6 @@ pattern CtPop :: Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.ctpop</tt>.
 intr_ctpop :: MonadBlockBuilder m => Value -> m Value
-
--- | A pattern for <tt>llvm.mlir.cast</tt>.
-pattern DialectCast :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>llvm.mlir.cast</tt>.
-mlir_cast :: MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.exp2</tt>.
 pattern Exp2 :: Location -> Type -> operand -> AbstractOperation operand
@@ -2056,15 +2046,15 @@ instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.T
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679469245 :: Context -> IO PassManager
+inline_c_ffi_6989586621679468349 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679469254 :: PassManager -> IO ()
+inline_c_ffi_6989586621679468358 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679469267 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679468371 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679469276 :: PassManager -> IO ()
+inline_c_ffi_6989586621679468380 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679469285 :: PassManager -> IO ()
+inline_c_ffi_6989586621679468389 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679469294 :: PassManager -> IO ()
+inline_c_ffi_6989586621679468398 :: PassManager -> IO ()
