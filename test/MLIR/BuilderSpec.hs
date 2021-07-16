@@ -21,6 +21,7 @@ import Control.Monad.Identity
 import MLIR.AST
 import MLIR.AST.Builder
 import MLIR.AST.Serialize
+import qualified Data.ByteString as BS
 import qualified MLIR.AST.Dialect.Std as Std
 import qualified MLIR.Native as MLIR
 
@@ -75,6 +76,31 @@ spec = do
                     Std.return [result]
                   endOfRegion
       verifyAndDump m
+
+  it "location propagation in builder" $ do
+      let f32 = Float32Type
+      let m = runIdentity $ buildModule $ do
+                buildSimpleFunction "f_loc" [f32] NoAttrs do
+                  x <- blockArgument f32
+                  y <- Std.addf x x
+                  setDefaultLocation (FileLocation "file.mlir" 4 10)
+                  z <- Std.addf y y
+                  Std.return [z]
+      MLIR.withContext \ctx -> do
+        MLIR.registerAllDialects ctx
+        nativeOp <- fromAST ctx (mempty, mempty) m
+        MLIR.verifyOperation nativeOp >>= (`shouldBe` True)
+        MLIR.showOperationWithLocation nativeOp >>= (`shouldBe` BS.intercalate "\n" [
+            "#loc0 = loc(unknown)"
+          , "module  {"
+          , "  func @f_loc(%arg0: f32 loc(unknown)) -> f32 {"
+          , "    %0 = addf %arg0, %arg0 : f32 loc(#loc0)"
+          , "    %1 = addf %0, %0 : f32 loc(#loc1)"
+          , "    return %1 : f32 loc(#loc1)"
+          , "  } loc(#loc0)"
+          , "} loc(#loc0)"
+          , "#loc1 = loc(\"file.mlir\":4:10)"
+          , ""])
 
 
 main :: IO ()
