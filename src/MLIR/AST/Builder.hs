@@ -79,14 +79,15 @@ freshBlockArg ty = (("arg" <>) <$> freshName) <&> (:> ty)
 data BlockBindings = BlockBindings
   { blockBindings :: SnocList Binding
   , blockArguments :: SnocList Value
+  , blockLocation :: Location
   }
 
 instance Semigroup BlockBindings where
-  BlockBindings bs args <> BlockBindings bs' args' =
-    BlockBindings (bs <> bs') (args <> args')
+  BlockBindings bs args _ <> BlockBindings bs' args' loc' =
+    BlockBindings (bs <> bs') (args <> args') loc'
 
 instance Monoid BlockBindings where
-  mempty = BlockBindings mempty mempty
+  mempty = BlockBindings mempty mempty UnknownLocation
 
 newtype BlockBuilderT m a = BlockBuilderT (StateT BlockBindings m a)
                             deriving (Functor, Applicative, Monad,
@@ -102,6 +103,7 @@ class Monad m => MonadBlockDecl m where
 class MonadBlockDecl m => MonadBlockBuilder m where
   emitOp :: Operation -> m [Value]
   blockArgument :: Type -> m Value
+  setLocation :: Location -> m ()
 
 data EndOfBlock = EndOfBlock
 
@@ -113,7 +115,7 @@ noTerminator = return EndOfBlock
 
 runBlockBuilder :: Monad m => BlockBuilderT m a -> m (a, ([Value], [Binding]))
 runBlockBuilder (BlockBuilderT act) = do
-  (result, BlockBindings binds args) <- runStateT act mempty
+  (result, BlockBindings binds args loc) <- runStateT act mempty
   return (result, (unsnocList args, unsnocList binds))
 
 instance Monad m => MonadBlockDecl (BlockBuilderT m) where
@@ -124,7 +126,11 @@ instance Monad m => MonadBlockDecl (BlockBuilderT m) where
       Explicit _  -> error "emitOp_ can only be used on ops that have no results"
 
 instance MonadNameSupply m => MonadBlockBuilder (BlockBuilderT m) where
-  emitOp op = BlockBuilderT $ do
+  emitOp opNoLoc = BlockBuilderT $ do
+    loc <- gets blockLocation
+    let op = case opLocation opNoLoc of
+          UnknownLocation -> opNoLoc { opLocation = loc }
+          _ -> opNoLoc
     results <- case opResultTypes op of
       Inferred     -> error "Builder doesn't support inferred result types!"
       Explicit tys -> lift $ mapM freshValue tys
@@ -134,6 +140,7 @@ instance MonadNameSupply m => MonadBlockBuilder (BlockBuilderT m) where
     value <- lift $ freshValue ty
     modify \s -> s { blockArguments = blockArguments s .:. value }
     return value
+  setLocation loc = BlockBuilderT $ modify \s -> s { blockLocation = loc }
 
 --------------------------------------------------------------------------------
 -- Region builder monad
