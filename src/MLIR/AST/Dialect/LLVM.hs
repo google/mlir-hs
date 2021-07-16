@@ -16,6 +16,9 @@ module MLIR.AST.Dialect.LLVM (
   -- * Types
     Type(..)
   , pattern Ptr
+  , pattern Array
+  , pattern Void
+  , pattern LiteralStruct
   -- * Operations
   , module MLIR.AST.Dialect.Generated.LLVM
   ) where
@@ -23,6 +26,8 @@ module MLIR.AST.Dialect.LLVM (
 import MLIR.AST.Dialect.Generated.LLVM
 
 import Data.Typeable
+import Control.Monad.IO.Class
+import Control.Monad.Trans.Cont
 import qualified Language.C.Inline as C
 
 import qualified MLIR.AST           as AST
@@ -34,7 +39,10 @@ C.context $ C.baseCtx <> Native.mlirCtx
 C.include "mlir-c/Dialect/LLVM.h"
 
 data Type = PointerType AST.Type
-          -- TODO(apaszke): Arrays, structures, functions, vectors, etc.
+          | ArrayType Int AST.Type
+          | VoidType
+          | LiteralStructType [AST.Type]
+          -- TODO(apaszke): Structures, functions, vectors, etc.
           deriving Eq
 
 instance AST.FromAST Type Native.Type where
@@ -42,6 +50,18 @@ instance AST.FromAST Type Native.Type where
     PointerType t -> do
       nt <- AST.fromAST ctx env t
       [C.exp| MlirType { mlirLLVMPointerTypeGet($(MlirType nt), 0) } |]
+    ArrayType size t -> do
+      nt <- AST.fromAST ctx env t
+      let nsize = fromIntegral size
+      [C.exp| MlirType { mlirLLVMArrayTypeGet($(MlirType nt), $(unsigned int nsize)) } |]
+    VoidType -> [C.exp| MlirType { mlirLLVMVoidTypeGet($(MlirContext ctx)) } |]
+    LiteralStructType fields -> evalContT $ do
+      (numFields, nativeFields) <- AST.packFromAST ctx env fields
+      liftIO $ [C.exp| MlirType {
+        mlirLLVMStructTypeLiteralGet($(MlirContext ctx), $(intptr_t numFields),
+                                     $(MlirType* nativeFields), false)
+      } |]
+
 
 castLLVMType :: AST.Type -> Maybe Type
 castLLVMType ty = case ty of
@@ -51,3 +71,15 @@ castLLVMType ty = case ty of
 pattern Ptr :: AST.Type -> AST.Type
 pattern Ptr t <- (castLLVMType -> Just (PointerType t))
   where Ptr t = AST.DialectType (PointerType t)
+
+pattern Array :: Int -> AST.Type -> AST.Type
+pattern Array n t <- (castLLVMType -> Just (ArrayType n t))
+  where Array n t = AST.DialectType (ArrayType n t)
+
+pattern Void :: AST.Type
+pattern Void <- (castLLVMType -> Just VoidType)
+  where Void = AST.DialectType VoidType
+
+pattern LiteralStruct :: [AST.Type] -> AST.Type
+pattern LiteralStruct fields <- (castLLVMType -> Just (LiteralStructType fields))
+  where LiteralStruct fields = AST.DialectType (LiteralStructType fields)
