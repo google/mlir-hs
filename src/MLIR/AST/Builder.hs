@@ -115,7 +115,7 @@ noTerminator = return EndOfBlock
 
 runBlockBuilder :: Monad m => BlockBuilderT m a -> m (a, ([Value], [Binding]))
 runBlockBuilder (BlockBuilderT act) = do
-  (result, BlockBindings binds args loc) <- runStateT act mempty
+  (result, BlockBindings binds args _) <- runStateT act mempty
   return (result, (unsnocList args, unsnocList binds))
 
 instance Monad m => MonadBlockDecl (BlockBuilderT m) where
