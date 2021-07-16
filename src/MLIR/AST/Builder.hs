@@ -79,7 +79,7 @@ freshBlockArg ty = (("arg" <>) <$> freshName) <&> (:> ty)
 data BlockBindings = BlockBindings
   { blockBindings :: SnocList Binding
   , blockArguments :: SnocList Value
-  , blockLocation :: Location
+  , blockDefaultLocation :: Location
   }
 
 instance Semigroup BlockBindings where
@@ -103,7 +103,7 @@ class Monad m => MonadBlockDecl m where
 class MonadBlockDecl m => MonadBlockBuilder m where
   emitOp :: Operation -> m [Value]
   blockArgument :: Type -> m Value
-  setLocation :: Location -> m ()
+  setDefaultLocation :: Location -> m ()
 
 data EndOfBlock = EndOfBlock
 
@@ -127,7 +127,7 @@ instance Monad m => MonadBlockDecl (BlockBuilderT m) where
 
 instance MonadNameSupply m => MonadBlockBuilder (BlockBuilderT m) where
   emitOp opNoLoc = BlockBuilderT $ do
-    loc <- gets blockLocation
+    loc <- gets blockDefaultLocation
     let op = case opLocation opNoLoc of
           UnknownLocation -> opNoLoc { opLocation = loc }
           _ -> opNoLoc
@@ -140,7 +140,7 @@ instance MonadNameSupply m => MonadBlockBuilder (BlockBuilderT m) where
     value <- lift $ freshValue ty
     modify \s -> s { blockArguments = blockArguments s .:. value }
     return value
-  setLocation loc = BlockBuilderT $ modify \s -> s { blockLocation = loc }
+  setDefaultLocation loc = BlockBuilderT $ modify \s -> s { blockDefaultLocation = loc }
 
 --------------------------------------------------------------------------------
 -- Region builder monad

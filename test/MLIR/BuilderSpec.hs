@@ -83,7 +83,7 @@ spec = do
                 buildSimpleFunction "f_loc" [f32] NoAttrs do
                   x <- blockArgument f32
                   y <- Std.addf x x
-                  setLocation (FileLocation "file.mlir" 4 10)
+                  setDefaultLocation (FileLocation "file.mlir" 4 10)
                   z <- Std.addf y y
                   Std.return [z]
       MLIR.withContext \ctx -> do
