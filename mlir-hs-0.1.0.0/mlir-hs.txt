@@ -1401,7 +1401,13 @@ vecmat :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT 
 module MLIR.AST.Dialect.LLVM
 data Type
 PointerType :: Type -> Type
+ArrayType :: Int -> Type -> Type
+VoidType :: Type
+LiteralStructType :: [Type] -> Type
 pattern Ptr :: Type -> Type
+pattern Array :: Int -> Type -> Type
+pattern Void :: Type
+pattern LiteralStruct :: [Type] -> Type
 
 -- | A pattern for <tt>llvm.ashr</tt>.
 pattern AShr :: Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -2046,15 +2052,15 @@ instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.T
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679468349 :: Context -> IO PassManager
+inline_c_ffi_6989586621679470769 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679468358 :: PassManager -> IO ()
+inline_c_ffi_6989586621679470778 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679468371 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679470791 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679468380 :: PassManager -> IO ()
+inline_c_ffi_6989586621679470800 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679468389 :: PassManager -> IO ()
+inline_c_ffi_6989586621679470809 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679468398 :: PassManager -> IO ()
+inline_c_ffi_6989586621679470818 :: PassManager -> IO ()

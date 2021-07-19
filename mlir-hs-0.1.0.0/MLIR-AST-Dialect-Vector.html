@@ -336,9 +336,9 @@ print %1
  based on the element type of the memref. The shape of the result vector
  type determines the shape of the slice read from the start memory address.
  The elements along each dimension of the slice are strided by the memref
- strides. Only memref with default strides are allowed. These constraints
- guarantee that elements read along the first dimension of the slice are
- contiguous in memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
+ strides. Only unit strides are allowed along the most minor memref
+ dimension. These constraints guarantee that elements read along the first
+ dimension of the slice are contiguous in memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
  element type is a scalar, it should match the element type of the result
  vector. If the memref element type is vector, it should match the result
  vector type.</p><p>Example 1: 1-D vector load on a scalar memref.
@@ -572,9 +572,9 @@ vector.scatter %base[%i, %j][%v], %mask, %value
  memref dimension based on the element type of the memref. The shape of the
  vector value to store determines the shape of the slice written from the
  start memory address. The elements along each dimension of the slice are
- strided by the memref strides. Only memref with default strides are allowed.
- These constraints guarantee that elements written along the first dimension
- of the slice are contiguous in memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
+ strided by the memref strides. Only unit strides are allowed along the most
+ minor memref dimension. These constraints guarantee that elements written
+ along the first dimension of the slice are contiguous in memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
  element type is a scalar, it should match the element type of the value
  to store. If the memref element type is vector, it should match the type
  of the value to store.</p><p>Example 1: 1-D vector store on a scalar memref.
