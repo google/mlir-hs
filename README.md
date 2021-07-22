@@ -26,24 +26,20 @@ You should be able to get them from your favorite package manager.
   1. Clone the latest LLVM code (or use `git pull` if you cloned it before)
      ```bash
      git clone https://github.com/llvm/llvm-project
-     cd llvm-project
      ```
 
   2. Create a temporary build directory
      ```bash
-     mkdir build && cd build
+     mkdir llvm-project/build
      ```
 
   3. Configure the build using CMake. Remember to replace `$PREFIX` with the directory
      where you want MLIR to be installed. See [LLVM documentation](https://llvm.org/docs/CMake.html)
      for extended explanation and other potentially interesting build flags.
      ```bash
-     cmake ../llvm                         \
+     cmake -B llvm-project/build           \
        -G Ninja                            \ # Use the Ninja build system
-       -DLLVM_ENABLE_PROJECTS=mlir         \ # Build MLIR
-       -DCMAKE_INSTALL_PREFIX=$PREFIX      \ # Install prefix
-       -DLLVM_BUILD_LLVM_DYLIB=ON          \ # Build the dynamic library
-       -DLLVM_BUILD_EXAMPLES=OFF             # Save some time
+       -DCMAKE_INSTALL_PREFIX=$PREFIX        # Install prefix
      ```
      For development purposes we additionally recommend using
      `-DCMAKE_BUILD_TYPE=RelWithDebInfo -DLLVM_ENABLE_ASSERTIONS=ON`
@@ -52,7 +48,7 @@ You should be able to get them from your favorite package manager.
   4. Build and install MLIR. Note that it uses the installation prefix specified
      in the previous step.
      ```bash
-     ninja install
+     cd llvm-project/build && ninja install llvm-project/llvm/install
      ```
 
 ## Contributing

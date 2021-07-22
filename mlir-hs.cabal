@@ -84,7 +84,7 @@ library
     , bytestring
     , transformers
   extra-libraries:
-    MLIRPublicAPI
+    MLIRHaskell
 
 test-suite spec
   import: defaults
