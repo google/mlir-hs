@@ -23,7 +23,7 @@ suite can be executed using `stack test`.
 The instructions below assume that you have `cmake` and `ninja` installed.
 You should be able to get them from your favorite package manager.
 
-  1. Clone the latest LLVM code (or use `git pull` if you cloned it before)
+  1. Clone the latest LLVM code (or use `git pull` if you cloned it before) into the root of this repository
      ```bash
      git clone https://github.com/llvm/llvm-project
      ```
