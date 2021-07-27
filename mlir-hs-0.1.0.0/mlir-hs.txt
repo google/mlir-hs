@@ -1287,9 +1287,6 @@ conv_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT
 -- | A builder for <tt>linalg.conv_3d_ncdhw</tt>.
 conv_3d_ncdhw :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
--- | A builder for <tt>linalg.conv_2d_nchw</tt>.
-conv_2d_nchw :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
 -- | A builder for <tt>linalg.conv_1d_ncw</tt>.
 conv_1d_ncw :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1382,6 +1379,12 @@ pattern PoolingSum :: Location -> operand -> operand -> operand -> Maybe [Int] -
 
 -- | A builder for <tt>linalg.pooling_sum</tt>.
 pooling_sum :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
+
+-- | A builder for <tt>linalg.quantized_batch_matmul</tt>.
+quantized_batch_matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.quantized_matmul</tt>.
+quantized_matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.soft_plus_2d</tt>.
 soft_plus_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -2052,15 +2055,15 @@ instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.T
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679470769 :: Context -> IO PassManager
+inline_c_ffi_6989586621679471822 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679470778 :: PassManager -> IO ()
+inline_c_ffi_6989586621679471831 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679470791 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679471844 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679470800 :: PassManager -> IO ()
+inline_c_ffi_6989586621679471853 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679470809 :: PassManager -> IO ()
+inline_c_ffi_6989586621679471862 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679470818 :: PassManager -> IO ()
+inline_c_ffi_6989586621679471871 :: PassManager -> IO ()
