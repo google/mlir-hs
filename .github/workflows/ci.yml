@@ -46,22 +46,22 @@ jobs:
     - name: Ccache for C++ compilation
       uses: hendrikmuhs/ccache-action@4687d037e4d7cf725512d9b819137a3af34d39b3
 
-    - name: Install dependencies (Haskell)
-      run: |
-        stack build --test --only-dependencies
-
     - name: Install dependencies (LLVM & MLIR)
       run: |
         export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-        cmake -S llvm_src/llvm -B llvm_src/build -DLLVM_CCACHE_BUILD=ON -DLLVM_ENABLE_PROJECTS=mlir \
-          -DLLVM_TARGETS_TO_BUILD="host" -DLLVM_BUILD_LLVM_DYLIB=ON -DCMAKE_BUILD_TYPE=Release \
-          -DLLVM_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=$HOME/mlir_shared
-        cd llvm_src/build && ninja -j4 install
+        cmake -B llvm_src/build -DLLVM_CCACHE_BUILD=ON \
+          -DLLVM_BUILD_LLVM_DYLIB=ON -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=$HOME/mlir_shared
+        cd llvm_src/build && ninja -j4 install llvm_src/llvm/install
         echo "$HOME/mlir_shared/bin" >> $GITHUB_PATH
       env:
         CC: clang
         CXX: clang++
         CMAKE_GENERATOR: Ninja
+
+    - name: Install dependencies (Haskell)
+      run: |
+        stack build --test --only-dependencies
 
     - name: Build mlir-hs
       run: |
