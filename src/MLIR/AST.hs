@@ -194,7 +194,7 @@ namedAttribute name value = M.singleton name value
 
 pattern ModuleOp :: Block -> Operation
 pattern ModuleOp body = Operation
-  { opName = "module"
+  { opName = "builtin.module"
   , opLocation = UnknownLocation
   , opResultTypes = Explicit []
   , opOperands = []
@@ -212,7 +212,7 @@ pattern FuncAttrs name ty <-
 
 pattern FuncOp :: Location -> Name -> Type -> Region -> Operation
 pattern FuncOp loc name ty body = Operation
-  { opName = "func"
+  { opName = "builtin.func"
   , opLocation = loc
   , opResultTypes = Explicit []
   , opOperands = []

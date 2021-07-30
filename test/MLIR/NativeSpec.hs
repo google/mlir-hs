@@ -30,8 +30,8 @@ import qualified MLIR.Native.Pass as MLIR
 import qualified MLIR.Native.ExecutionEngine as MLIR
 
 exampleModuleStr :: BS.ByteString
-exampleModuleStr = pack $ [r|module  {
-  func @add(%arg0: i32) -> i32 attributes {llvm.emit_c_interface} {
+exampleModuleStr = pack $ [r|builtin.module  {
+  builtin.func @add(%arg0: i32) -> i32 attributes {llvm.emit_c_interface} {
     %0 = addi %arg0, %arg0 : i32
     return %0 : i32
   }
@@ -66,7 +66,7 @@ spec = do
       m <- MLIR.createEmptyModule loc
       str <- MLIR.showModule m
       MLIR.destroyModule m
-      str `shouldBe` "module  {\n}\n"
+      str `shouldBe` "builtin.module  {\n}\n"
 
     it "Can parse an example module" $ \ctx -> do
       exampleModule <- liftM fromJust $
@@ -85,7 +85,7 @@ spec = do
         m <- MLIR.createEmptyModule loc
         str <- (MLIR.moduleAsOperation >=> MLIR.showOperationWithLocation) m
         MLIR.destroyModule m
-        str `shouldBe` "module  {\n} loc(#loc)\n#loc = loc(\"test.cc\":21:45)\n"
+        str `shouldBe` "builtin.module  {\n} loc(#loc)\n#loc = loc(\"test.cc\":21:45)\n"
 
   describe "Evaluation engine" $ beforeAll prepareContext $ do
     it "Can evaluate the example module" $ \ctx -> do
