@@ -812,6 +812,12 @@ pattern AtomicYield :: Location -> operand -> AbstractOperation operand
 -- | A builder for <tt>std.atomic_yield</tt>.
 atomic_yield :: MonadBlockBuilder m => Value -> m EndOfBlock
 
+-- | A pattern for <tt>std.bitcast</tt>.
+pattern Bitcast :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>std.bitcast</tt>.
+bitcast :: MonadBlockBuilder m => Type -> Value -> m Value
+
 -- | A builder for <tt>std.call_indirect</tt>.
 call_indirect :: MonadBlockBuilder m => [Type] -> Value -> [Value] -> m Value
 
@@ -1246,7 +1252,7 @@ pattern Linalg_InitTensor :: Location -> Type -> [operand] -> [Int] -> AbstractO
 init_tensor :: MonadBlockBuilder m => Type -> [Value] -> [Int] -> m Value
 
 -- | A builder for <tt>linalg.pad_tensor</tt>.
-pad_tensor :: MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> Maybe Value -> [Int] -> [Int] -> RegionBuilderT m () -> m Value
+pad_tensor :: MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Int] -> [Int] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>linalg.range</tt>.
 pattern Linalg_Range :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
@@ -1263,41 +1269,20 @@ pattern Linalg_Yield :: Location -> [operand] -> AbstractOperation operand
 -- | A builder for <tt>linalg.yield</tt>.
 yield :: MonadBlockBuilder m => [Value] -> m EndOfBlock
 
--- | A builder for <tt>linalg.batch_matmul_i16_i16_i32</tt>.
-batch_matmul_i16_i16_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.batch_matmul_i32_i32_i32</tt>.
-batch_matmul_i32_i32_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.batch_matmul_i8_i8_i32</tt>.
-batch_matmul_i8_i8_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
 -- | A builder for <tt>linalg.batch_matmul</tt>.
 batch_matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.batch_matvec</tt>.
 batch_matvec :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
--- | A builder for <tt>linalg.conv_3d</tt>.
-conv_3d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+-- | A builder for <tt>linalg.conv_1d</tt>.
+conv_1d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.conv_2d</tt>.
 conv_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
--- | A builder for <tt>linalg.conv_3d_ncdhw</tt>.
-conv_3d_ncdhw :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.conv_1d_ncw</tt>.
-conv_1d_ncw :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.conv_3d_ndhwc</tt>.
-conv_3d_ndhwc :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.conv_2d_nhwc</tt>.
-conv_2d_nhwc :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.conv_1d_nwc</tt>.
-conv_1d_nwc :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+-- | A builder for <tt>linalg.conv_3d</tt>.
+conv_3d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>linalg.conv</tt>.
 pattern Conv :: Location -> operand -> operand -> operand -> Maybe [Int] -> Maybe [Int] -> AbstractOperation operand
@@ -1305,20 +1290,8 @@ pattern Conv :: Location -> operand -> operand -> operand -> Maybe [Int] -> Mayb
 -- | A builder for <tt>linalg.conv</tt>.
 conv :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
 
--- | A builder for <tt>linalg.conv_1d</tt>.
-conv_1d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
 -- | A builder for <tt>linalg.copy</tt>.
 copy :: MonadBlockBuilder m => Value -> Value -> Maybe Map -> Maybe Map -> RegionBuilderT m () -> m ()
-
--- | A builder for <tt>linalg.dot_i16_i16_i32</tt>.
-dot_i16_i16_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.dot_i32_i32_i32</tt>.
-dot_i32_i32_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.dot_i8_i8_i32</tt>.
-dot_i8_i8_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.dot</tt>.
 dot :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1332,29 +1305,11 @@ fill_rng_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuil
 -- | A builder for <tt>linalg.generic</tt>.
 generic :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> [Attribute] -> Maybe ByteString -> Maybe ByteString -> RegionBuilderT m () -> m Value
 
--- | A builder for <tt>linalg.matmul_column_major</tt>.
-matmul_column_major :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.matmul_i16_i16_i32</tt>.
-matmul_i16_i16_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.matmul_i32_i32_i32</tt>.
-matmul_i32_i32_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
 -- | A builder for <tt>linalg.matmul_i8_i8_i32</tt>.
 matmul_i8_i8_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matmul</tt>.
 matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.matvec_i16_i16_i32</tt>.
-matvec_i16_i16_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.matvec_i32_i32_i32</tt>.
-matvec_i32_i32_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.matvec_i8_i8_i32</tt>.
-matvec_i8_i8_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matvec</tt>.
 matvec :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1388,15 +1343,6 @@ quantized_matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> Regio
 
 -- | A builder for <tt>linalg.soft_plus_2d</tt>.
 soft_plus_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.vecmat_i16_i16_i32</tt>.
-vecmat_i16_i16_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.vecmat_i32_i32_i32</tt>.
-vecmat_i32_i32_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.vecmat_i8_i8_i32</tt>.
-vecmat_i8_i8_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.vecmat</tt>.
 vecmat :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -2055,15 +2001,15 @@ instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.T
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679471822 :: Context -> IO PassManager
+inline_c_ffi_6989586621679451474 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679471831 :: PassManager -> IO ()
+inline_c_ffi_6989586621679451483 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679471844 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679451496 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679471853 :: PassManager -> IO ()
+inline_c_ffi_6989586621679451505 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679471862 :: PassManager -> IO ()
+inline_c_ffi_6989586621679451514 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679471871 :: PassManager -> IO ()
+inline_c_ffi_6989586621679451523 :: PassManager -> IO ()
