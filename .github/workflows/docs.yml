@@ -36,7 +36,7 @@ jobs:
       with:
         repository: llvm/llvm-project
         ref: 'main'
-        path: 'llvm_src'
+        path: 'llvm-project'
 
     - name: Ccache for C++ compilation
       uses: hendrikmuhs/ccache-action@4687d037e4d7cf725512d9b819137a3af34d39b3
@@ -44,10 +44,10 @@ jobs:
     - name: Install dependencies (LLVM & MLIR)
       run: |
         export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-        cmake -B llvm_src/build -DLLVM_CCACHE_BUILD=ON \
+        cmake -B llvm-project/build -DLLVM_CCACHE_BUILD=ON \
           -DLLVM_BUILD_LLVM_DYLIB=ON -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_INSTALL_PREFIX=$HOME/mlir_shared
-        cd llvm_src/build && ninja -j4 install llvm_src/llvm/install
+        cd llvm-project/build && ninja -j4 install llvm-project/llvm/install
         echo "$HOME/mlir_shared/bin" >> $GITHUB_PATH
       env:
         CC: clang
