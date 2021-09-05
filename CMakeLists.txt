@@ -41,8 +41,8 @@ set(LLVM_INCLUDE_TESTS ON CACHE BOOL "Disable tests")
 set(MLIR_BINDINGS_PYTHON_LOCK_VERSION OFF CACHE BOOL "Disable linking against libpython")
 
 # LLVM configuration.
-# Expected that LLVM is in/symlinked in to llvm_src.
-set(LLVM_SRC_RELATIVE_DIR "llvm_src" CACHE STRING "Relative path to LLVM source")
+# Expected that LLVM is in/symlinked in to llvm-project.
+set(LLVM_SRC_RELATIVE_DIR "llvm-project" CACHE STRING "Relative path to LLVM source")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/${LLVM_SRC_RELATIVE_DIR}/llvm" EXCLUDE_FROM_ALL)
 
 set(_haskell_mlir_install_prefix "haskell_package")

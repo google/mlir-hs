@@ -39,11 +39,14 @@ You should be able to get them from your favorite package manager.
      ```bash
      cmake -B llvm-project/build           \
        -G Ninja                            \ # Use the Ninja build system
-       -DCMAKE_INSTALL_PREFIX=$PREFIX        # Install prefix
+       -DCMAKE_INSTALL_PREFIX=$PREFIX      \ # Install prefix
+       -DLLVM_BUILD_LLVM_DYLIB=ON            # Build shared libraries
      ```
      For development purposes we additionally recommend using
      `-DCMAKE_BUILD_TYPE=RelWithDebInfo -DLLVM_ENABLE_ASSERTIONS=ON`
-     to retain debug information and enable internal LLVM assertions.
+     to retain debug information and enable internal LLVM assertions. If one changes
+     the install directory (CMAKE_INSTALL_PREFIX) then one needs to add this directory
+     to PATH and LD_LIBRARY_PATH for the subsequent builds (e.g., `stack`) to find it.
 
   4. Build and install MLIR. Note that it uses the installation prefix specified
      in the previous step.

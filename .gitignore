@@ -6,3 +6,5 @@ stack.yaml.lock
 # Generated files
 src/MLIR/AST/Dialect/Generated
 test/MLIR/AST/Dialect/Generated
+# LLVM src checkout dir
+llvm-project
