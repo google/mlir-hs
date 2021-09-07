@@ -104,10 +104,10 @@ instance Eq Type where
 data Location =
     UnknownLocation
   | FileLocation { locPath :: BS.ByteString, locLine :: UInt, locColumn :: UInt }
+  | NameLocation { name :: BS.ByteString, childLoc :: Location }
   -- TODO(jpienaar): Add support C API side and implement these
   | CallSiteLocation
   | FusedLocation
-  | NameLocation
   | OpaqueLocation
 
 data Binding = Bind [Name] Operation
@@ -232,13 +232,17 @@ C.include "mlir-c/BuiltinTypes.h"
 C.include "mlir-c/BuiltinAttributes.h"
 
 instance FromAST Location Native.Location where
-  fromAST ctx _ loc = case loc of
+  fromAST ctx env loc = case loc of
     UnknownLocation -> Native.getUnknownLocation ctx
     FileLocation file line col -> do
       Native.withStringRef file \fileStrRef ->
         Native.getFileLineColLocation ctx fileStrRef cline ccol
           where cline = fromIntegral line
                 ccol = fromIntegral col
+    NameLocation name childLoc -> do
+      Native.withStringRef name \nameStrRef -> do
+        nativeChildLoc <- fromAST ctx env childLoc
+        Native.getNameLocation ctx nameStrRef nativeChildLoc
     -- TODO(jpienaar): Fix
     _ -> error "Unimplemented Location case"
 
