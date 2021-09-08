@@ -104,7 +104,7 @@ instance Eq Type where
 data Location =
     UnknownLocation
   | FileLocation { locPath :: BS.ByteString, locLine :: UInt, locColumn :: UInt }
-  | NameLocation { name :: BS.ByteString, childLoc :: Location }
+  | NameLocation { locName :: BS.ByteString, locChild :: Location }
   -- TODO(jpienaar): Add support C API side and implement these
   | CallSiteLocation
   | FusedLocation
