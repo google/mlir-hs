@@ -33,6 +33,7 @@ module MLIR.Native (
     -- * Location
     Location,
     getFileLineColLocation,
+    getNameLocation,
     getUnknownLocation,
     -- * Operation
     Operation,
@@ -145,6 +146,14 @@ getFileLineColLocation ctx (StringRef sPtr len) line col  =
       (MlirStringRef){$(char* sPtr), $(size_t len)},
       $(unsigned int line),
       $(unsigned int col)) } |]
+
+getNameLocation :: Context -> StringRef -> Location -> IO Location
+getNameLocation ctx (StringRef sPtr len) childLoc =
+  [C.exp| MlirLocation {
+    mlirLocationNameGet(
+      $(MlirContext ctx),
+      (MlirStringRef){$(char* sPtr), $(size_t len)},
+      $(MlirLocation childLoc)) } |]
 
 -- TODO(apaszke): No destructor for locations?
 
