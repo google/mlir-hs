@@ -110,6 +110,7 @@ spec = do
           ctx <- MLIR.getContext m
           MLIR.withPassManager ctx \pm -> do
             MLIR.addConvertStandardToLLVMPass pm
+            MLIR.addConvertReconcileUnrealizedCastsPass pm
             result <- MLIR.runPasses pm m
             when (result == MLIR.Failure) $ error "Failed to lower to LLVM!"
 

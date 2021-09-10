@@ -84,6 +84,7 @@ shouldImplementMatmul op = evalContT $ do
       MLIR.addConvertMemRefToLLVMPass   pm
       MLIR.addConvertVectorToLLVMPass   pm
       MLIR.addConvertStandardToLLVMPass pm
+      MLIR.addConvertReconcileUnrealizedCastsPass pm
       result <- MLIR.runPasses pm m
       result `shouldBe` MLIR.Success
     return m
