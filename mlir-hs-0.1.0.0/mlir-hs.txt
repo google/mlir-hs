@@ -2004,15 +2004,17 @@ instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.T
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679452353 :: Context -> IO PassManager
+inline_c_ffi_6989586621679452354 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679452362 :: PassManager -> IO ()
+inline_c_ffi_6989586621679452363 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679452375 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679452376 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679452384 :: PassManager -> IO ()
+inline_c_ffi_6989586621679452385 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679452393 :: PassManager -> IO ()
+inline_c_ffi_6989586621679452394 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679452402 :: PassManager -> IO ()
+inline_c_ffi_6989586621679452403 :: PassManager -> IO ()
+addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
+inline_c_ffi_6989586621679452412 :: PassManager -> IO ()
