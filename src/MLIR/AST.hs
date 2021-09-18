@@ -105,9 +105,9 @@ data Location =
     UnknownLocation
   | FileLocation { locPath :: BS.ByteString, locLine :: UInt, locColumn :: UInt }
   | NameLocation { locName :: BS.ByteString, locChild :: Location }
+  | FusedLocation { locLocations :: [Location], locMetadata :: Maybe Attribute }
   -- TODO(jpienaar): Add support C API side and implement these
   | CallSiteLocation
-  | FusedLocation
   | OpaqueLocation
 
 data Binding = Bind [Name] Operation
@@ -239,6 +239,21 @@ instance FromAST Location Native.Location where
         Native.getFileLineColLocation ctx fileStrRef cline ccol
           where cline = fromIntegral line
                 ccol = fromIntegral col
+    FusedLocation locLocations locMetadata -> do
+      metadata <- case (locMetadata) of
+        -- TODO: Consider factoring out to convenience function.
+        Nothing -> [C.exp| MlirAttribute { mlirAttributeGetNull() } |]
+        Just l -> fromAST ctx env l
+      evalContT $ do
+        -- TODO: This limits the creation of FusedLocation to via AST, this is
+        -- contrary to the other Location which have getters in the Native.hs.
+        -- Revise this to make this more uniform.
+        (numLocs, locs) <- packFromAST ctx env locLocations
+        liftIO $ [C.exp| MlirLocation {
+          mlirLocationFusedGet($(MlirContext ctx),
+            $(intptr_t numLocs), $(MlirLocation* locs),
+            $(MlirAttribute metadata))
+        } |]
     NameLocation name childLoc -> do
       Native.withStringRef name \nameStrRef -> do
         nativeChildLoc <- fromAST ctx env childLoc

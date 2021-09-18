@@ -73,6 +73,14 @@ shouldShowAs op expectedWithLeadingNewline = do
     let expected = trimLeadingSpaces $ BS.append (BS.tail expectedWithLeadingNewline) "\n"
     MLIR.showOperation nativeOp >>= (`shouldBe` expected)
 
+shouldShowWithLocationAs :: Operation -> BS.ByteString -> Expectation
+shouldShowWithLocationAs op expectedWithLeadingNewline = do
+  MLIR.withContext \ctx -> do
+    MLIR.registerAllDialects ctx
+    nativeOp <- fromAST ctx (mempty, mempty) op
+    MLIR.verifyOperation nativeOp >>= (`shouldBe` True)
+    let expected = trimLeadingSpaces $ BS.append (BS.tail expectedWithLeadingNewline) "\n"
+    MLIR.showOperationWithLocation nativeOp >>= (`shouldBe` expected)
 
 shouldImplementMatmul :: Operation -> Expectation
 shouldImplementMatmul op = evalContT $ do
@@ -132,6 +140,27 @@ spec = do
       m `shouldShowAs` [r|
         module  {
         }|]
+
+    it "Can translate a module with location" $ do
+      -- TODO(jpienaar): This builds the module explicitly using the Operation
+      -- interface to set the opLocation on an Operation corresponding to a
+      -- Module.
+      let m = Operation {
+        opName = "builtin.module"
+        , opLocation = FusedLocation [
+            NameLocation "first" UnknownLocation
+            , NameLocation "last" UnknownLocation
+            ] Nothing
+        , opResultTypes = Explicit []
+        , opOperands = []
+        , opRegions = [Region [Block "0" [] []]]
+        , opSuccessors = []
+        , opAttributes = NoAttrs
+        }
+      m `shouldShowWithLocationAs` [r|
+        module  {
+        } loc(#loc)
+        #loc = loc(fused["first", "last"])|]
 
     it "Can construct a matmul via vector.matrix_multiply" $ do
       let v64Ty = VectorType [64] Float32Type

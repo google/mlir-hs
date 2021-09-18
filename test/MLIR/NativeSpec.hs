@@ -49,6 +49,11 @@ prepareContext = do
   MLIR.registerAllDialects ctx
   return ctx
 
+-- Helper matcher as shouldContain requires the same type both sides and here
+-- we are predominantly checking if a BS contains some String.
+bsShouldContain :: BS.ByteString -> BS.ByteString -> Expectation
+bsShouldContain str sub = str `shouldSatisfy` BS.isInfixOf sub
+
 spec :: Spec
 spec = do
   describe "Basics" $ do
@@ -85,16 +90,16 @@ spec = do
         m <- MLIR.createEmptyModule loc
         str <- (MLIR.moduleAsOperation >=> MLIR.showOperationWithLocation) m
         MLIR.destroyModule m
-        str `shouldBe` "module  {\n} loc(#loc)\n#loc = loc(\"test.cc\":21:45)\n"
+        str `bsShouldContain` "loc(\"test.cc\":21:45)"
 
     it "Can create an empty module with name location" $ \ctx -> do
       MLIR.withStringRef "WhatIamCalled" $ \nameRef -> do
-        childLoc <- MLIR.getUnknownLocation ctx
-        loc <- MLIR.getNameLocation ctx nameRef childLoc
+        -- childLoc <- MLIR.getUnknownLocation ctx
+        loc <- MLIR.getNameLocation ctx nameRef =<< MLIR.getUnknownLocation ctx
         m <- MLIR.createEmptyModule loc
         str <- (MLIR.moduleAsOperation >=> MLIR.showOperationWithLocation) m
         MLIR.destroyModule m
-        str `shouldBe` "module  {\n} loc(#loc)\n#loc = loc(\"WhatIamCalled\")\n"
+        str `bsShouldContain` "loc(\"WhatIamCalled\")"
 
   describe "Evaluation engine" $ beforeAll prepareContext $ do
     it "Can evaluate the example module" $ \ctx -> do
