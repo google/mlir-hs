@@ -240,14 +240,11 @@ instance FromAST Location Native.Location where
           where cline = fromIntegral line
                 ccol = fromIntegral col
     FusedLocation locLocations locMetadata -> do
-      metadata <- case (locMetadata) of
+      metadata <- case locMetadata of
         -- TODO: Consider factoring out to convenience function.
         Nothing -> [C.exp| MlirAttribute { mlirAttributeGetNull() } |]
         Just l -> fromAST ctx env l
       evalContT $ do
-        -- TODO: This limits the creation of FusedLocation to via AST, this is
-        -- contrary to the other Location which have getters in the Native.hs.
-        -- Revise this to make this more uniform.
         (numLocs, locs) <- packFromAST ctx env locLocations
         liftIO $ [C.exp| MlirLocation {
           mlirLocationFusedGet($(MlirContext ctx),

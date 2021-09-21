@@ -14,7 +14,7 @@
 
 module MLIR.NativeSpec where
 
-import Test.Hspec
+import Test.Hspec hiding (shouldContain)
 
 import Text.RawString.QQ
 
@@ -51,8 +51,8 @@ prepareContext = do
 
 -- Helper matcher as shouldContain requires the same type both sides and here
 -- we are predominantly checking if a BS contains some String.
-bsShouldContain :: BS.ByteString -> BS.ByteString -> Expectation
-bsShouldContain str sub = str `shouldSatisfy` BS.isInfixOf sub
+shouldContain :: BS.ByteString -> BS.ByteString -> Expectation
+shouldContain str sub = str `shouldSatisfy` BS.isInfixOf sub
 
 spec :: Spec
 spec = do
@@ -90,16 +90,15 @@ spec = do
         m <- MLIR.createEmptyModule loc
         str <- (MLIR.moduleAsOperation >=> MLIR.showOperationWithLocation) m
         MLIR.destroyModule m
-        str `bsShouldContain` "loc(\"test.cc\":21:45)"
+        str `shouldContain` "loc(\"test.cc\":21:45)"
 
     it "Can create an empty module with name location" $ \ctx -> do
       MLIR.withStringRef "WhatIamCalled" $ \nameRef -> do
-        -- childLoc <- MLIR.getUnknownLocation ctx
         loc <- MLIR.getNameLocation ctx nameRef =<< MLIR.getUnknownLocation ctx
         m <- MLIR.createEmptyModule loc
         str <- (MLIR.moduleAsOperation >=> MLIR.showOperationWithLocation) m
         MLIR.destroyModule m
-        str `bsShouldContain` "loc(\"WhatIamCalled\")"
+        str `shouldContain` "loc(\"WhatIamCalled\")"
 
   describe "Evaluation engine" $ beforeAll prepareContext $ do
     it "Can evaluate the example module" $ \ctx -> do
