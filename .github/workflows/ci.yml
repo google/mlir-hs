@@ -8,6 +8,7 @@ on:
   schedule:
     # Always regenerate once every 4 hour
     - cron:  '15 */4 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
