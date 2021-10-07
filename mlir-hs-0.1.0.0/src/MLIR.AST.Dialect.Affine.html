@@ -36,7 +36,7 @@
 </span><span id="line-36"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Mod"><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Mod"><span class="hs-identifier hs-var">Mod</span></a></span></span><span>       </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Expr"><span class="hs-identifier hs-type">Expr</span></a></span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Expr"><span class="hs-identifier hs-type">Expr</span></a></span><span>
 </span><span id="line-37"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="FloorDiv"><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#FloorDiv"><span class="hs-identifier hs-var">FloorDiv</span></a></span></span><span>  </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Expr"><span class="hs-identifier hs-type">Expr</span></a></span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Expr"><span class="hs-identifier hs-type">Expr</span></a></span><span>
 </span><span id="line-38"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="CeilDiv"><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#CeilDiv"><span class="hs-identifier hs-var">CeilDiv</span></a></span></span><span>   </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Expr"><span class="hs-identifier hs-type">Expr</span></a></span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Expr"><span class="hs-identifier hs-type">Expr</span></a></span><span>
-</span><span id="line-39"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679465599"><span id="local-6989586621679465601"><span class="annot"><span class="annottext">Expr -&gt; Expr -&gt; Bool
+</span><span id="line-39"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679464834"><span id="local-6989586621679464836"><span class="annot"><span class="annottext">Expr -&gt; Expr -&gt; Bool
 (Expr -&gt; Expr -&gt; Bool) -&gt; (Expr -&gt; Expr -&gt; Bool) -&gt; Eq Expr
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 /= :: Expr -&gt; Expr -&gt; Bool
@@ -52,7 +52,7 @@ $c== :: Expr -&gt; Expr -&gt; Bool
 </span><span id="line-43"></span><span>               </span><span class="hs-special">,</span><span> </span><span id="mapExprs"><span class="annot"><span class="annottext">Map -&gt; [Expr]
 </span><a href="MLIR.AST.Dialect.Affine.html#mapExprs"><span class="hs-identifier hs-var hs-var">mapExprs</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Expr"><span class="hs-identifier hs-type">Expr</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-44"></span><span>               </span><span class="hs-special">}</span><span>
-</span><span id="line-45"></span><span>               </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679465590"><span id="local-6989586621679465592"><span class="annot"><span class="annottext">Map -&gt; Map -&gt; Bool
+</span><span id="line-45"></span><span>               </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679464825"><span id="local-6989586621679464827"><span class="annot"><span class="annottext">Map -&gt; Map -&gt; Bool
 (Map -&gt; Map -&gt; Bool) -&gt; (Map -&gt; Map -&gt; Bool) -&gt; Eq Map
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 /= :: Map -&gt; Map -&gt; Bool
@@ -63,153 +63,153 @@ $c== :: Map -&gt; Map -&gt; Bool
 </span><span id="line-46"></span><span>
 </span><span id="line-47"></span><span>
 </span><span id="line-48"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="MLIR.AST.Serialize.html#FromAST"><span class="hs-identifier hs-type">FromAST</span></a></span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Expr"><span class="hs-identifier hs-type">Expr</span></a></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#AffineExpr"><span class="hs-identifier hs-type">Native.AffineExpr</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-49"></span><span>  </span><span id="local-6989586621679465587"><span class="annot"><span class="annottext">fromAST :: Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
-</span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromAST</span></a></span></span><span> </span><span id="local-6989586621679465585"><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span></span><span> </span><span id="local-6989586621679465584"><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span id="local-6989586621679465583"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465583"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465583"><span class="hs-identifier hs-var">expr</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-50"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Dimension"><span class="hs-identifier hs-type">Dimension</span></a></span><span> </span><span id="local-6989586621679465582"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679465582"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-51"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679465581"><span class="annot"><span class="annottext">natIdx :: CIntPtr
-</span><a href="#local-6989586621679465581"><span class="hs-identifier hs-var hs-var">natIdx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; CIntPtr
+</span><span id="line-49"></span><span>  </span><span id="local-6989586621679464822"><span class="annot"><span class="annottext">fromAST :: Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromAST</span></a></span></span><span> </span><span id="local-6989586621679464820"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span></span><span> </span><span id="local-6989586621679464819"><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span id="local-6989586621679464818"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464818"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464818"><span class="hs-identifier hs-var">expr</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-50"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Dimension"><span class="hs-identifier hs-type">Dimension</span></a></span><span> </span><span id="local-6989586621679464817"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679464817"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-51"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679464816"><span class="annot"><span class="annottext">natIdx :: CIntPtr
+</span><a href="#local-6989586621679464816"><span class="hs-identifier hs-var hs-var">natIdx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; CIntPtr
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
 </span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679465582"><span class="hs-identifier hs-var">idx</span></a></span><span>
+</span><a href="#local-6989586621679464817"><span class="hs-identifier hs-var">idx</span></a></span><span>
 </span><span id="line-52"></span><span>      </span><span class="annot"><span class="">[C.exp| MlirAffineExpr { mlirAffineDimExprGet($(MlirContext ctx), $(intptr_t natIdx)) } |]</span></span><span>
-</span><span id="line-53"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Symbol"><span class="hs-identifier hs-type">Symbol</span></a></span><span>    </span><span id="local-6989586621679465579"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679465579"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-54"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679465578"><span class="annot"><span class="annottext">natIdx :: CIntPtr
-</span><a href="#local-6989586621679465578"><span class="hs-identifier hs-var hs-var">natIdx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; CIntPtr
+</span><span id="line-53"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Symbol"><span class="hs-identifier hs-type">Symbol</span></a></span><span>    </span><span id="local-6989586621679464814"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679464814"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-54"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679464813"><span class="annot"><span class="annottext">natIdx :: CIntPtr
+</span><a href="#local-6989586621679464813"><span class="hs-identifier hs-var hs-var">natIdx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; CIntPtr
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
 </span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679465579"><span class="hs-identifier hs-var">idx</span></a></span><span>
+</span><a href="#local-6989586621679464814"><span class="hs-identifier hs-var">idx</span></a></span><span>
 </span><span id="line-55"></span><span>      </span><span class="annot"><span class="">[C.exp| MlirAffineExpr { mlirAffineSymbolExprGet($(MlirContext ctx), $(intptr_t natIdx)) } |]</span></span><span>
-</span><span id="line-56"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Constant"><span class="hs-identifier hs-type">Constant</span></a></span><span>  </span><span id="local-6989586621679465576"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679465576"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-57"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679465575"><span class="annot"><span class="annottext">natVal :: Int64
-</span><a href="#local-6989586621679465575"><span class="hs-identifier hs-var hs-var">natVal</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int64
+</span><span id="line-56"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Constant"><span class="hs-identifier hs-type">Constant</span></a></span><span>  </span><span id="local-6989586621679464811"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679464811"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-57"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679464810"><span class="annot"><span class="annottext">natVal :: Int64
+</span><a href="#local-6989586621679464810"><span class="hs-identifier hs-var hs-var">natVal</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int64
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
 </span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679465576"><span class="hs-identifier hs-var">val</span></a></span><span>
+</span><a href="#local-6989586621679464811"><span class="hs-identifier hs-var">val</span></a></span><span>
 </span><span id="line-58"></span><span>      </span><span class="annot"><span class="">[C.exp| MlirAffineExpr { mlirAffineConstantExprGet($(MlirContext ctx), $(int64_t natVal)) } |]</span></span><span>
-</span><span id="line-59"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Add"><span class="hs-identifier hs-type">Add</span></a></span><span>       </span><span id="local-6989586621679465573"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465573"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679465572"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465572"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-60"></span><span>      </span><span id="local-6989586621679465571"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465571"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><span id="line-59"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Add"><span class="hs-identifier hs-type">Add</span></a></span><span>       </span><span id="local-6989586621679464808"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464808"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679464807"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464807"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-60"></span><span>      </span><span id="local-6989586621679464806"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464806"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465573"><span class="hs-identifier hs-var">l</span></a></span><span>
-</span><span id="line-61"></span><span>      </span><span id="local-6989586621679465570"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465570"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464808"><span class="hs-identifier hs-var">l</span></a></span><span>
+</span><span id="line-61"></span><span>      </span><span id="local-6989586621679464805"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464805"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465572"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464807"><span class="hs-identifier hs-var">r</span></a></span><span>
 </span><span id="line-62"></span><span>      </span><span class="annot"><span class="">[C.exp| MlirAffineExpr { mlirAffineAddExprGet($(MlirAffineExpr natL), $(MlirAffineExpr natR)) } |]</span></span><span>
-</span><span id="line-63"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Mul"><span class="hs-identifier hs-type">Mul</span></a></span><span>       </span><span id="local-6989586621679465568"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465568"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679465567"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465567"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-64"></span><span>      </span><span id="local-6989586621679465566"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465566"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><span id="line-63"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Mul"><span class="hs-identifier hs-type">Mul</span></a></span><span>       </span><span id="local-6989586621679464803"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464803"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679464802"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464802"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-64"></span><span>      </span><span id="local-6989586621679464801"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464801"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465568"><span class="hs-identifier hs-var">l</span></a></span><span>
-</span><span id="line-65"></span><span>      </span><span id="local-6989586621679465565"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465565"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464803"><span class="hs-identifier hs-var">l</span></a></span><span>
+</span><span id="line-65"></span><span>      </span><span id="local-6989586621679464800"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464800"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465567"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464802"><span class="hs-identifier hs-var">r</span></a></span><span>
 </span><span id="line-66"></span><span>      </span><span class="annot"><span class="">[C.exp| MlirAffineExpr { mlirAffineMulExprGet($(MlirAffineExpr natL), $(MlirAffineExpr natR)) } |]</span></span><span>
-</span><span id="line-67"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Mod"><span class="hs-identifier hs-type">Mod</span></a></span><span>       </span><span id="local-6989586621679465563"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465563"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679465562"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465562"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-68"></span><span>      </span><span id="local-6989586621679465561"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465561"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><span id="line-67"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Mod"><span class="hs-identifier hs-type">Mod</span></a></span><span>       </span><span id="local-6989586621679464798"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464798"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679464797"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464797"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-68"></span><span>      </span><span id="local-6989586621679464796"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464796"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465563"><span class="hs-identifier hs-var">l</span></a></span><span>
-</span><span id="line-69"></span><span>      </span><span id="local-6989586621679465560"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465560"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464798"><span class="hs-identifier hs-var">l</span></a></span><span>
+</span><span id="line-69"></span><span>      </span><span id="local-6989586621679464795"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464795"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465562"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464797"><span class="hs-identifier hs-var">r</span></a></span><span>
 </span><span id="line-70"></span><span>      </span><span class="annot"><span class="">[C.exp| MlirAffineExpr { mlirAffineModExprGet($(MlirAffineExpr natL), $(MlirAffineExpr natR)) } |]</span></span><span>
-</span><span id="line-71"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#FloorDiv"><span class="hs-identifier hs-type">FloorDiv</span></a></span><span>  </span><span id="local-6989586621679465558"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465558"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679465557"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465557"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-72"></span><span>      </span><span id="local-6989586621679465556"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465556"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><span id="line-71"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#FloorDiv"><span class="hs-identifier hs-type">FloorDiv</span></a></span><span>  </span><span id="local-6989586621679464793"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464793"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679464792"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464792"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-72"></span><span>      </span><span id="local-6989586621679464791"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464791"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465558"><span class="hs-identifier hs-var">l</span></a></span><span>
-</span><span id="line-73"></span><span>      </span><span id="local-6989586621679465555"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465555"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464793"><span class="hs-identifier hs-var">l</span></a></span><span>
+</span><span id="line-73"></span><span>      </span><span id="local-6989586621679464790"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464790"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465557"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464792"><span class="hs-identifier hs-var">r</span></a></span><span>
 </span><span id="line-74"></span><span>      </span><span class="annot"><span class="">[C.exp| MlirAffineExpr { mlirAffineFloorDivExprGet($(MlirAffineExpr natL), $(MlirAffineExpr natR)) } |]</span></span><span>
-</span><span id="line-75"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#CeilDiv"><span class="hs-identifier hs-type">CeilDiv</span></a></span><span>   </span><span id="local-6989586621679465553"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465553"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679465552"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465552"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-76"></span><span>      </span><span id="local-6989586621679465551"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465551"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><span id="line-75"></span><span>    </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#CeilDiv"><span class="hs-identifier hs-type">CeilDiv</span></a></span><span>   </span><span id="local-6989586621679464788"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464788"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679464787"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464787"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-76"></span><span>      </span><span id="local-6989586621679464786"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464786"><span class="hs-identifier hs-var">natL</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465553"><span class="hs-identifier hs-var">l</span></a></span><span>
-</span><span id="line-77"></span><span>      </span><span id="local-6989586621679465550"><span class="annot"><span class="annottext">AffineExpr
-</span><a href="#local-6989586621679465550"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464788"><span class="hs-identifier hs-var">l</span></a></span><span>
+</span><span id="line-77"></span><span>      </span><span id="local-6989586621679464785"><span class="annot"><span class="annottext">AffineExpr
+</span><a href="#local-6989586621679464785"><span class="hs-identifier hs-var">natR</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; ValueAndBlockMapping -&gt; Expr -&gt; IO AffineExpr
 forall ast native.
 FromAST ast native =&gt;
 Context -&gt; ValueAndBlockMapping -&gt; ast -&gt; IO native
 </span><a href="MLIR.AST.Serialize.html#fromAST"><span class="hs-identifier hs-var">fromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465585"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465584"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679465552"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><a href="#local-6989586621679464820"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464819"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679464787"><span class="hs-identifier hs-var">r</span></a></span><span>
 </span><span id="line-78"></span><span>      </span><span class="annot"><span class="">[C.exp| MlirAffineExpr { mlirAffineCeilDivExprGet($(MlirAffineExpr natL), $(MlirAffineExpr natR)) } |]</span></span><span>
 </span><span id="line-79"></span><span>
 </span><span id="line-80"></span><span>
 </span><span id="line-81"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="MLIR.AST.Serialize.html#FromAST"><span class="hs-identifier hs-type">FromAST</span></a></span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Map"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><a href="MLIR.Native.FFI.html#AffineMap"><span class="hs-identifier hs-type">Native.AffineMap</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-82"></span><span>  </span><span id="local-6989586621679465547"><span class="annot"><span class="annottext">fromAST :: Context -&gt; ValueAndBlockMapping -&gt; Map -&gt; IO AffineMap
-</span><a href="#local-6989586621679465547"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromAST</span></a></span></span><span> </span><span id="local-6989586621679465546"><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465546"><span class="hs-identifier hs-var">ctx</span></a></span></span><span> </span><span id="local-6989586621679465545"><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465545"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Map"><span class="hs-identifier hs-type">Map</span></a></span><span class="hs-special">{</span><span id="local-6989586621679465542"><span id="local-6989586621679465543"><span id="local-6989586621679465544"><span class="annot"><span class="annottext">Int
+</span><span id="line-82"></span><span>  </span><span id="local-6989586621679464782"><span class="annot"><span class="annottext">fromAST :: Context -&gt; ValueAndBlockMapping -&gt; Map -&gt; IO AffineMap
+</span><a href="#local-6989586621679464782"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromAST</span></a></span></span><span> </span><span id="local-6989586621679464781"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679464781"><span class="hs-identifier hs-var">ctx</span></a></span></span><span> </span><span id="local-6989586621679464780"><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464780"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html#Map"><span class="hs-identifier hs-type">Map</span></a></span><span class="hs-special">{</span><span id="local-6989586621679464777"><span id="local-6989586621679464778"><span id="local-6989586621679464779"><span class="annot"><span class="annottext">Int
 [Expr]
 mapExprs :: [Expr]
 mapSymbolCount :: Int
@@ -217,15 +217,15 @@ mapDimensionCount :: Int
 mapExprs :: Map -&gt; [Expr]
 mapSymbolCount :: Map -&gt; Int
 mapDimensionCount :: Map -&gt; Int
-</span><a href="#local-6989586621679465542"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ContT AffineMap IO AffineMap -&gt; IO AffineMap
+</span><a href="#local-6989586621679464777"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ContT AffineMap IO AffineMap -&gt; IO AffineMap
 forall (m :: * -&gt; *) r. Monad m =&gt; ContT r m r -&gt; m r
 </span><span class="hs-identifier hs-var">evalContT</span></span><span> </span><span class="annot"><span class="annottext">(ContT AffineMap IO AffineMap -&gt; IO AffineMap)
 -&gt; ContT AffineMap IO AffineMap -&gt; IO AffineMap
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-83"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679465540"><span class="annot"><span class="annottext">CIntPtr
-</span><a href="#local-6989586621679465540"><span class="hs-identifier hs-var">numExprs</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679465539"><span class="annot"><span class="annottext">Ptr AffineExpr
-</span><a href="#local-6989586621679465539"><span class="hs-identifier hs-var">nativeExprs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context
+</span><span id="line-83"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679464775"><span class="annot"><span class="annottext">CIntPtr
+</span><a href="#local-6989586621679464775"><span class="hs-identifier hs-var">numExprs</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679464774"><span class="annot"><span class="annottext">Ptr AffineExpr
+</span><a href="#local-6989586621679464774"><span class="hs-identifier hs-var">nativeExprs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context
 -&gt; ValueAndBlockMapping
 -&gt; [Expr]
 -&gt; ContT AffineMap IO (CIntPtr, Ptr AffineExpr)
@@ -236,19 +236,19 @@ Context
 -&gt; [ast]
 -&gt; ContT r IO (CIntPtr, Ptr native)
 </span><a href="MLIR.AST.Serialize.html#packFromAST"><span class="hs-identifier hs-var">packFromAST</span></a></span><span> </span><span class="annot"><span class="annottext">Context
-</span><a href="#local-6989586621679465546"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
-</span><a href="#local-6989586621679465545"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">[Expr]
-</span><a href="#local-6989586621679465542"><span class="hs-identifier hs-var">mapExprs</span></a></span><span>
-</span><span id="line-84"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679465537"><span class="annot"><span class="annottext">nativeDimCount :: CIntPtr
-</span><a href="#local-6989586621679465537"><span class="hs-identifier hs-var hs-var">nativeDimCount</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">Int -&gt; CIntPtr
+</span><a href="#local-6989586621679464781"><span class="hs-identifier hs-var">ctx</span></a></span><span> </span><span class="annot"><span class="annottext">ValueAndBlockMapping
+</span><a href="#local-6989586621679464780"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679464777"><span class="hs-identifier hs-var">mapExprs</span></a></span><span>
+</span><span id="line-84"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679464772"><span class="annot"><span class="annottext">nativeDimCount :: CIntPtr
+</span><a href="#local-6989586621679464772"><span class="hs-identifier hs-var hs-var">nativeDimCount</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">Int -&gt; CIntPtr
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
 </span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679465544"><span class="hs-identifier hs-var">mapDimensionCount</span></a></span><span>
-</span><span id="line-85"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679465536"><span class="annot"><span class="annottext">nativeSymbolCount :: CIntPtr
-</span><a href="#local-6989586621679465536"><span class="hs-identifier hs-var hs-var">nativeSymbolCount</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">Int -&gt; CIntPtr
+</span><a href="#local-6989586621679464779"><span class="hs-identifier hs-var">mapDimensionCount</span></a></span><span>
+</span><span id="line-85"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679464771"><span class="annot"><span class="annottext">nativeSymbolCount :: CIntPtr
+</span><a href="#local-6989586621679464771"><span class="hs-identifier hs-var hs-var">nativeSymbolCount</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">Int -&gt; CIntPtr
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
 </span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679465543"><span class="hs-identifier hs-var">mapSymbolCount</span></a></span><span>
+</span><a href="#local-6989586621679464778"><span class="hs-identifier hs-var">mapSymbolCount</span></a></span><span>
 </span><span id="line-86"></span><span>    </span><span class="annot"><span class="annottext">IO AffineMap -&gt; ContT AffineMap IO AffineMap
 forall (m :: * -&gt; *) a. MonadIO m =&gt; IO a -&gt; m a
 </span><span class="hs-identifier hs-var">liftIO</span></span><span> </span><span class="annot"><span class="annottext">(IO AffineMap -&gt; ContT AffineMap IO AffineMap)

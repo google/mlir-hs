@@ -897,6 +897,42 @@ pattern IndexCast :: Location -> Type -> operand -> AbstractOperation operand
 -- | A builder for <tt>std.index_cast</tt>.
 index_cast :: MonadBlockBuilder m => Type -> Value -> m Value
 
+-- | A pattern for <tt>std.maxf</tt>.
+pattern MaxF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>std.maxf</tt>.
+maxf :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>std.maxsi</tt>.
+pattern MaxSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>std.maxsi</tt>.
+maxsi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>std.maxui</tt>.
+pattern MaxUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>std.maxui</tt>.
+maxui :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>std.minf</tt>.
+pattern MinF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>std.minf</tt>.
+minf :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>std.minsi</tt>.
+pattern MinSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>std.minsi</tt>.
+minsi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>std.minui</tt>.
+pattern MinUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>std.minui</tt>.
+minui :: MonadBlockBuilder m => Value -> Value -> m Value
+
 -- | A pattern for <tt>std.mulf</tt>.
 pattern MulF :: Location -> Type -> operand -> operand -> AbstractOperation operand
 
@@ -1169,17 +1205,17 @@ pattern IsBroadcastable :: Location -> Type -> [operand] -> AbstractOperation op
 -- | A builder for <tt>shape.is_broadcastable</tt>.
 is_broadcastable :: MonadBlockBuilder m => Type -> [Value] -> m Value
 
--- | A pattern for <tt>shape.join</tt>.
-pattern Join :: Location -> Type -> operand -> operand -> Maybe ByteString -> AbstractOperation operand
-
--- | A builder for <tt>shape.join</tt>.
-join :: MonadBlockBuilder m => Type -> Value -> Value -> Maybe ByteString -> m Value
-
 -- | A pattern for <tt>shape.max</tt>.
 pattern Max :: Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.max</tt>.
 max :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>shape.meet</tt>.
+pattern Meet :: Location -> Type -> operand -> operand -> Maybe ByteString -> AbstractOperation operand
+
+-- | A builder for <tt>shape.meet</tt>.
+meet :: MonadBlockBuilder m => Type -> Value -> Value -> Maybe ByteString -> m Value
 
 -- | A pattern for <tt>shape.min</tt>.
 pattern Min :: Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -1312,9 +1348,6 @@ fill_rng_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuil
 -- | A builder for <tt>linalg.generic</tt>.
 generic :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> [Attribute] -> Maybe ByteString -> Maybe ByteString -> RegionBuilderT m () -> m Value
 
--- | A builder for <tt>linalg.matmul_i8_i8_i32</tt>.
-matmul_i8_i8_i32 :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
 -- | A builder for <tt>linalg.matmul</tt>.
 matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1323,24 +1356,6 @@ matvec :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT 
 
 -- | A builder for <tt>linalg.mmt4d</tt>.
 mmt4d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A pattern for <tt>linalg.pooling_max</tt>.
-pattern PoolingMax :: Location -> operand -> operand -> operand -> Maybe [Int] -> Maybe [Int] -> AbstractOperation operand
-
--- | A builder for <tt>linalg.pooling_max</tt>.
-pooling_max :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
-
--- | A pattern for <tt>linalg.pooling_min</tt>.
-pattern PoolingMin :: Location -> operand -> operand -> operand -> Maybe [Int] -> Maybe [Int] -> AbstractOperation operand
-
--- | A builder for <tt>linalg.pooling_min</tt>.
-pooling_min :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
-
--- | A pattern for <tt>linalg.pooling_sum</tt>.
-pattern PoolingSum :: Location -> operand -> operand -> operand -> Maybe [Int] -> Maybe [Int] -> AbstractOperation operand
-
--- | A builder for <tt>linalg.pooling_sum</tt>.
-pooling_sum :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
 
 -- | A builder for <tt>linalg.quantized_batch_matmul</tt>.
 quantized_batch_matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -2008,17 +2023,17 @@ instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.T
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679453895 :: Context -> IO PassManager
+inline_c_ffi_6989586621679453130 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679453904 :: PassManager -> IO ()
+inline_c_ffi_6989586621679453139 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679453917 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679453152 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679453926 :: PassManager -> IO ()
+inline_c_ffi_6989586621679453161 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679453935 :: PassManager -> IO ()
+inline_c_ffi_6989586621679453170 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679453944 :: PassManager -> IO ()
+inline_c_ffi_6989586621679453179 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679453953 :: PassManager -> IO ()
+inline_c_ffi_6989586621679453188 :: PassManager -> IO ()
