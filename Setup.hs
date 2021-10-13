@@ -128,6 +128,7 @@ main = defaultMainWithHooks simpleUserHooks
       tblgen <- buildTblgen confFlags
       let dialects =
             [ ("Std"             , "mlir/Dialect/StandardOps/IR/Ops.td", [])
+            , ("Arith"           , "mlir/Dialect/Arithmetic/IR/ArithmeticOps.td", ["-strip-prefix", "Arith_"])
             , ("Vector"          , "mlir/Dialect/Vector/VectorOps.td", ["-strip-prefix", "Vector_"])
             , ("Shape"           , "mlir/Dialect/Shape/IR/ShapeOps.td", ["-strip-prefix", "Shape_"])
             , ("LLVM"            , "mlir/Dialect/LLVMIR/LLVMOps.td", ["-strip-prefix", "LLVM_", "-dialect-name", "LLVM"])

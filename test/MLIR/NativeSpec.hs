@@ -32,7 +32,7 @@ import qualified MLIR.Native.ExecutionEngine as MLIR
 exampleModuleStr :: BS.ByteString
 exampleModuleStr = pack $ [r|module  {
   func @add(%arg0: i32) -> i32 attributes {llvm.emit_c_interface} {
-    %0 = addi %arg0, %arg0 : i32
+    %0 = arith.addi %arg0, %arg0 : i32
     return %0 : i32
   }
 }

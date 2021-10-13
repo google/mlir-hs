@@ -22,6 +22,7 @@ import MLIR.AST
 import MLIR.AST.Builder
 import MLIR.AST.Serialize
 import qualified Data.ByteString as BS
+import qualified MLIR.AST.Dialect.Arith as Arith
 import qualified MLIR.AST.Dialect.Std as Std
 import qualified MLIR.Native as MLIR
 
@@ -46,13 +47,13 @@ spec = do
             Std.return [z]
 
     it "Can construct a simple add function" $ do
-      let m = runIdentity $ buildModule $ combineFunc "add" Float32Type Std.addf
+      let m = runIdentity $ buildModule $ combineFunc "add" Float32Type Arith.addf
       verifyAndDump m
 
     it "Can construct a module with two simple functions" $ do
       let m = runIdentity $ buildModule $ do
-                combineFunc "add_fp32" Float32Type Std.addf
-                combineFunc "add_fp64" Float64Type Std.addf
+                combineFunc "add_fp32" Float32Type Arith.addf
+                combineFunc "add_fp64" Float64Type Arith.addf
       verifyAndDump m
 
     it "Can loop blocks with MonadFix" $ do
@@ -61,15 +62,15 @@ spec = do
       let m = runIdentity $ buildModule $ do
                 buildFunction "one_shot_loop" [f32] NoAttrs mdo
                   _entry <- buildBlock do
-                    false <- Std.constant i1 $ IntegerAttr i1 0
+                    false <- Arith.constant i1 $ IntegerAttr i1 0
                     Std.br header [false]
                   header <- buildBlock do
                     isDone <- blockArgument i1
-                    result <- Std.constant f32 $ FloatAttr f32 1234.0
+                    result <- Arith.constant f32 $ FloatAttr f32 1234.0
                     Std.cond_br isDone exit [result] body [result]
                   body <- buildBlock do
                     _ <- blockArgument f32
-                    true <- Std.constant i1 $ IntegerAttr i1 1
+                    true <- Arith.constant i1 $ IntegerAttr i1 1
                     Std.br header [true]
                   exit <- buildBlock do
                     result <- blockArgument f32
@@ -82,9 +83,9 @@ spec = do
       let m = runIdentity $ buildModule $ do
                 buildSimpleFunction "f_loc" [f32] NoAttrs do
                   x <- blockArgument f32
-                  y <- Std.addf x x
+                  y <- Arith.addf x x
                   setDefaultLocation (FileLocation "file.mlir" 4 10)
-                  z <- Std.addf y y
+                  z <- Arith.addf y y
                   Std.return [z]
       MLIR.withContext \ctx -> do
         MLIR.registerAllDialects ctx
@@ -94,8 +95,8 @@ spec = do
             "#loc0 = loc(unknown)"
           , "module  {"
           , "  func @f_loc(%arg0: f32 loc(unknown)) -> f32 {"
-          , "    %0 = addf %arg0, %arg0 : f32 loc(#loc0)"
-          , "    %1 = addf %0, %0 : f32 loc(#loc1)"
+          , "    %0 = arith.addf %arg0, %arg0 : f32 loc(#loc0)"
+          , "    %1 = arith.addf %0, %0 : f32 loc(#loc1)"
           , "    return %1 : f32 loc(#loc1)"
           , "  } loc(#loc0)"
           , "} loc(#loc0)"
