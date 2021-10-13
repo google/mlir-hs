@@ -783,30 +783,6 @@ pattern Branch :: Location -> BlockName -> [Name] -> Operation
 br :: MonadBlockBuilder m => BlockName -> [Value] -> m EndOfBlock
 cond_br :: MonadBlockBuilder m => Value -> BlockName -> [Value] -> BlockName -> [Value] -> m EndOfBlock
 
--- | A pattern for <tt>std.absf</tt>.
-pattern AbsF :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.absf</tt>.
-absf :: MonadBlockBuilder m => Value -> m Value
-
--- | A pattern for <tt>std.addf</tt>.
-pattern AddF :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.addf</tt>.
-addf :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.addi</tt>.
-pattern AddI :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.addi</tt>.
-addi :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.and</tt>.
-pattern And :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.and</tt>.
-and :: MonadBlockBuilder m => Value -> Value -> m Value
-
 -- | A pattern for <tt>std.assert</tt>.
 pattern Assert :: Location -> operand -> ByteString -> AbstractOperation operand
 
@@ -819,20 +795,8 @@ pattern AtomicYield :: Location -> operand -> AbstractOperation operand
 -- | A builder for <tt>std.atomic_yield</tt>.
 atomic_yield :: MonadBlockBuilder m => Value -> m EndOfBlock
 
--- | A pattern for <tt>std.bitcast</tt>.
-pattern Bitcast :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.bitcast</tt>.
-bitcast :: MonadBlockBuilder m => Type -> Value -> m Value
-
 -- | A builder for <tt>std.call_indirect</tt>.
 call_indirect :: MonadBlockBuilder m => [Type] -> Value -> [Value] -> m Value
-
--- | A pattern for <tt>std.ceilf</tt>.
-pattern CeilF :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.ceilf</tt>.
-ceilf :: MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>std.constant</tt>.
 pattern Constant :: Location -> Type -> Attribute -> AbstractOperation operand
@@ -840,62 +804,8 @@ pattern Constant :: Location -> Type -> Attribute -> AbstractOperation operand
 -- | A builder for <tt>std.constant</tt>.
 constant :: MonadBlockBuilder m => Type -> Attribute -> m Value
 
--- | A pattern for <tt>std.copysign</tt>.
-pattern CopySign :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.copysign</tt>.
-copysign :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.divf</tt>.
-pattern DivF :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.divf</tt>.
-divf :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.fpext</tt>.
-pattern FPExt :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.fpext</tt>.
-fpext :: MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A pattern for <tt>std.fptosi</tt>.
-pattern FPToSI :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.fptosi</tt>.
-fptosi :: MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A pattern for <tt>std.fptoui</tt>.
-pattern FPToUI :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.fptoui</tt>.
-fptoui :: MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A pattern for <tt>std.fptrunc</tt>.
-pattern FPTrunc :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.fptrunc</tt>.
-fptrunc :: MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A pattern for <tt>std.floorf</tt>.
-pattern FloorF :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.floorf</tt>.
-floorf :: MonadBlockBuilder m => Value -> m Value
-
--- | A pattern for <tt>std.fmaf</tt>.
-pattern FmaF :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.fmaf</tt>.
-fmaf :: MonadBlockBuilder m => Value -> Value -> Value -> m Value
-
 -- | A builder for <tt>std.generic_atomic_rmw</tt>.
 generic_atomic_rmw :: MonadBlockBuilder m => Type -> Value -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A pattern for <tt>std.index_cast</tt>.
-pattern IndexCast :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.index_cast</tt>.
-index_cast :: MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>std.maxf</tt>.
 pattern MaxF :: Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -933,41 +843,11 @@ pattern MinUI :: Location -> Type -> operand -> operand -> AbstractOperation ope
 -- | A builder for <tt>std.minui</tt>.
 minui :: MonadBlockBuilder m => Value -> Value -> m Value
 
--- | A pattern for <tt>std.mulf</tt>.
-pattern MulF :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.mulf</tt>.
-mulf :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.muli</tt>.
-pattern MulI :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.muli</tt>.
-muli :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.negf</tt>.
-pattern NegF :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.negf</tt>.
-negf :: MonadBlockBuilder m => Value -> m Value
-
--- | A pattern for <tt>std.or</tt>.
-pattern Or :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.or</tt>.
-or :: MonadBlockBuilder m => Value -> Value -> m Value
-
 -- | A pattern for <tt>std.rank</tt>.
 pattern Rank :: Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.rank</tt>.
 rank :: MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A pattern for <tt>std.remf</tt>.
-pattern RemF :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.remf</tt>.
-remf :: MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>std.return</tt>.
 pattern Return :: Location -> [operand] -> AbstractOperation operand
@@ -975,119 +855,17 @@ pattern Return :: Location -> [operand] -> AbstractOperation operand
 -- | A builder for <tt>std.return</tt>.
 return :: MonadBlockBuilder m => [Value] -> m EndOfBlock
 
--- | A pattern for <tt>std.sitofp</tt>.
-pattern SIToFP :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.sitofp</tt>.
-sitofp :: MonadBlockBuilder m => Type -> Value -> m Value
-
 -- | A pattern for <tt>std.select</tt>.
 pattern Select :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.select</tt>.
 select :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
--- | A pattern for <tt>std.shift_left</tt>.
-pattern ShiftLeft :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.shift_left</tt>.
-shift_left :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.sexti</tt>.
-pattern SignExtendI :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.sexti</tt>.
-sexti :: MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A pattern for <tt>std.ceildivi_signed</tt>.
-pattern SignedCeilDivI :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.ceildivi_signed</tt>.
-ceildivi_signed :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.divi_signed</tt>.
-pattern SignedDivI :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.divi_signed</tt>.
-divi_signed :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.floordivi_signed</tt>.
-pattern SignedFloorDivI :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.floordivi_signed</tt>.
-floordivi_signed :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.remi_signed</tt>.
-pattern SignedRemI :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.remi_signed</tt>.
-remi_signed :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.shift_right_signed</tt>.
-pattern SignedShiftRight :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.shift_right_signed</tt>.
-shift_right_signed :: MonadBlockBuilder m => Value -> Value -> m Value
-
 -- | A pattern for <tt>std.splat</tt>.
 pattern Splat :: Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.splat</tt>.
 splat :: MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A pattern for <tt>std.subf</tt>.
-pattern SubF :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.subf</tt>.
-subf :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.subi</tt>.
-pattern SubI :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.subi</tt>.
-subi :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.trunci</tt>.
-pattern TruncateI :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.trunci</tt>.
-trunci :: MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A pattern for <tt>std.uitofp</tt>.
-pattern UIToFP :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.uitofp</tt>.
-uitofp :: MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A pattern for <tt>std.divi_unsigned</tt>.
-pattern UnsignedDivI :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.divi_unsigned</tt>.
-divi_unsigned :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.remi_unsigned</tt>.
-pattern UnsignedRemI :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.remi_unsigned</tt>.
-remi_unsigned :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.shift_right_unsigned</tt>.
-pattern UnsignedShiftRight :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.shift_right_unsigned</tt>.
-shift_right_unsigned :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.xor</tt>.
-pattern XOr :: Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.xor</tt>.
-xor :: MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.zexti</tt>.
-pattern ZeroExtendI :: Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.zexti</tt>.
-zexti :: MonadBlockBuilder m => Type -> Value -> m Value
 
 module MLIR.AST.Dialect.Shape
 
@@ -1327,12 +1105,6 @@ conv_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT
 -- | A builder for <tt>linalg.conv_3d</tt>.
 conv_3d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
--- | A pattern for <tt>linalg.conv</tt>.
-pattern Conv :: Location -> operand -> operand -> operand -> Maybe [Int] -> Maybe [Int] -> AbstractOperation operand
-
--- | A builder for <tt>linalg.conv</tt>.
-conv :: MonadBlockBuilder m => Value -> Value -> Value -> Maybe [Int] -> Maybe [Int] -> m ()
-
 -- | A builder for <tt>linalg.copy</tt>.
 copy :: MonadBlockBuilder m => Value -> Value -> Maybe Map -> Maybe Map -> RegionBuilderT m () -> m ()
 
@@ -1350,6 +1122,9 @@ generic :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> [Attr
 
 -- | A builder for <tt>linalg.matmul</tt>.
 matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.matmul_unsigned</tt>.
+matmul_unsigned :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matvec</tt>.
 matvec :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -2021,19 +1796,219 @@ intr_vector_reduce_xor :: MonadBlockBuilder m => Type -> Value -> m Value
 instance GHC.Classes.Eq MLIR.AST.Dialect.LLVM.Type
 instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.Type
 
+module MLIR.AST.Dialect.Arith
+
+-- | A pattern for <tt>arith.addf</tt>.
+pattern AddF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.addf</tt>.
+addf :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.addi</tt>.
+pattern AddI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.addi</tt>.
+addi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.andi</tt>.
+pattern AndI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.andi</tt>.
+andi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.bitcast</tt>.
+pattern Bitcast :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.bitcast</tt>.
+bitcast :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.ceildivsi</tt>.
+pattern CeilDivSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.ceildivsi</tt>.
+ceildivsi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.constant</tt>.
+pattern Constant :: Location -> Type -> Attribute -> AbstractOperation operand
+
+-- | A builder for <tt>arith.constant</tt>.
+constant :: MonadBlockBuilder m => Type -> Attribute -> m Value
+
+-- | A pattern for <tt>arith.divf</tt>.
+pattern DivF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.divf</tt>.
+divf :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.divsi</tt>.
+pattern DivSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.divsi</tt>.
+divsi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.divui</tt>.
+pattern DivUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.divui</tt>.
+divui :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.extf</tt>.
+pattern ExtF :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.extf</tt>.
+extf :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.extsi</tt>.
+pattern ExtSI :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.extsi</tt>.
+extsi :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.extui</tt>.
+pattern ExtUI :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.extui</tt>.
+extui :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.fptosi</tt>.
+pattern FPToSI :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.fptosi</tt>.
+fptosi :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.fptoui</tt>.
+pattern FPToUI :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.fptoui</tt>.
+fptoui :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.floordivsi</tt>.
+pattern FloorDivSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.floordivsi</tt>.
+floordivsi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.index_cast</tt>.
+pattern IndexCast :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.index_cast</tt>.
+index_cast :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.mulf</tt>.
+pattern MulF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.mulf</tt>.
+mulf :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.muli</tt>.
+pattern MulI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.muli</tt>.
+muli :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.negf</tt>.
+pattern NegF :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.negf</tt>.
+negf :: MonadBlockBuilder m => Value -> m Value
+
+-- | A pattern for <tt>arith.ori</tt>.
+pattern OrI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.ori</tt>.
+ori :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.remf</tt>.
+pattern RemF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.remf</tt>.
+remf :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.remsi</tt>.
+pattern RemSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.remsi</tt>.
+remsi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.remui</tt>.
+pattern RemUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.remui</tt>.
+remui :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.sitofp</tt>.
+pattern SIToFP :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.sitofp</tt>.
+sitofp :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.shli</tt>.
+pattern ShLI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.shli</tt>.
+shli :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.shrsi</tt>.
+pattern ShRSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.shrsi</tt>.
+shrsi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.shrui</tt>.
+pattern ShRUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.shrui</tt>.
+shrui :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.subf</tt>.
+pattern SubF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.subf</tt>.
+subf :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.subi</tt>.
+pattern SubI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.subi</tt>.
+subi :: MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.truncf</tt>.
+pattern TruncF :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.truncf</tt>.
+truncf :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.trunci</tt>.
+pattern TruncI :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.trunci</tt>.
+trunci :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.uitofp</tt>.
+pattern UIToFP :: Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.uitofp</tt>.
+uitofp :: MonadBlockBuilder m => Type -> Value -> m Value
+
+-- | A pattern for <tt>arith.xori</tt>.
+pattern XOrI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.xori</tt>.
+xori :: MonadBlockBuilder m => Value -> Value -> m Value
+
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679453130 :: Context -> IO PassManager
+inline_c_ffi_6989586621679448347 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679453139 :: PassManager -> IO ()
+inline_c_ffi_6989586621679448356 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679453152 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679448369 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679453161 :: PassManager -> IO ()
+inline_c_ffi_6989586621679448378 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679453170 :: PassManager -> IO ()
+inline_c_ffi_6989586621679448387 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679453179 :: PassManager -> IO ()
+inline_c_ffi_6989586621679448396 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679453188 :: PassManager -> IO ()
+inline_c_ffi_6989586621679448405 :: PassManager -> IO ()
