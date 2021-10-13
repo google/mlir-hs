@@ -22,6 +22,7 @@ import MLIR.AST
 import MLIR.AST.Builder
 import MLIR.AST.Serialize
 import MLIR.AST.Rewrite
+import qualified MLIR.AST.Dialect.Arith as Arith
 import qualified MLIR.AST.Dialect.Std as Std
 import qualified MLIR.Native as MLIR
 
@@ -43,15 +44,15 @@ spec = do
                 buildSimpleFunction "f" [Float32Type] NoAttrs do
                   x <- blockArgument Float32Type
                   y <- blockArgument Float32Type
-                  z <- Std.addf x y
-                  w <- Std.addf z z
+                  z <- Arith.addf x y
+                  w <- Arith.addf z z
                   Std.return [w]
       let m' = applyClosedOpRewrite replaceAddWithMul m
       verifyAndDump m'
       where
         replaceAddWithMul op = case op of
-          Std.AddF _ _ x y -> ReplaceOne <$> Std.mulf x y
-          _                -> return Traverse
+          Arith.AddF _ _ x y -> ReplaceOne <$> Arith.mulf x y
+          _                  -> return Traverse
 
 
 main :: IO ()

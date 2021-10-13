@@ -31,6 +31,7 @@ import Control.Monad.IO.Class
 
 import MLIR.AST
 import MLIR.AST.Serialize
+import qualified MLIR.AST.Dialect.Arith  as Arith
 import qualified MLIR.AST.Dialect.Std    as Std
 import qualified MLIR.AST.Dialect.MemRef as MemRef
 import qualified MLIR.AST.Dialect.Affine as Affine
@@ -175,7 +176,7 @@ spec = do
                     , "1" := MemRef.Load v64Ty "arg1" []
                     , "2" := Vector.Matmul UnknownLocation v64Ty "0" "1" 8 8 8
                     , "3" := MemRef.Load v64Ty "arg2" []
-                    , "4" := Std.AddF UnknownLocation v64Ty "3" "2"
+                    , "4" := Arith.AddF UnknownLocation v64Ty "3" "2"
                     , Do $ MemRef.Store "4" "arg2" []
                     , Do $ Std.Return UnknownLocation []
                     ]
@@ -188,7 +189,7 @@ spec = do
             %1 = memref.load %arg1[] : memref<vector<64xf32>>
             %2 = vector.matrix_multiply %0, %1 {lhs_columns = 8 : i32, lhs_rows = 8 : i32, rhs_columns = 8 : i32} : (vector<64xf32>, vector<64xf32>) -> vector<64xf32>
             %3 = memref.load %arg2[] : memref<vector<64xf32>>
-            %4 = addf %3, %2 : vector<64xf32>
+            %4 = arith.addf %3, %2 : vector<64xf32>
             memref.store %4, %arg2[] : memref<vector<64xf32>>
             return
           }
