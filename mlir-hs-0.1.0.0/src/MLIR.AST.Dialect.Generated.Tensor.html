@@ -119,11 +119,11 @@ Name
 </span><span id="line-83"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-84"></span><span class="hs-comment">-- @</span><span>
 </span><span id="line-85"></span><span class="hs-comment">-- // Always returns 4, can be constant folded:</span><span>
-</span><span id="line-86"></span><span class="hs-comment">-- %c0 = constant 0 : index</span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- %c0 = arith.constant 0 : index</span><span>
 </span><span id="line-87"></span><span class="hs-comment">-- %x = tensor.dim %A, %c0 : tensor\&lt;4x?xf32&gt;</span><span>
 </span><span id="line-88"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-89"></span><span class="hs-comment">-- // Returns the dynamic dimension of %A.</span><span>
-</span><span id="line-90"></span><span class="hs-comment">-- %c1 = constant 1 : index</span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- %c1 = arith.constant 1 : index</span><span>
 </span><span id="line-91"></span><span class="hs-comment">-- %y = tensor.dim %A, %c1 : memref\&lt;4x?xf32&gt;</span><span>
 </span><span id="line-92"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-93"></span><span class="hs-comment">-- // Equivalent generic form:</span><span>

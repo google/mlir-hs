@@ -129,7 +129,7 @@ Name
 </span><span id="line-93"></span><span class="hs-comment">-- Example:</span><span>
 </span><span id="line-94"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-95"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-96"></span><span class="hs-comment">-- %0 = constant 0.0 : f32</span><span>
+</span><span id="line-96"></span><span class="hs-comment">-- %0 = arith.constant 0.0 : f32</span><span>
 </span><span id="line-97"></span><span class="hs-comment">-- %1 = vector.broadcast %0 : f32 to vector\&lt;16xf32&gt;</span><span>
 </span><span id="line-98"></span><span class="hs-comment">-- %2 = vector.broadcast %1 : vector\&lt;16xf32&gt; to vector\&lt;4x16xf32&gt;</span><span>
 </span><span id="line-99"></span><span class="hs-comment">-- @</span><span>
@@ -795,7 +795,7 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span id="line-474"></span><span class="hs-comment">-- Example:</span><span>
 </span><span id="line-475"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-476"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-477"></span><span class="hs-comment">-- %c = constant 15 : i32</span><span>
+</span><span id="line-477"></span><span class="hs-comment">-- %c = arith.constant 15 : i32</span><span>
 </span><span id="line-478"></span><span class="hs-comment">-- %1 = vector.extractelement %0[%c : i32]: vector\&lt;16xf32&gt;</span><span>
 </span><span id="line-479"></span><span class="hs-comment">-- @</span><span>
 </span><span id="line-480"></span><span class="hs-comment">--   </span><span>
@@ -1508,8 +1508,8 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span id="line-817"></span><span class="hs-comment">-- Example:</span><span>
 </span><span id="line-818"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-819"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-820"></span><span class="hs-comment">-- %c = constant 15 : i32</span><span>
-</span><span id="line-821"></span><span class="hs-comment">-- %f = constant 0.0f : f32</span><span>
+</span><span id="line-820"></span><span class="hs-comment">-- %c = arith.constant 15 : i32</span><span>
+</span><span id="line-821"></span><span class="hs-comment">-- %f = arith.constant 0.0f : f32</span><span>
 </span><span id="line-822"></span><span class="hs-comment">-- %1 = vector.insertelement %f, %0[%c : i32]: vector\&lt;16xf32&gt;</span><span>
 </span><span id="line-823"></span><span class="hs-comment">-- @</span><span>
 </span><span id="line-824"></span><span class="hs-comment">--   </span><span>
@@ -2468,7 +2468,7 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span id="line-1305"></span><span class="hs-comment">-- Example:</span><span>
 </span><span id="line-1306"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-1307"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-1308"></span><span class="hs-comment">-- %0 = constant 0.0 : f32</span><span>
+</span><span id="line-1308"></span><span class="hs-comment">-- %0 = arith.constant 0.0 : f32</span><span>
 </span><span id="line-1309"></span><span class="hs-comment">-- %1 = vector.broadcast %0 : f32 to vector\&lt;4xf32&gt;</span><span>
 </span><span id="line-1310"></span><span class="hs-comment">-- vector.print %1 : vector\&lt;4xf32&gt;</span><span>
 </span><span id="line-1311"></span><span class="hs-comment">-- </span><span>
@@ -3331,7 +3331,7 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span id="line-1811"></span><span class="hs-comment">--         memref\&lt;?x?x?x?xf32&gt;</span><span>
 </span><span id="line-1812"></span><span class="hs-comment">--       store %tmp[%i, %j, %k] : vector\&lt;3x4x5xf32&gt;</span><span>
 </span><span id="line-1813"></span><span class="hs-comment">-- }}}</span><span>
-</span><span id="line-1814"></span><span class="hs-comment">-- %c0 = constant 0 : index</span><span>
+</span><span id="line-1814"></span><span class="hs-comment">-- %c0 = arith.constant 0 : index</span><span>
 </span><span id="line-1815"></span><span class="hs-comment">-- %vec = load %view_in_tmp[%c0] : vector\&lt;3x4x5xf32&gt;</span><span>
 </span><span id="line-1816"></span><span class="hs-comment">-- @</span><span>
 </span><span id="line-1817"></span><span class="hs-comment">-- </span><span>
@@ -3352,7 +3352,7 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span id="line-1832"></span><span class="hs-comment">--       memref\&lt;?x?x?x?xf32&gt;</span><span>
 </span><span id="line-1833"></span><span class="hs-comment">--     store %tmp[%i, 0, %k] : vector\&lt;3x4x5xf32&gt;</span><span>
 </span><span id="line-1834"></span><span class="hs-comment">-- }}</span><span>
-</span><span id="line-1835"></span><span class="hs-comment">-- %c0 = constant 0 : index</span><span>
+</span><span id="line-1835"></span><span class="hs-comment">-- %c0 = arith.constant 0 : index</span><span>
 </span><span id="line-1836"></span><span class="hs-comment">-- %tmpvec = load %view_in_tmp[%c0] : vector\&lt;3x4x5xf32&gt;</span><span>
 </span><span id="line-1837"></span><span class="hs-comment">-- %vec = broadcast %tmpvec, 1 : vector\&lt;3x4x5xf32&gt;</span><span>
 </span><span id="line-1838"></span><span class="hs-comment">-- @</span><span>
@@ -3374,7 +3374,7 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span id="line-1854"></span><span class="hs-comment">-- @</span><span>
 </span><span id="line-1855"></span><span class="hs-comment">-- // Read the slice @%A[%i0, %i1:%i1+256, %i2:%i2+32]@ into vector\&lt;32x256xf32&gt;</span><span>
 </span><span id="line-1856"></span><span class="hs-comment">-- // and pad with %f0 to handle the boundary case:</span><span>
-</span><span id="line-1857"></span><span class="hs-comment">-- %f0 = constant 0.0f : f32</span><span>
+</span><span id="line-1857"></span><span class="hs-comment">-- %f0 = arith.constant 0.0f : f32</span><span>
 </span><span id="line-1858"></span><span class="hs-comment">-- for %i0 = 0 to %0 {</span><span>
 </span><span id="line-1859"></span><span class="hs-comment">--   affine.for %i1 = 0 to %1 step 256 {</span><span>
 </span><span id="line-1860"></span><span class="hs-comment">--     affine.for %i2 = 0 to %2 step 32 {</span><span>

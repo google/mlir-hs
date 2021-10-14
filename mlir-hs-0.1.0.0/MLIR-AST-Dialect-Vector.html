@@ -26,7 +26,7 @@
  The source operand is duplicated over all the missing leading dimensions
  and stretched over the trailing dimensions where the source has a non-equal
  dimension of 1. These rules imply that any scalar broadcast (k=0) to any
- shaped vector with the same element type is always legal.</p><p>Example:</p><pre>%0 = constant 0.0 : f32
+ shaped vector with the same element type is always legal.</p><p>Example:</p><pre>%0 = arith.constant 0.0 : f32
 %1 = vector.broadcast %0 : f32 to vector&lt;16xf32&gt;
 %2 = vector.broadcast %1 : vector&lt;16xf32&gt; to vector&lt;4x16xf32&gt;
 </pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Broadcast" class="def">Broadcast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#Broadcast" class="link">Source</a> <a href="#v:Broadcast" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.broadcast</code>.</p></div></div><div class="top"><p class="src"><a id="v:broadcast" class="def">broadcast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#broadcast" class="link">Source</a> <a href="#v:broadcast" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.broadcast</code>.</p></div></div><a href="#g:3" id="g:3"><h1>compressstore</h1></a><div class="doc"><p>The compress store operation writes elements from a 1-D vector into memory
@@ -202,7 +202,7 @@ print %1
  scalar at that position. Note that this instruction resembles
  vector.extract, but is restricted to 1-D vectors and relaxed
  to dynamic indices. It is meant to be closer to LLVM's version:
- <a href="https://llvm.org/docs/LangRef.html\#extractelement-instruction">https://llvm.org/docs/LangRef.html\#extractelement-instruction</a></p><p>Example:</p><pre>%c = constant 15 : i32
+ <a href="https://llvm.org/docs/LangRef.html\#extractelement-instruction">https://llvm.org/docs/LangRef.html\#extractelement-instruction</a></p><p>Example:</p><pre>%c = arith.constant 15 : i32
 %1 = vector.extractelement %0[%c : i32]: vector&lt;16xf32&gt;
 </pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:ExtractElement" class="def">ExtractElement</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#ExtractElement" class="link">Source</a> <a href="#v:ExtractElement" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.extractelement</code>.</p></div></div><div class="top"><p class="src"><a id="v:extractelement" class="def">extractelement</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#extractelement" class="link">Source</a> <a href="#v:extractelement" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.extractelement</code>.</p></div></div><a href="#g:9" id="g:9"><h1>extract_map</h1></a><div class="doc"><p>Takes an N-D vector and extracts a sub-part of the vector starting at id
  along each dimension.</p><p>The dimension associated to each element of <code>ids</code> used to extract are
@@ -285,8 +285,8 @@ print %1
  position.  Note that this instruction resembles vector.insert, but
  is restricted to 1-D vectors and relaxed to dynamic indices. It is
  meant to be closer to LLVM's version:
- <a href="https://llvm.org/docs/LangRef.html\#insertelement-instruction">https://llvm.org/docs/LangRef.html\#insertelement-instruction</a></p><p>Example:</p><pre>%c = constant 15 : i32
-%f = constant 0.0f : f32
+ <a href="https://llvm.org/docs/LangRef.html\#insertelement-instruction">https://llvm.org/docs/LangRef.html\#insertelement-instruction</a></p><p>Example:</p><pre>%c = arith.constant 15 : i32
+%f = arith.constant 0.0f : f32
 %1 = vector.insertelement %f, %0[%c : i32]: vector&lt;16xf32&gt;
 </pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:InsertElement" class="def">InsertElement</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Vector.html#InsertElement" class="link">Source</a> <a href="#v:InsertElement" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>vector.insertelement</code>.</p></div></div><div class="top"><p class="src"><a id="v:insertelement" class="def">insertelement</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#insertelement" class="link">Source</a> <a href="#v:insertelement" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.insertelement</code>.</p></div></div><a href="#g:16" id="g:16"><h1>insert_map</h1></a><div class="doc"><p>Inserts a N-D vector and within a larger vector starting at id. The new
  vector created will have the same size as the destination operand vector.</p><p>The dimension associated to each element of <code>ids</code> used to insert is
@@ -453,7 +453,7 @@ return %3: vector&lt;4x8xf32&gt;
 return %6: vector&lt;10xf32&gt;
 
 </pre></div><div class="top"><p class="src"><a id="v:outerproduct" class="def">outerproduct</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Vector.html#outerproduct" class="link">Source</a> <a href="#v:outerproduct" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.outerproduct</code>.</p></div></div><a href="#g:25" id="g:25"><h1>print</h1></a><div class="doc"><p>Prints the source vector (or scalar) to stdout in human readable
- format (for testing and debugging). No return value.</p><p>Example:</p><pre>%0 = constant 0.0 : f32
+ format (for testing and debugging). No return value.</p><p>Example:</p><pre>%0 = arith.constant 0.0 : f32
 %1 = vector.broadcast %0 : f32 to vector&lt;4xf32&gt;
 vector.print %1 : vector&lt;4xf32&gt;
 
@@ -647,7 +647,7 @@ for %i = 0 to 3 {
         memref&lt;?x?x?x?xf32&gt;
       store %tmp[%i, %j, %k] : vector&lt;3x4x5xf32&gt;
 }}}
-%c0 = constant 0 : index
+%c0 = arith.constant 0 : index
 %vec = load %view_in_tmp[%c0] : vector&lt;3x4x5xf32&gt;
 </pre><p>On a GPU one could then map <code>i</code>, <code>j</code>, <code>k</code> to blocks and threads. Notice that
  the temporary storage footprint is <code>3 * 5</code> values but <code>3 * 4 * 5</code> values are
@@ -661,7 +661,7 @@ for %i = 0 to 3 {
       memref&lt;?x?x?x?xf32&gt;
     store %tmp[%i, 0, %k] : vector&lt;3x4x5xf32&gt;
 }}
-%c0 = constant 0 : index
+%c0 = arith.constant 0 : index
 %tmpvec = load %view_in_tmp[%c0] : vector&lt;3x4x5xf32&gt;
 %vec = broadcast %tmpvec, 1 : vector&lt;3x4x5xf32&gt;
 </pre><p>where <code>broadcast</code> broadcasts from element 0 to all others along the
@@ -674,7 +674,7 @@ for %i = 0 to 3 {
    </code>{<code> attribute-entry </code>} :<code> memref-type </code>,<code> vector-type
  </code></p><p>Example:</p><pre>// Read the slice <code>%A[%i0, %i1:%i1+256, %i2:%i2+32]</code> into vector&lt;32x256xf32&gt;
 // and pad with %f0 to handle the boundary case:
-%f0 = constant 0.0f : f32
+%f0 = arith.constant 0.0f : f32
 for %i0 = 0 to %0 {
   affine.for %i1 = 0 to %1 step 256 {
     affine.for %i2 = 0 to %2 step 32 {

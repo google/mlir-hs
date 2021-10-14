@@ -44,15 +44,16 @@
 </pre><p>The <code>constant</code> operation produces an SSA value equal to some constant
  specified by an attribute. This is the way that MLIR uses to form simple
  integer and floating point constants, as well as more exotic things like
- references to functions and tensor/vector constants.</p><p>Example:</p><pre>// Integer constant
-%1 = constant 42 : i32
+ references to functions and tensor/vector constants.</p><p>Example:</p><pre>// Complex constant
+%1 = constant [1.0 : f32, 1.0 : f32] : complex&lt;f32&gt;
 
 // Reference to function @myfn.
-%3 = constant @myfn : (tensor&lt;16xf32&gt;, f32) -&gt; tensor&lt;16xf32&gt;
+%2 = constant @myfn : (tensor&lt;16xf32&gt;, f32) -&gt; tensor&lt;16xf32&gt;
 
 // Equivalent generic forms
-%1 = &quot;std.constant&quot;() {value = 42 : i32} : () -&gt; i32
-%3 = &quot;std.constant&quot;() {value = @myfn}
+%1 = &quot;std.constant&quot;() {value = [1.0 : f32, 1.0 : f32] : complex&lt;f32&gt;}
+   : () -&gt; complex&lt;f32&gt;
+%2 = &quot;std.constant&quot;() {value = @myfn}
    : () -&gt; ((tensor&lt;16xf32&gt;, f32) -&gt; tensor&lt;16xf32&gt;)
 </pre><p>MLIR does not allow direct references to functions in SSA operands because
  the compiler is multithreaded, and disallowing SSA values to directly
@@ -67,7 +68,7 @@
  performed. No side-effecting ops are allowed in the body of
  <code>GenericAtomicRMWOp</code>.</p><p>Example:</p><pre>%x = generic_atomic_rmw %I[%i] : memref&lt;10xf32&gt; {
   ^bb0(%current_value : f32):
-    %c1 = constant 1.0 : f32
+    %c1 = arith.constant 1.0 : f32
     %inc = arith.addf %c1, %current_value : f32
     atomic_yield %inc : f32
 }

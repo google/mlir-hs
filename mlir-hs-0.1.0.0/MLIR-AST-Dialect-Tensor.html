@@ -14,11 +14,11 @@
 </pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Cast" class="def">Cast</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Tensor.html#Cast" class="link">Source</a> <a href="#v:Cast" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>tensor.cast</code>.</p></div></div><div class="top"><p class="src"><a id="v:cast" class="def">cast</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Tensor.html#cast" class="link">Source</a> <a href="#v:cast" class="selflink">#</a></p><div class="doc"><p>A builder for <code>tensor.cast</code>.</p></div></div><a href="#g:2" id="g:2"><h1>dim</h1></a><div class="doc"><p>The <code>dim</code> operation takes a tensor and a dimension operand of type <code>index</code>.
  It returns the size of the requested dimension of the given tensor.
  If the dimension index is out of bounds, the behavior is undefined.</p><p>The specified tensor type is that of the first operand.</p><p>Example:</p><pre>// Always returns 4, can be constant folded:
-%c0 = constant 0 : index
+%c0 = arith.constant 0 : index
 %x = tensor.dim %A, %c0 : tensor&lt;4x?xf32&gt;
 
 // Returns the dynamic dimension of %A.
-%c1 = constant 1 : index
+%c1 = arith.constant 1 : index
 %y = tensor.dim %A, %c1 : memref&lt;4x?xf32&gt;
 
 // Equivalent generic form:
