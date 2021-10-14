@@ -45,8 +45,9 @@ set(MLIR_BINDINGS_PYTHON_LOCK_VERSION OFF CACHE BOOL "Disable linking against li
 set(LLVM_SRC_RELATIVE_DIR "llvm-project" CACHE STRING "Relative path to LLVM source")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/${LLVM_SRC_RELATIVE_DIR}/llvm" EXCLUDE_FROM_ALL)
 
-set(_haskell_mlir_install_prefix "haskell_package")
-set(public_api_libs
+add_mlir_aggregate(MLIRHaskell
+  SHARED
+  EMBED_LIBS
   MLIRCAPIConversion
   MLIRCAPIDebug
   MLIRCEXECUTIONENGINE
@@ -64,32 +65,4 @@ set(public_api_libs
   MLIRCAPIStandard
   MLIRCAPISCF
   MLIRCAPITensor
-)
-
-foreach(lib ${public_api_libs})
-  if(XCODE)
-    # Xcode doesn't support object libraries, so we have to trick it into
-    # linking the static libraries instead.
-    list(APPEND _DEPS "-force_load" ${lib})
-  else()
-    list(APPEND _OBJECTS $<TARGET_OBJECTS:obj.${lib}>)
-  endif()
-  # Accumulate transitive deps of each exported lib into _DEPS.
-  list(APPEND _DEPS  $<TARGET_PROPERTY:${lib},LINK_LIBRARIES>)
-endforeach()
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${LLVM_SRC_RELATIVE_DIR}/llvm/cmake/modules")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${LLVM_SRC_RELATIVE_DIR}/mlir/cmake/modules")
-include(AddLLVM)
-include(AddMLIR)
-
-add_mlir_library(MLIRHaskell
-  PARTIAL_SOURCES_INTENDED
-  SHARED
-  ${_OBJECTS}
-  EXCLUDE_FROM_LIBMLIR
-  LINK_LIBS
-  ${_DEPS}
-  LINK_COMPONENTS
-  Support
 )
