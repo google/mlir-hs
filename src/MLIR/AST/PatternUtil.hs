@@ -15,9 +15,11 @@
 module MLIR.AST.PatternUtil
   ( pattern I64ArrayAttr
   , pattern AffineMapArrayAttr
+  , DummyIx
   ) where
 
 import Data.Traversable
+import Data.Array
 
 import MLIR.AST
 import qualified MLIR.AST.Dialect.Affine as Affine
@@ -41,3 +43,12 @@ unwrapAffineMapArrayAttr _ = Nothing
 pattern AffineMapArrayAttr :: [Affine.Map] -> Attribute
 pattern AffineMapArrayAttr vals <- (unwrapAffineMapArrayAttr -> Just vals)
   where AffineMapArrayAttr vals = ArrayAttr $ fmap AffineMapAttr vals
+
+data DummyIx
+deriving instance Eq DummyIx
+deriving instance Ord DummyIx
+deriving instance Show DummyIx
+instance Ix DummyIx where
+  range   _   = error "Invalid index"
+  index   _ _ = error "Invalid index"
+  inRange _ _ = error "Invalid index"

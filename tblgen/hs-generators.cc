@@ -84,30 +84,165 @@ void warn(const mlir::tblgen::Operator& op, const std::string& reason) {
   warn(op.getOperationName(), reason);
 }
 
-struct AttrHandler {
-  std::string _pattern;
-  std::string type;
-
-  std::string pattern(std::string name) {
-    return llvm::formatv(_pattern.c_str(), name);
-  }
+struct AttrPatternTemplate {
+  const char* _pattern;
+  const char* _type;
+  std::vector<const char*> provided_constraints;
+  std::vector<const char*> type_var_defaults;
 };
-using attr_handler_map = llvm::StringMap<AttrHandler>;
 
-const attr_handler_map& getAttrHandlers() {
-  static const attr_handler_map* kAttrHandlers = new attr_handler_map{
-      {"AnyAttr", {"{0}", "Attribute"}},
-      {"AffineMapArrayAttr", {"PatternUtil.AffineMapArrayAttr {0}", "[Affine.Map]"}},
-      {"AffineMapAttr", {"AffineMapAttr {0}", "Affine.Map"}},
-      {"ArrayAttr", {"ArrayAttr {0}", "[Attribute]"}},
-      {"BoolAttr", {"BoolAttr {0}", "Bool"}},
-      {"DictionaryAttr", {"DictionaryAttr {0}", "(M.Map Name Attribute)"}},
-      {"I32Attr", {"IntegerAttr (IntegerType Signless 32) {0}", "Int"}},
-      {"I64ArrayAttr", {"PatternUtil.I64ArrayAttr {0}", "[Int]"}},
-      {"IndexAttr", {"IntegerAttr IndexType {0}", "Int"}},
-      {"StrAttr", {"StringAttr {0}", "BS.ByteString"}},
+using attr_print_state = llvm::StringSet<>;
+class AttrPattern {
+ public:
+  virtual ~AttrPattern() = default;
+  virtual std::string type() const = 0;
+  virtual std::string match(std::string name) const = 0;
+  virtual const std::vector<std::string>& provided_constraints() const = 0;
+  virtual void print(llvm::raw_ostream& os,
+                     attr_print_state& optional_attr_defs) const = 0;
+};
+
+struct NameSource {
+  NameSource(const char* prefix) : prefix(prefix) {}
+  NameSource(const NameSource&) = delete;
+  std::string fresh() { return std::string(prefix) + std::to_string(suffix++); }
+ private:
+    const char* prefix;
+    int suffix = 0;
+};
+
+class SimpleAttrPattern : public AttrPattern {
+ public:
+  SimpleAttrPattern(const AttrPatternTemplate& tmpl, NameSource& gen)
+    : _type_var_defaults(tmpl.type_var_defaults) {
+    _pattern = tmpl._pattern;
+    if (tmpl.type_var_defaults.empty()) {
+      _type = tmpl._type;
+      _provided_constraints =
+          map_vector(tmpl.provided_constraints,
+                     [](const char* c) { return std::string(c); });
+    } else if (tmpl.type_var_defaults.size() == 1) {
+      std::string var = gen.fresh();
+      _type_vars.push_back(var);
+      _type = llvm::formatv(tmpl._type, var);
+      _provided_constraints = map_vector(
+          tmpl.provided_constraints,
+          [&var](const char* c) { return llvm::formatv(c, var).str(); });
+    } else {
+      std::abort();  // Not sure how to splat arbitrary many vars into formatv.
+    }
+  }
+
+  std::string match(std::string name) const override { return llvm::formatv(_pattern, name); }
+  std::string type() const override { return _type; }
+  const std::vector<std::string>& provided_constraints() const override { return _provided_constraints; }
+  const std::vector<std::string>& type_vars() const { return _type_vars; }
+  const std::vector<const char*>& type_var_defaults() const { return _type_var_defaults; }
+
+  void print(llvm::raw_ostream& os,
+             attr_print_state& optional_attr_defs) const override {}
+ private:
+  const char* _pattern;
+  std::string _type;
+  std::vector<std::string> _provided_constraints;
+  std::vector<std::string> _type_vars;
+  const std::vector<const char*> _type_var_defaults;
+};
+
+class OptionalAttrPattern : public AttrPattern {
+ public:
+  OptionalAttrPattern(llvm::StringRef attr_kind, SimpleAttrPattern base)
+    : base(std::move(base)), attr_kind(attr_kind) {}
+
+  std::string type() const override {
+    return "Maybe " + base.type();
+  }
+  std::string match(std::string name) const override {
+    return llvm::formatv("Optional{0} {1}", attr_kind, name);
+  }
+  const std::vector<std::string>& provided_constraints() const override { return base.provided_constraints(); }
+
+  void print(llvm::raw_ostream& os,
+             attr_print_state& optional_attr_defs) const override {
+    if (!optional_attr_defs.contains(attr_kind)) {
+      if (base.provided_constraints().empty()) {
+        const char* kOptionalHandler = R"(
+pattern Optional{0} :: Maybe {1} -> Maybe Attribute
+pattern Optional{0} x <- ((\case Just ({2}) -> Just y; Nothing -> Nothing) -> x)
+  where Optional{0} x = case x of Just y -> Just ({2}); Nothing -> Nothing
+)";
+        os << llvm::formatv(kOptionalHandler, attr_kind, base.type(),
+                            base.match("y"));
+      } else {
+        const char *kOptionalHandlerConstr = R"(
+data Maybe{0}Adapter = forall {4:$[ ]}. ({3:$[, ]}) => AdaptMaybe{0} (Maybe ({1}))
+
+unwrapMaybe{0} :: Maybe Attribute -> Maybe{0}Adapter
+unwrapMaybe{0} = \case
+  Just ({2}) -> AdaptMaybe{0} (Just y)
+  _ -> AdaptMaybe{0} {5:[]}Nothing
+
+pattern Optional{0} :: () => ({3:$[, ]}) => Maybe {1} -> Maybe Attribute
+pattern Optional{0} x <- (unwrapMaybe{0} -> AdaptMaybe{0} x)
+  where Optional{0} x = case x of Just y -> Just ({2}); Nothing  -> Nothing
+)";
+        std::vector<std::string> default_apps;
+        for (const char* d : base.type_var_defaults()) {
+          default_apps.push_back("@" + std::string(d) + " ");
+        }
+        os << llvm::formatv(kOptionalHandlerConstr,
+                            attr_kind,                                // 0
+                            base.type(),                              // 1
+                            base.match("y"),                          // 2
+                            make_range(base.provided_constraints()),  // 3
+                            make_range(base.type_vars()),             // 4
+                            make_range(default_apps));                // 5
+      }
+      optional_attr_defs.insert(attr_kind);
+    }
+  }
+
+ private:
+  SimpleAttrPattern base;
+  llvm::StringRef attr_kind;
+};
+
+using attr_pattern_map = llvm::StringMap<AttrPatternTemplate>;
+
+const attr_pattern_map& getAttrPatternTemplates() {
+  static const attr_pattern_map* kAttrHandlers = new attr_pattern_map{
+      {"AnyAttr", {"{0}", "Attribute", {}, {}}},
+      {"AffineMapArrayAttr", {"PatternUtil.AffineMapArrayAttr {0}", "[Affine.Map]", {}, {}}},
+      {"AffineMapAttr", {"AffineMapAttr {0}", "Affine.Map", {}, {}}},
+      {"ArrayAttr", {"ArrayAttr {0}", "[Attribute]", {}, {}}},
+      {"BoolAttr", {"BoolAttr {0}", "Bool", {}, {}}},
+      {"DictionaryAttr", {"DictionaryAttr {0}", "(M.Map Name Attribute)", {}, {}}},
+      {"F32Attr", {"FloatAttr Float32Type {0}", "Double", {}, {}}},
+      {"F64Attr", {"FloatAttr Float64Type {0}", "Double", {}, {}}},
+      {"I32Attr", {"IntegerAttr (IntegerType Signless 32) {0}", "Int", {}, {}}},
+      {"I64Attr", {"IntegerAttr (IntegerType Signless 64) {0}", "Int", {}, {}}},
+      {"I64ArrayAttr", {"PatternUtil.I64ArrayAttr {0}", "[Int]", {}, {}}},
+      {"I64ElementsAttr", {"DenseElementsAttr (IntegerType Signless 64) (DenseInt64 {0})",
+                           "(AST.IStorableArray {0} Int64)", {"Ix {0}", "Show {0}"}, {"PatternUtil.DummyIx"}}},
+      {"IndexAttr", {"IntegerAttr IndexType {0}", "Int", {}, {}}},
+      {"StrAttr", {"StringAttr {0}", "BS.ByteString", {}, {}}},
   };
   return *kAttrHandlers;
+}
+
+// Returns nullptr when the attribute pattern couldn't be constructed.
+std::unique_ptr<AttrPattern> tryGetAttrPattern(
+    const mlir::tblgen::NamedAttribute& nattr, NameSource& gen) {
+  llvm::StringRef attr_kind = nattr.attr.getAttrDefName();
+  if (getAttrPatternTemplates().count(attr_kind) != 1) return nullptr;
+  const AttrPatternTemplate& tmpl = getAttrPatternTemplates().lookup(attr_kind);
+  if (!nattr.attr.isOptional()) {
+    return std::make_unique<SimpleAttrPattern>(tmpl, gen);
+  } else {
+    auto pat = std::make_unique<OptionalAttrPattern>(
+        attr_kind, SimpleAttrPattern(tmpl, gen));
+    return pat;
+  }
 }
 
 const std::string sanitizeName(llvm::StringRef name, llvm::Optional<int> idx = llvm::None) {
@@ -145,31 +280,30 @@ std::string getDialectName(llvm::ArrayRef<llvm::Record*> op_defs) {
   return dialect_name;
 }
 
-class AttrPattern {
-  AttrPattern(std::string name, std::vector<std::string> binders,
-              std::vector<mlir::tblgen::NamedAttribute> attrs)
+class OpAttrPattern {
+  OpAttrPattern(std::string name, std::vector<std::string> binders,
+                std::vector<mlir::tblgen::NamedAttribute> attrs,
+                std::vector<std::unique_ptr<AttrPattern>> patterns)
       : name(std::move(name)),
         binders(std::move(binders)),
-        attrs(std::move(attrs)) {
-    for (const auto& nattr : this->attrs) {
-      types.push_back(getHandlerType(nattr));
-    }
-  }
+        attrs(std::move(attrs)),
+        patterns(std::move(patterns)) {}
 
  public:
-  static llvm::Optional<AttrPattern> buildFor(mlir::tblgen::Operator& op) {
-    if (op.getNumAttributes() == 0) return AttrPattern("NoAttrs", {}, {});
+  static llvm::Optional<OpAttrPattern> buildFor(mlir::tblgen::Operator& op) {
+    if (op.getNumAttributes() == 0) return OpAttrPattern("NoAttrs", {}, {}, {});
 
-    const auto& attr_handlers = getAttrHandlers();
+    NameSource gen("a");
     std::vector<std::string> binders;
     std::vector<mlir::tblgen::NamedAttribute> attrs;
+    std::vector<std::unique_ptr<AttrPattern>> patterns;
     for (const auto& named_attr : op.getAttributes()) {
       // Derived attributes are never materialized and don't have to be
       // specified.
       if (named_attr.attr.isDerivedAttr()) continue;
 
-      auto handler_it = attr_handlers.find(named_attr.attr.getAttrDefName());
-      if (handler_it == attr_handlers.end()) {
+      auto pattern = tryGetAttrPattern(named_attr, gen);
+      if (!pattern) {
         if (named_attr.attr.hasDefaultValue()) {
           warn(op, llvm::formatv("unsupported attr {0} (but has default value)",
                                  named_attr.attr.getAttrDefName()));
@@ -184,18 +318,17 @@ class AttrPattern {
                                named_attr.attr.getAttrDefName()));
         return llvm::None;
       }
-      std::string attr_arg_name = sanitizeName(named_attr.name);
-      binders.push_back(attr_arg_name);
+      binders.push_back(sanitizeName(named_attr.name));
       attrs.push_back(named_attr);
+      patterns.push_back(std::move(pattern));
     }
-    if (binders.empty()) return AttrPattern("NoAttrs", {}, {});
+    if (binders.empty()) return OpAttrPattern("NoAttrs", {}, {}, {});
     std::string name = "Internal" + op.getCppClassName().str() + "Attributes";
-    return AttrPattern(std::move(name), std::move(binders), std::move(attrs));
+    return OpAttrPattern(std::move(name), std::move(binders), std::move(attrs),
+                         std::move(patterns));
   }
 
-  using print_state = llvm::StringSet<>;
-
-  void print(llvm::raw_ostream& os, print_state& optional_attr_defs) {
+  void print(llvm::raw_ostream& os, attr_print_state& optional_attr_defs) {
     if (name == "NoAttrs") return;
     // `M.lookup "attr_name" m` for every attribute
     std::vector<std::string> lookups;
@@ -205,68 +338,56 @@ class AttrPattern {
     std::vector<std::string> singleton_pairs;
     for (size_t i = 0; i < attrs.size(); ++i) {
       const mlir::tblgen::NamedAttribute& nattr = attrs[i];
-      AttrHandler handler = getHandler(nattr, os, optional_attr_defs);
+      const AttrPattern& pattern = *patterns[i];
+      pattern.print(os, optional_attr_defs);
       lookups.push_back(llvm::formatv("M.lookup \"{0}\" m", nattr.name));
-      std::string pattern = handler.pattern(binders[i]);
+      std::string inst_pattern = pattern.match(binders[i]);
       if (nattr.attr.isOptional()) {
-        lookup_patterns.push_back(pattern);
+        lookup_patterns.push_back(inst_pattern);
         singleton_pairs.push_back(llvm::formatv(
-            "(Data.Maybe.maybeToList $ (\"{0}\",) <$> {1})", nattr.name, pattern));
+            "(Data.Maybe.maybeToList $ (\"{0}\",) <$> {1})", nattr.name, inst_pattern));
       } else {
-        lookup_patterns.push_back(llvm::formatv("Just ({0})", pattern));
+        lookup_patterns.push_back(llvm::formatv("Just ({0})", inst_pattern));
         singleton_pairs.push_back(
-            llvm::formatv("[(\"{0}\", {1})]", nattr.name, pattern));
+            llvm::formatv("[(\"{0}\", {1})]", nattr.name, inst_pattern));
       }
     }
     const char* kAttributePattern = R"(
-pattern {0} :: {1:$[ -> ]} -> NamedAttributes
+pattern {0} :: () => ({6:$[, ]}) => {1:$[ -> ]} -> NamedAttributes
 pattern {0} {2:$[ ]} <- ((\m -> ({3:$[, ]})) -> ({4:$[, ]}))
   where {0} {2:$[ ]} = M.fromList $ {5:$[ ++ ]}
 )";
     os << llvm::formatv(kAttributePattern,
-                        name,                          // 0
-                        make_range(types),             // 1
-                        make_range(binders),           // 2
-                        make_range(lookups),           // 3
-                        make_range(lookup_patterns),   // 4
-                        make_range(singleton_pairs));  // 5
+                        name,                                   // 0
+                        make_range(types()),                    // 1
+                        make_range(binders),                    // 2
+                        make_range(lookups),                    // 3
+                        make_range(lookup_patterns),            // 4
+                        make_range(singleton_pairs),            // 5
+                        make_range(provided_constraints()));    // 6
   }
 
-  std::string getHandlerType(const mlir::tblgen::NamedAttribute& nattr) {
-    llvm::StringRef attr_kind = nattr.attr.getAttrDefName();
-    assert(getAttrHandlers().count(attr_kind) == 1);
-    AttrHandler handler = getAttrHandlers().lookup(attr_kind);
-    if (!nattr.attr.isOptional()) return handler.type;
-    return "Maybe (" + handler.type + ")";
+  std::vector<std::string> types() const {
+    return map_vector(patterns, [](const std::unique_ptr<AttrPattern>& p) {
+      return p->type();
+    });
   }
-
-  AttrHandler getHandler(const mlir::tblgen::NamedAttribute& nattr,
-                         llvm::raw_ostream& os,
-                         print_state& optional_attr_defs) {
-    llvm::StringRef attr_kind = nattr.attr.getAttrDefName();
-    assert(getAttrHandlers().count(attr_kind) == 1);
-    AttrHandler handler = getAttrHandlers().lookup(attr_kind);
-    if (!nattr.attr.isOptional()) return handler;
-    if (!optional_attr_defs.contains(attr_kind)) {
-      const char* kOptionalHandler = R"(
-pattern Optional{0} :: Maybe {1} -> Maybe Attribute
-pattern Optional{0} x <- ((\case Just ({2}) -> Just y; Nothing -> Nothing) -> x)
-  where Optional{0} x = case x of Just y -> Just ({2}); Nothing -> Nothing
-)";
-      os << llvm::formatv(kOptionalHandler, attr_kind, handler.type,
-                          handler.pattern("y"));
-      optional_attr_defs.insert(attr_kind);
+  std::vector<std::string> provided_constraints() const {
+    std::vector<std::string> result;
+    for (auto& p : patterns) {
+      for (auto& c : p->provided_constraints()) {
+        result.push_back(c);
+      }
     }
-    return {"Optional" + attr_kind.str() + " {0}",
-            "Maybe (" + handler.type + ")"};
+    return result;
   }
 
   std::string name;
   std::vector<std::string> binders;
-  std::vector<std::string> types;
 
  private:
   std::vector<mlir::tblgen::NamedAttribute> attrs;
+  std::vector<std::unique_ptr<AttrPattern>> patterns;
 };
 
 llvm::Optional<std::string> buildOperation(
@@ -275,7 +396,7 @@ llvm::Optional<std::string> buildOperation(
     const std::vector<std::string>& type_exprs,
     const std::vector<std::string>& operand_exprs,
     const std::vector<std::string>& region_exprs,
-    const AttrPattern& attr_pattern) {
+    const OpAttrPattern& attr_pattern) {
   mlir::tblgen::Operator op(def);
   auto fail = [&op, &what_for](std::string reason) {
     warn(op, llvm::formatv("couldn't construct {0}: {1}", what_for, reason));
@@ -408,7 +529,7 @@ std::string stripDialect(std::string name) {
 }
 
 void emitBuilderMethod(mlir::tblgen::Operator& op,
-                       const AttrPattern& attr_pattern, llvm::raw_ostream& os) {
+                       const OpAttrPattern& attr_pattern, llvm::raw_ostream& os) {
   auto fail = [&op](std::string reason) {
     warn(op, "couldn't construct builder: " + reason);
   };
@@ -488,8 +609,9 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
     }
   }
 
-  builder_arg_types.insert(builder_arg_types.end(), attr_pattern.types.begin(),
-                           attr_pattern.types.end());
+  auto attr_types = attr_pattern.types();
+  builder_arg_types.insert(builder_arg_types.end(), attr_types.begin(),
+                           attr_types.end());
 
   std::vector<std::string> region_builder_binders;
   std::vector<std::string> region_binders;
@@ -516,25 +638,26 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
 
   const char* kBuilder = R"(
 -- | A builder for @{10}@.
-{0} :: MonadBlockBuilder m => {1:$[ -> ]}m {2}
+{0} :: ({11:$[, ]}) => MonadBlockBuilder m => {1:$[ -> ]}m {2}
 {0} {3:$[ ]} {4:$[ ]} {5:$[ ]} {6:$[ ]} = do
   {7}(AST.emitOp ({8})){9}
 )";
   os << llvm::formatv(kBuilder,
-                      builder_name,                        // 0
-                      make_range(builder_arg_types),       // 1
-                      result_type,                         // 2
-                      make_range(type_binders),            // 3
-                      make_range(operand_binders),         // 4
-                      make_range(attr_pattern.binders),    // 5
-                      make_range(region_builder_binders),  // 6
-                      prologue,                            // 7
-                      *operation,                          // 8
-                      continuation,                        // 9
-                      op.getOperationName());              // 10
+                      builder_name,                                      // 0
+                      make_range(builder_arg_types),                     // 1
+                      result_type,                                       // 2
+                      make_range(type_binders),                          // 3
+                      make_range(operand_binders),                       // 4
+                      make_range(attr_pattern.binders),                  // 5
+                      make_range(region_builder_binders),                // 6
+                      prologue,                                          // 7
+                      *operation,                                        // 8
+                      continuation,                                      // 9
+                      op.getOperationName(),                             // 10
+                      make_range(attr_pattern.provided_constraints()));  // 11
 }
 
-void emitPattern(const llvm::Record* def, const AttrPattern& attr_pattern,
+void emitPattern(const llvm::Record* def, const OpAttrPattern& attr_pattern,
                  llvm::raw_ostream& os) {
   mlir::tblgen::Operator op(def);
   auto fail = [&op](std::string reason) {
@@ -587,8 +710,9 @@ void emitPattern(const llvm::Record* def, const AttrPattern& attr_pattern,
   }
 
   // Prepare attribute pattern
-  pattern_arg_types.insert(pattern_arg_types.end(), attr_pattern.types.begin(),
-                           attr_pattern.types.end());
+  auto attr_types = attr_pattern.types();
+  pattern_arg_types.insert(pattern_arg_types.end(), attr_types.begin(),
+                           attr_types.end());
 
   llvm::Optional<std::string> operation = buildOperation(
       def, true, "pattern", "loc",
@@ -597,17 +721,18 @@ void emitPattern(const llvm::Record* def, const AttrPattern& attr_pattern,
 
   const char* kPatternExplicitType = R"(
 -- | A pattern for @{6}@.
-pattern {0} :: {1:$[ -> ]} -> AbstractOperation operand
+pattern {0} :: () => ({7:$[, ]}) => {1:$[ -> ]} -> AbstractOperation operand
 pattern {0} loc {2:$[ ]} {3:$[ ]} {4:$[ ]} = {5}
 )";
   os << llvm::formatv(kPatternExplicitType,
-                      pattern_name,                      // 0
-                      make_range(pattern_arg_types),     // 1
-                      make_range(type_binders),          // 2
-                      make_range(operand_binders),       // 3
-                      make_range(attr_pattern.binders),  // 4
-                      *operation,                        // 5
-                      op.getOperationName());            // 6
+                      pattern_name,                                      // 0
+                      make_range(pattern_arg_types),                     // 1
+                      make_range(type_binders),                          // 2
+                      make_range(operand_binders),                       // 3
+                      make_range(attr_pattern.binders),                  // 4
+                      *operation,                                        // 5
+                      op.getOperationName(),                             // 6
+                      make_range(attr_pattern.provided_constraints()));  // 7
 
 }
 
@@ -645,9 +770,11 @@ bool emitOpTableDefs(const llvm::RecordKeeper& recordKeeper,
   os << "{-# OPTIONS_HADDOCK hide, prune, not-home #-}\n\n";
   os << "module MLIR.AST.Dialect.Generated." << dialect_name << " where\n";
   os << R"(
-import Prelude (Int, Maybe(..), Bool(..), (++), (<$>), ($), (<>))
+import Prelude (Int, Double, Maybe(..), Bool(..), (++), (<$>), ($), (<>), Show)
 import qualified Prelude
+import Data.Int (Int64)
 import qualified Data.Maybe
+import Data.Array (Ix)
 import qualified Data.Array.IArray as IArray
 import qualified Data.ByteString as BS
 import qualified Data.Map.Strict as M
@@ -660,11 +787,12 @@ import MLIR.AST ( Attribute(..), Type(..), AbstractOperation(..), ResultTypes(..
 import qualified MLIR.AST as AST
 import MLIR.AST.Builder (Value, EndOfBlock, MonadBlockBuilder, RegionBuilderT)
 import qualified MLIR.AST.Builder as AST
+import qualified MLIR.AST.IStorableArray as AST
 import qualified MLIR.AST.PatternUtil as PatternUtil
 import qualified MLIR.AST.Dialect.Affine as Affine
 )";
 
-  AttrPattern::print_state attr_pattern_state;
+  attr_print_state attr_pattern_state;
   for (const auto* def : defs) {
     mlir::tblgen::Operator op(*def);
     if (op.hasDescription()) {
@@ -672,7 +800,7 @@ import qualified MLIR.AST.Dialect.Affine as Affine
       os << formatDescription(op);
       os << "\n";
     }
-    llvm::Optional<AttrPattern> attr_pattern = AttrPattern::buildFor(op);
+    llvm::Optional<OpAttrPattern> attr_pattern = OpAttrPattern::buildFor(op);
     if (!attr_pattern) continue;
     attr_pattern->print(os, attr_pattern_state);
     emitPattern(def, *attr_pattern, os);
@@ -713,7 +841,7 @@ spec = do
   os << llvm::formatv(module_header, dialect_name);
   for (const auto* def : defs) {
     mlir::tblgen::Operator op(*def);
-    llvm::Optional<AttrPattern> attr_pattern = AttrPattern::buildFor(op);
+    llvm::Optional<OpAttrPattern> attr_pattern = OpAttrPattern::buildFor(op);
     if (!attr_pattern) continue;
     os << "\n  Hspec.describe \"" << op.getOperationName() << "\" $ do";
     const char* bidirectional_test_template = R"(
