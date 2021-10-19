@@ -60,7 +60,7 @@ data Type =
   | FunctionType [Type] [Type]
   | MemRefType { memrefTypeShape :: [Maybe Int]
                , memrefTypeElement :: Type
-               , memrefTypeAffineMaps :: [Affine.Map]
+               , memrefTypeLayout :: Maybe Attribute
                , memrefTypeMemorySpace :: Maybe Attribute }
   | RankedTensorType { rankedTensorTypeShape :: [Maybe Int]
                      , rankedTensorTypeElement :: Type
@@ -289,20 +289,22 @@ instance FromAST Type Native.Type where
         mlirIntegerTypeUnsignedGet($(MlirContext ctx), $(unsigned int cwidth))
       } |]
       where cwidth = fromIntegral width
-    MemRefType shape elTy [] memSpace -> evalContT $ do
+    MemRefType shape elTy layout memSpace -> evalContT $ do
       (rank, nativeShape) <- packArray shapeI64
       liftIO $ do
         nativeElTy <- fromAST ctx env elTy
         nativeSpace <- case memSpace of
           Just space -> fromAST ctx env space
           Nothing    -> return $ coerce nullPtr
+        nativeLayout <- case layout of
+          Just alayout -> fromAST ctx env alayout
+          Nothing      -> return $ coerce nullPtr
         [C.exp| MlirType {
           mlirMemRefTypeGet($(MlirType nativeElTy),
                             $(intptr_t rank), $(int64_t* nativeShape),
-                            0, NULL, $(MlirAttribute nativeSpace))
+                            $(MlirAttribute nativeLayout), $(MlirAttribute nativeSpace))
         } |]
       where shapeI64 = fmap (maybe (-1) fromIntegral) shape :: [Int64]
-    MemRefType _ _ _ _ -> notImplemented -- AffineMap suport
     NoneType -> [C.exp| MlirType { mlirNoneTypeGet($(MlirContext ctx)) } |]
     OpaqueType _ _ -> notImplemented
     RankedTensorType shape elTy encoding -> evalContT $ do
