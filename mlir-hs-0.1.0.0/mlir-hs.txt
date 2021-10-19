@@ -219,10 +219,10 @@ IntegerType :: Signedness -> UInt -> Type
 TupleType :: [Type] -> Type
 NoneType :: Type
 FunctionType :: [Type] -> [Type] -> Type
-MemRefType :: [Maybe Int] -> Type -> [Map] -> Maybe Attribute -> Type
+MemRefType :: [Maybe Int] -> Type -> Maybe Attribute -> Maybe Attribute -> Type
 [memrefTypeShape] :: Type -> [Maybe Int]
 [memrefTypeElement] :: Type -> Type
-[memrefTypeAffineMaps] :: Type -> [Map]
+[memrefTypeLayout] :: Type -> Maybe Attribute
 [memrefTypeMemorySpace] :: Type -> Maybe Attribute
 RankedTensorType :: [Maybe Int] -> Type -> Maybe Attribute -> Type
 [rankedTensorTypeShape] :: Type -> [Maybe Int]
@@ -305,8 +305,8 @@ namedAttribute :: Name -> Attribute -> NamedAttributes
 pattern ModuleOp :: Block -> Operation
 pattern FuncAttrs :: Name -> Type -> Map Name Attribute
 pattern FuncOp :: Location -> Name -> Type -> Region -> Operation
-inline_c_ffi_6989586621679081668 :: IO Attribute
-inline_c_ffi_6989586621679081686 :: Context -> CIntPtr -> Ptr Location -> Attribute -> IO Location
+inline_c_ffi_6989586621679081673 :: IO Attribute
+inline_c_ffi_6989586621679081691 :: Context -> CIntPtr -> Ptr Location -> Attribute -> IO Location
 inline_c_ffi_6989586621679081425 :: Context -> IO Type
 inline_c_ffi_6989586621679081433 :: Context -> IO Type
 inline_c_ffi_6989586621679081441 :: Context -> IO Type
@@ -317,13 +317,13 @@ inline_c_ffi_6989586621679081489 :: Context -> IO Type
 inline_c_ffi_6989586621679081502 :: Context -> CUInt -> IO Type
 inline_c_ffi_6989586621679081512 :: Context -> CUInt -> IO Type
 inline_c_ffi_6989586621679081522 :: Context -> CUInt -> IO Type
-inline_c_ffi_6989586621679081562 :: Type -> CIntPtr -> Ptr Int64 -> Attribute -> IO Type
-inline_c_ffi_6989586621679081570 :: Context -> IO Type
-inline_c_ffi_6989586621679081593 :: CIntPtr -> Ptr Int64 -> Type -> Attribute -> IO Type
-inline_c_ffi_6989586621679081608 :: Context -> CIntPtr -> Ptr Type -> IO Type
-inline_c_ffi_6989586621679081622 :: Type -> Attribute -> IO Type
-inline_c_ffi_6989586621679081632 :: Type -> IO Type
-inline_c_ffi_6989586621679081650 :: CIntPtr -> Ptr Int64 -> Type -> IO Type
+inline_c_ffi_6989586621679081567 :: Type -> CIntPtr -> Ptr Int64 -> Attribute -> Attribute -> IO Type
+inline_c_ffi_6989586621679081575 :: Context -> IO Type
+inline_c_ffi_6989586621679081598 :: CIntPtr -> Ptr Int64 -> Type -> Attribute -> IO Type
+inline_c_ffi_6989586621679081613 :: Context -> CIntPtr -> Ptr Type -> IO Type
+inline_c_ffi_6989586621679081627 :: Type -> Attribute -> IO Type
+inline_c_ffi_6989586621679081637 :: Type -> IO Type
+inline_c_ffi_6989586621679081655 :: CIntPtr -> Ptr Int64 -> Type -> IO Type
 inline_c_ffi_6989586621679081412 :: IO Region
 inline_c_ffi_6989586621679081390 :: Region -> Block -> IO ()
 inline_c_ffi_6989586621679081406 :: CIntPtr -> Ptr Type -> IO Block
@@ -351,9 +351,9 @@ inline_c_ffi_6989586621679081279 :: Type -> CIntPtr -> Ptr CFloat -> IO Attribut
 inline_c_ffi_6989586621679081295 :: Type -> CIntPtr -> Ptr CDouble -> IO Attribute
 inline_c_ffi_6989586621679081050 :: Ptr CChar -> CSize -> Location -> CBool -> CIntPtr -> Ptr Type -> CIntPtr -> Ptr Value -> CIntPtr -> Ptr Region -> CIntPtr -> Ptr Block -> CIntPtr -> Ptr NamedAttribute -> IO Operation
 packNamedAttrs :: Context -> ValueAndBlockMapping -> Map Name Attribute -> ContT r IO (CIntPtr, Ptr NamedAttribute)
-inline_c_ffi_6989586621679081702 :: IO CSize
-inline_c_ffi_6989586621679081709 :: IO CSize
-inline_c_ffi_6989586621679081731 :: Ptr NamedAttribute -> CInt -> Identifier -> Attribute -> IO ()
+inline_c_ffi_6989586621679081707 :: IO CSize
+inline_c_ffi_6989586621679081714 :: IO CSize
+inline_c_ffi_6989586621679081736 :: Ptr NamedAttribute -> CInt -> Identifier -> Attribute -> IO ()
 pattern CTrue :: CBool
 pattern CFalse :: CBool
 notImplemented :: forall a. a
@@ -1512,6 +1512,12 @@ pattern Memcpy :: Location -> operand -> operand -> operand -> operand -> Abstra
 -- | A builder for <tt>llvm.intr.memcpy</tt>.
 intr_memcpy :: MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
 
+-- | A pattern for <tt>llvm.intr.memset</tt>.
+pattern Memset :: Location -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.memset</tt>.
+intr_memset :: MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
+
 -- | A pattern for <tt>llvm.intr.minnum</tt>.
 pattern MinNum :: Location -> Type -> operand -> operand -> AbstractOperation operand
 
@@ -1998,17 +2004,17 @@ xori :: MonadBlockBuilder m => Value -> Value -> m Value
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679448347 :: Context -> IO PassManager
+inline_c_ffi_6989586621679449666 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679448356 :: PassManager -> IO ()
+inline_c_ffi_6989586621679449675 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679448369 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679449688 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679448378 :: PassManager -> IO ()
+inline_c_ffi_6989586621679449697 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679448387 :: PassManager -> IO ()
+inline_c_ffi_6989586621679449706 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679448396 :: PassManager -> IO ()
+inline_c_ffi_6989586621679449715 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679448405 :: PassManager -> IO ()
+inline_c_ffi_6989586621679449724 :: PassManager -> IO ()
