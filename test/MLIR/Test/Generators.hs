@@ -101,7 +101,7 @@ instance Arbitrary Type where
       leafGenerators = scalarTypeGenerators ++
         [ MemRefType <$> arbitrary
                      <*> arbitraryScalarType
-                     <*> frequency [(9, pure []     ), (1, arbitrary)]
+                     <*> frequency [(9, pure Nothing), (1, arbitrary)]
                      <*> frequency [(9, pure Nothing), (1, arbitrary)]
         , pure NoneType
         , OpaqueType <$> arbitrary <*> arbitrary

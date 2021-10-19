@@ -167,7 +167,7 @@ spec = do
       let v64Ty = VectorType [64] Float32Type
       let v64refTy = MemRefType { memrefTypeShape = []
                                 , memrefTypeElement = v64Ty
-                                , memrefTypeAffineMaps = []
+                                , memrefTypeLayout = Nothing
                                 , memrefTypeMemorySpace = Nothing }
       let m = ModuleOp $ Block "0" [] [
                 Do $ emitted $ FuncOp UnknownLocation "matmul8x8x8" (FunctionType [v64refTy, v64refTy, v64refTy] []) $ Region [
@@ -197,7 +197,7 @@ spec = do
 
     it "Can translate matmul via vector.contract" $ do
       let v8x8Ty = VectorType [8, 8] Float32Type
-      let v8x8RefTy = MemRefType [] v8x8Ty [] Nothing
+      let v8x8RefTy = MemRefType [] v8x8Ty Nothing Nothing
       let m = ModuleOp $ Block "0" [] [
                 Do $ emitted $ FuncOp UnknownLocation "matmul8x8x8" (FunctionType [v8x8RefTy, v8x8RefTy, v8x8RefTy] []) $ Region [
                   Block "0" [("arg0", v8x8RefTy), ("arg1", v8x8RefTy), ("arg2", v8x8RefTy)]
