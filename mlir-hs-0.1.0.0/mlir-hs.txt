@@ -371,6 +371,11 @@ instance GHC.Classes.Eq MLIR.AST.DenseElements
 module MLIR.AST.PatternUtil
 pattern I64ArrayAttr :: [Int] -> Attribute
 pattern AffineMapArrayAttr :: [Map] -> Attribute
+data DummyIx
+instance GHC.Classes.Eq MLIR.AST.PatternUtil.DummyIx
+instance GHC.Classes.Ord MLIR.AST.PatternUtil.DummyIx
+instance GHC.Show.Show MLIR.AST.PatternUtil.DummyIx
+instance GHC.Ix.Ix MLIR.AST.PatternUtil.DummyIx
 
 module MLIR.AST.Dialect.MemRef
 pattern Load :: Type -> Name -> [Name] -> Operation
@@ -479,91 +484,91 @@ applyClosedOpRewriteT :: MonadFix m => OpRewriteM m -> Operation -> m Operation
 module MLIR.AST.Dialect.X86Vector
 
 -- | A pattern for <tt>x86vector.avx.intr.dp.ps.256</tt>.
-pattern DotIntr :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern DotIntr :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx.intr.dp.ps.256</tt>.
-avx_intr_dp_ps_256 :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+avx_intr_dp_ps_256 :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx.intr.dot</tt>.
-pattern Dot :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Dot :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx.intr.dot</tt>.
-avx_intr_dot :: MonadBlockBuilder m => Value -> Value -> m Value
+avx_intr_dot :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx512.intr.mask.compress</tt>.
-pattern MaskCompressIntr :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern MaskCompressIntr :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.intr.mask.compress</tt>.
-avx512_intr_mask_compress :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+avx512_intr_mask_compress :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A builder for <tt>x86vector.avx512.mask.compress</tt>.
-avx512_mask_compress :: MonadBlockBuilder m => Type -> Value -> Value -> Maybe Value -> m Value
+avx512_mask_compress :: () => MonadBlockBuilder m => Type -> Value -> Value -> Maybe Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx512.mask.rndscale</tt>.
-pattern MaskRndScale :: Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern MaskRndScale :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.mask.rndscale</tt>.
-avx512_mask_rndscale :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
+avx512_mask_rndscale :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx512.intr.mask.rndscale.pd.512</tt>.
-pattern MaskRndScalePDIntr :: Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern MaskRndScalePDIntr :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.intr.mask.rndscale.pd.512</tt>.
-avx512_intr_mask_rndscale_pd_512 :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
+avx512_intr_mask_rndscale_pd_512 :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx512.intr.mask.rndscale.ps.512</tt>.
-pattern MaskRndScalePSIntr :: Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern MaskRndScalePSIntr :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.intr.mask.rndscale.ps.512</tt>.
-avx512_intr_mask_rndscale_ps_512 :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
+avx512_intr_mask_rndscale_ps_512 :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx512.mask.scalef</tt>.
-pattern MaskScaleF :: Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern MaskScaleF :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.mask.scalef</tt>.
-avx512_mask_scalef :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
+avx512_mask_scalef :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx512.intr.mask.scalef.pd.512</tt>.
-pattern MaskScaleFPDIntr :: Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern MaskScaleFPDIntr :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.intr.mask.scalef.pd.512</tt>.
-avx512_intr_mask_scalef_pd_512 :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
+avx512_intr_mask_scalef_pd_512 :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx512.intr.mask.scalef.ps.512</tt>.
-pattern MaskScaleFPSIntr :: Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern MaskScaleFPSIntr :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.intr.mask.scalef.ps.512</tt>.
-avx512_intr_mask_scalef_ps_512 :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
+avx512_intr_mask_scalef_ps_512 :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx.intr.rsqrt.ps.256</tt>.
-pattern RsqrtIntr :: Location -> Type -> operand -> AbstractOperation operand
+pattern RsqrtIntr :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx.intr.rsqrt.ps.256</tt>.
-avx_intr_rsqrt_ps_256 :: MonadBlockBuilder m => Value -> m Value
+avx_intr_rsqrt_ps_256 :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx.rsqrt</tt>.
-pattern Rsqrt :: Location -> Type -> operand -> AbstractOperation operand
+pattern Rsqrt :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx.rsqrt</tt>.
-avx_rsqrt :: MonadBlockBuilder m => Value -> m Value
+avx_rsqrt :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx512.intr.vp2intersect.d.512</tt>.
-pattern Vp2IntersectDIntr :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Vp2IntersectDIntr :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.intr.vp2intersect.d.512</tt>.
-avx512_intr_vp2intersect_d_512 :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+avx512_intr_vp2intersect_d_512 :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>x86vector.avx512.vp2intersect</tt>.
-pattern Vp2Intersect :: Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
+pattern Vp2Intersect :: () => () => Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.vp2intersect</tt>.
-avx512_vp2intersect :: MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
+avx512_vp2intersect :: () => MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
 
 -- | A pattern for <tt>x86vector.avx512.intr.vp2intersect.q.512</tt>.
-pattern Vp2IntersectQIntr :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Vp2IntersectQIntr :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>x86vector.avx512.intr.vp2intersect.q.512</tt>.
-avx512_intr_vp2intersect_q_512 :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+avx512_intr_vp2intersect_q_512 :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 module MLIR.AST.Dialect.Vector
 data IteratorType
@@ -576,207 +581,207 @@ showIterator :: IteratorType -> ByteString
 itersFromAttribute :: Attribute -> Maybe [IteratorType]
 
 -- | A pattern for <tt>vector.bitcast</tt>.
-pattern BitCast :: Location -> Type -> operand -> AbstractOperation operand
+pattern BitCast :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>vector.bitcast</tt>.
-bitcast :: MonadBlockBuilder m => Type -> Value -> m Value
+bitcast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>vector.broadcast</tt>.
-pattern Broadcast :: Location -> Type -> operand -> AbstractOperation operand
+pattern Broadcast :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>vector.broadcast</tt>.
-broadcast :: MonadBlockBuilder m => Type -> Value -> m Value
+broadcast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>vector.compressstore</tt>.
-compressstore :: MonadBlockBuilder m => Value -> [Value] -> Value -> Value -> m ()
+compressstore :: () => MonadBlockBuilder m => Value -> [Value] -> Value -> Value -> m ()
 
 -- | A pattern for <tt>vector.constant_mask</tt>.
-pattern ConstantMask :: Location -> Type -> [Int] -> AbstractOperation operand
+pattern ConstantMask :: () => () => Location -> Type -> [Int] -> AbstractOperation operand
 
 -- | A builder for <tt>vector.constant_mask</tt>.
-constant_mask :: MonadBlockBuilder m => Type -> [Int] -> m Value
+constant_mask :: () => MonadBlockBuilder m => Type -> [Int] -> m Value
 
 -- | A builder for <tt>vector.contract</tt>.
-contract :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> [Value] -> [Map] -> [Attribute] -> m Value
+contract :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> [Value] -> [Map] -> [Attribute] -> m Value
 
 -- | A pattern for <tt>vector.create_mask</tt>.
-pattern CreateMask :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern CreateMask :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>vector.create_mask</tt>.
-create_mask :: MonadBlockBuilder m => Type -> [Value] -> m Value
+create_mask :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A builder for <tt>vector.expandload</tt>.
-expandload :: MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> m Value
+expandload :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> m Value
 
 -- | A pattern for <tt>vector.extractelement</tt>.
-pattern ExtractElement :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern ExtractElement :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>vector.extractelement</tt>.
-extractelement :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+extractelement :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A builder for <tt>vector.extract_map</tt>.
-extract_map :: MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
+extract_map :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
 
 -- | A pattern for <tt>vector.extract</tt>.
-pattern Extract :: Location -> Type -> operand -> [Int] -> AbstractOperation operand
+pattern Extract :: () => () => Location -> Type -> operand -> [Int] -> AbstractOperation operand
 
 -- | A builder for <tt>vector.extract</tt>.
-extract :: MonadBlockBuilder m => Type -> Value -> [Int] -> m Value
+extract :: () => MonadBlockBuilder m => Type -> Value -> [Int] -> m Value
 
 -- | A pattern for <tt>vector.extract_strided_slice</tt>.
-pattern ExtractStridedSlice :: Location -> Type -> operand -> [Int] -> [Int] -> [Int] -> AbstractOperation operand
+pattern ExtractStridedSlice :: () => () => Location -> Type -> operand -> [Int] -> [Int] -> [Int] -> AbstractOperation operand
 
 -- | A builder for <tt>vector.extract_strided_slice</tt>.
-extract_strided_slice :: MonadBlockBuilder m => Type -> Value -> [Int] -> [Int] -> [Int] -> m Value
+extract_strided_slice :: () => MonadBlockBuilder m => Type -> Value -> [Int] -> [Int] -> [Int] -> m Value
 
 -- | A pattern for <tt>vector.fma</tt>.
-pattern FMA :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern FMA :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>vector.fma</tt>.
-fma :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+fma :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>vector.flat_transpose</tt>.
-pattern FlatTranspose :: Location -> Type -> operand -> Int -> Int -> AbstractOperation operand
+pattern FlatTranspose :: () => () => Location -> Type -> operand -> Int -> Int -> AbstractOperation operand
 
 -- | A builder for <tt>vector.flat_transpose</tt>.
-flat_transpose :: MonadBlockBuilder m => Type -> Value -> Int -> Int -> m Value
+flat_transpose :: () => MonadBlockBuilder m => Type -> Value -> Int -> Int -> m Value
 
 -- | A builder for <tt>vector.gather</tt>.
-gather :: MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> Value -> m Value
+gather :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>vector.insertelement</tt>.
-pattern InsertElement :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern InsertElement :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>vector.insertelement</tt>.
-insertelement :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+insertelement :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A builder for <tt>vector.insert_map</tt>.
-insert_map :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Value
+insert_map :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Value
 
 -- | A pattern for <tt>vector.insert</tt>.
-pattern Insert :: Location -> Type -> operand -> operand -> [Int] -> AbstractOperation operand
+pattern Insert :: () => () => Location -> Type -> operand -> operand -> [Int] -> AbstractOperation operand
 
 -- | A builder for <tt>vector.insert</tt>.
-insert :: MonadBlockBuilder m => Type -> Value -> Value -> [Int] -> m Value
+insert :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Int] -> m Value
 
 -- | A pattern for <tt>vector.insert_strided_slice</tt>.
-pattern InsertStridedSlice :: Location -> Type -> operand -> operand -> [Int] -> [Int] -> AbstractOperation operand
+pattern InsertStridedSlice :: () => () => Location -> Type -> operand -> operand -> [Int] -> [Int] -> AbstractOperation operand
 
 -- | A builder for <tt>vector.insert_strided_slice</tt>.
-insert_strided_slice :: MonadBlockBuilder m => Type -> Value -> Value -> [Int] -> [Int] -> m Value
+insert_strided_slice :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Int] -> [Int] -> m Value
 
 -- | A builder for <tt>vector.load</tt>.
-load :: MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
+load :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
 
 -- | A builder for <tt>vector.maskedload</tt>.
-maskedload :: MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> m Value
+maskedload :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> m Value
 
 -- | A builder for <tt>vector.maskedstore</tt>.
-maskedstore :: MonadBlockBuilder m => Value -> [Value] -> Value -> Value -> m ()
+maskedstore :: () => MonadBlockBuilder m => Value -> [Value] -> Value -> Value -> m ()
 
 -- | A pattern for <tt>vector.matrix_multiply</tt>.
-pattern Matmul :: Location -> Type -> operand -> operand -> Int -> Int -> Int -> AbstractOperation operand
+pattern Matmul :: () => () => Location -> Type -> operand -> operand -> Int -> Int -> Int -> AbstractOperation operand
 
 -- | A builder for <tt>vector.matrix_multiply</tt>.
-matrix_multiply :: MonadBlockBuilder m => Type -> Value -> Value -> Int -> Int -> Int -> m Value
+matrix_multiply :: () => MonadBlockBuilder m => Type -> Value -> Value -> Int -> Int -> Int -> m Value
 
 -- | A builder for <tt>vector.outerproduct</tt>.
-outerproduct :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Value
+outerproduct :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Value
 
 -- | A pattern for <tt>vector.print</tt>.
-pattern Print :: Location -> operand -> AbstractOperation operand
+pattern Print :: () => () => Location -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>vector.print</tt>.
-print :: MonadBlockBuilder m => Value -> m ()
+print :: () => MonadBlockBuilder m => Value -> m ()
 
 -- | A builder for <tt>vector.reduction</tt>.
-reduction :: MonadBlockBuilder m => Type -> Value -> [Value] -> ByteString -> m Value
+reduction :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> ByteString -> m Value
 
 -- | A builder for <tt>vector.reshape</tt>.
-reshape :: MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Int] -> m Value
+reshape :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Int] -> m Value
 
 -- | A builder for <tt>vector.scatter</tt>.
-scatter :: MonadBlockBuilder m => Value -> [Value] -> Value -> Value -> Value -> m ()
+scatter :: () => MonadBlockBuilder m => Value -> [Value] -> Value -> Value -> Value -> m ()
 
 -- | A pattern for <tt>vector.shape_cast</tt>.
-pattern ShapeCast :: Location -> Type -> operand -> AbstractOperation operand
+pattern ShapeCast :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>vector.shape_cast</tt>.
-shape_cast :: MonadBlockBuilder m => Type -> Value -> m Value
+shape_cast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>vector.shuffle</tt>.
-pattern Shuffle :: Location -> Type -> operand -> operand -> [Int] -> AbstractOperation operand
+pattern Shuffle :: () => () => Location -> Type -> operand -> operand -> [Int] -> AbstractOperation operand
 
 -- | A builder for <tt>vector.shuffle</tt>.
-shuffle :: MonadBlockBuilder m => Type -> Value -> Value -> [Int] -> m Value
+shuffle :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Int] -> m Value
 
 -- | A builder for <tt>vector.store</tt>.
-store :: MonadBlockBuilder m => Value -> Value -> [Value] -> m ()
+store :: () => MonadBlockBuilder m => Value -> Value -> [Value] -> m ()
 
 -- | A builder for <tt>vector.transfer_read</tt>.
-transfer_read :: MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Maybe Value -> Map -> m Value
+transfer_read :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Maybe Value -> Map -> m Value
 
 -- | A builder for <tt>vector.transfer_write</tt>.
-transfer_write :: MonadBlockBuilder m => Maybe Type -> Value -> Value -> [Value] -> Maybe Value -> Map -> m Value
+transfer_write :: () => MonadBlockBuilder m => Maybe Type -> Value -> Value -> [Value] -> Maybe Value -> Map -> m Value
 
 -- | A pattern for <tt>vector.transpose</tt>.
-pattern Transpose :: Location -> Type -> operand -> [Int] -> AbstractOperation operand
+pattern Transpose :: () => () => Location -> Type -> operand -> [Int] -> AbstractOperation operand
 
 -- | A builder for <tt>vector.transpose</tt>.
-transpose :: MonadBlockBuilder m => Type -> Value -> [Int] -> m Value
+transpose :: () => MonadBlockBuilder m => Type -> Value -> [Int] -> m Value
 
 -- | A pattern for <tt>vector.type_cast</tt>.
-pattern TypeCast :: Location -> Type -> operand -> AbstractOperation operand
+pattern TypeCast :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>vector.type_cast</tt>.
-type_cast :: MonadBlockBuilder m => Type -> Value -> m Value
+type_cast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 module MLIR.AST.Dialect.Tensor
 
 -- | A pattern for <tt>tensor.cast</tt>.
-pattern Cast :: Location -> Type -> operand -> AbstractOperation operand
+pattern Cast :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>tensor.cast</tt>.
-cast :: MonadBlockBuilder m => Type -> Value -> m Value
+cast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>tensor.dim</tt>.
-pattern Dim :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Dim :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>tensor.dim</tt>.
-dim :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+dim :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A builder for <tt>tensor.extract</tt>.
-extract :: MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
+extract :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
 
 -- | A builder for <tt>tensor.extract_slice</tt>.
-extract_slice :: MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Value] -> [Int] -> [Int] -> [Int] -> m Value
+extract_slice :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Value] -> [Int] -> [Int] -> [Int] -> m Value
 
 -- | A pattern for <tt>tensor.from_elements</tt>.
-pattern FromElements :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern FromElements :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>tensor.from_elements</tt>.
-from_elements :: MonadBlockBuilder m => Type -> [Value] -> m Value
+from_elements :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A builder for <tt>tensor.generate</tt>.
-generate :: MonadBlockBuilder m => Type -> [Value] -> RegionBuilderT m () -> m Value
+generate :: () => MonadBlockBuilder m => Type -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>tensor.insert</tt>.
-insert :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Value
+insert :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Value
 
 -- | A builder for <tt>tensor.insert_slice</tt>.
-insert_slice :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> [Value] -> [Value] -> [Int] -> [Int] -> [Int] -> m Value
+insert_slice :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> [Value] -> [Value] -> [Int] -> [Int] -> [Int] -> m Value
 
 -- | A pattern for <tt>tensor.reshape</tt>.
-pattern Reshape :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Reshape :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>tensor.reshape</tt>.
-reshape :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+reshape :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>tensor.yield</tt>.
-pattern Yield :: Location -> operand -> AbstractOperation operand
+pattern Yield :: () => () => Location -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>tensor.yield</tt>.
-yield :: MonadBlockBuilder m => Value -> m EndOfBlock
+yield :: () => MonadBlockBuilder m => Value -> m EndOfBlock
 
 module MLIR.AST.Dialect.Std
 pattern Branch :: Location -> BlockName -> [Name] -> Operation
@@ -784,365 +789,371 @@ br :: MonadBlockBuilder m => BlockName -> [Value] -> m EndOfBlock
 cond_br :: MonadBlockBuilder m => Value -> BlockName -> [Value] -> BlockName -> [Value] -> m EndOfBlock
 
 -- | A pattern for <tt>std.assert</tt>.
-pattern Assert :: Location -> operand -> ByteString -> AbstractOperation operand
+pattern Assert :: () => () => Location -> operand -> ByteString -> AbstractOperation operand
 
 -- | A builder for <tt>std.assert</tt>.
-assert :: MonadBlockBuilder m => Value -> ByteString -> m ()
+assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 -- | A pattern for <tt>std.atomic_yield</tt>.
-pattern AtomicYield :: Location -> operand -> AbstractOperation operand
+pattern AtomicYield :: () => () => Location -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.atomic_yield</tt>.
-atomic_yield :: MonadBlockBuilder m => Value -> m EndOfBlock
+atomic_yield :: () => MonadBlockBuilder m => Value -> m EndOfBlock
 
 -- | A builder for <tt>std.call_indirect</tt>.
-call_indirect :: MonadBlockBuilder m => [Type] -> Value -> [Value] -> m Value
+call_indirect :: () => MonadBlockBuilder m => [Type] -> Value -> [Value] -> m Value
 
 -- | A pattern for <tt>std.constant</tt>.
-pattern Constant :: Location -> Type -> Attribute -> AbstractOperation operand
+pattern Constant :: () => () => Location -> Type -> Attribute -> AbstractOperation operand
 
 -- | A builder for <tt>std.constant</tt>.
-constant :: MonadBlockBuilder m => Type -> Attribute -> m Value
+constant :: () => MonadBlockBuilder m => Type -> Attribute -> m Value
 
 -- | A builder for <tt>std.generic_atomic_rmw</tt>.
-generic_atomic_rmw :: MonadBlockBuilder m => Type -> Value -> [Value] -> RegionBuilderT m () -> m Value
+generic_atomic_rmw :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>std.maxf</tt>.
-pattern MaxF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MaxF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.maxf</tt>.
-maxf :: MonadBlockBuilder m => Value -> Value -> m Value
+maxf :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>std.maxsi</tt>.
-pattern MaxSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MaxSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.maxsi</tt>.
-maxsi :: MonadBlockBuilder m => Value -> Value -> m Value
+maxsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>std.maxui</tt>.
-pattern MaxUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MaxUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.maxui</tt>.
-maxui :: MonadBlockBuilder m => Value -> Value -> m Value
+maxui :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>std.minf</tt>.
-pattern MinF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MinF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.minf</tt>.
-minf :: MonadBlockBuilder m => Value -> Value -> m Value
+minf :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>std.minsi</tt>.
-pattern MinSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MinSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.minsi</tt>.
-minsi :: MonadBlockBuilder m => Value -> Value -> m Value
+minsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>std.minui</tt>.
-pattern MinUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MinUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.minui</tt>.
-minui :: MonadBlockBuilder m => Value -> Value -> m Value
+minui :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>std.rank</tt>.
-pattern Rank :: Location -> Type -> operand -> AbstractOperation operand
+pattern Rank :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.rank</tt>.
-rank :: MonadBlockBuilder m => Type -> Value -> m Value
+rank :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>std.return</tt>.
-pattern Return :: Location -> [operand] -> AbstractOperation operand
+pattern Return :: () => () => Location -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>std.return</tt>.
-return :: MonadBlockBuilder m => [Value] -> m EndOfBlock
+return :: () => MonadBlockBuilder m => [Value] -> m EndOfBlock
 
 -- | A pattern for <tt>std.select</tt>.
-pattern Select :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern Select :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.select</tt>.
-select :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+select :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>std.splat</tt>.
-pattern Splat :: Location -> Type -> operand -> AbstractOperation operand
+pattern Splat :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>std.splat</tt>.
-splat :: MonadBlockBuilder m => Type -> Value -> m Value
+splat :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 module MLIR.AST.Dialect.Shape
 
 -- | A pattern for <tt>shape.add</tt>.
-pattern Add :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Add :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.add</tt>.
-add :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+add :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>shape.any</tt>.
-pattern Any :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern Any :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>shape.any</tt>.
-any :: MonadBlockBuilder m => Type -> [Value] -> m Value
+any :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A pattern for <tt>shape.assuming_all</tt>.
-pattern AssumingAll :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern AssumingAll :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>shape.assuming_all</tt>.
-assuming_all :: MonadBlockBuilder m => Type -> [Value] -> m Value
+assuming_all :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A builder for <tt>shape.assuming</tt>.
-assuming :: MonadBlockBuilder m => [Type] -> Value -> RegionBuilderT m () -> m Value
+assuming :: () => MonadBlockBuilder m => [Type] -> Value -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>shape.assuming_yield</tt>.
-pattern AssumingYield :: Location -> [operand] -> AbstractOperation operand
+pattern AssumingYield :: () => () => Location -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>shape.assuming_yield</tt>.
-assuming_yield :: MonadBlockBuilder m => [Value] -> m EndOfBlock
+assuming_yield :: () => MonadBlockBuilder m => [Value] -> m EndOfBlock
 
 -- | A pattern for <tt>shape.broadcast</tt>.
-pattern Broadcast :: Location -> Type -> [operand] -> Maybe ByteString -> AbstractOperation operand
+pattern Broadcast :: () => () => Location -> Type -> [operand] -> Maybe ByteString -> AbstractOperation operand
 
 -- | A builder for <tt>shape.broadcast</tt>.
-broadcast :: MonadBlockBuilder m => Type -> [Value] -> Maybe ByteString -> m Value
+broadcast :: () => MonadBlockBuilder m => Type -> [Value] -> Maybe ByteString -> m Value
 
 -- | A pattern for <tt>shape.concat</tt>.
-pattern Concat :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Concat :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.concat</tt>.
-concat :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+concat :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>shape.const_size</tt>.
-pattern ConstSize :: Location -> Type -> Int -> AbstractOperation operand
+pattern ConstSize :: () => () => Location -> Type -> Int -> AbstractOperation operand
 
 -- | A builder for <tt>shape.const_size</tt>.
-const_size :: MonadBlockBuilder m => Type -> Int -> m Value
+const_size :: () => MonadBlockBuilder m => Type -> Int -> m Value
 
 -- | A pattern for <tt>shape.const_witness</tt>.
-pattern ConstWitness :: Location -> Type -> Bool -> AbstractOperation operand
+pattern ConstWitness :: () => () => Location -> Type -> Bool -> AbstractOperation operand
 
 -- | A builder for <tt>shape.const_witness</tt>.
-const_witness :: MonadBlockBuilder m => Type -> Bool -> m Value
+const_witness :: () => MonadBlockBuilder m => Type -> Bool -> m Value
 
 -- | A pattern for <tt>shape.cstr_broadcastable</tt>.
-pattern CstrBroadcastable :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern CstrBroadcastable :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>shape.cstr_broadcastable</tt>.
-cstr_broadcastable :: MonadBlockBuilder m => Type -> [Value] -> m Value
+cstr_broadcastable :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A pattern for <tt>shape.cstr_eq</tt>.
-pattern CstrEq :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern CstrEq :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>shape.cstr_eq</tt>.
-cstr_eq :: MonadBlockBuilder m => Type -> [Value] -> m Value
+cstr_eq :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A pattern for <tt>shape.cstr_require</tt>.
-pattern CstrRequire :: Location -> Type -> operand -> ByteString -> AbstractOperation operand
+pattern CstrRequire :: () => () => Location -> Type -> operand -> ByteString -> AbstractOperation operand
 
 -- | A builder for <tt>shape.cstr_require</tt>.
-cstr_require :: MonadBlockBuilder m => Type -> Value -> ByteString -> m Value
+cstr_require :: () => MonadBlockBuilder m => Type -> Value -> ByteString -> m Value
 
 -- | A pattern for <tt>shape.debug_print</tt>.
-pattern DebugPrint :: Location -> Type -> operand -> AbstractOperation operand
+pattern DebugPrint :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.debug_print</tt>.
-debug_print :: MonadBlockBuilder m => Type -> Value -> m Value
+debug_print :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>shape.div</tt>.
-pattern Div :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Div :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.div</tt>.
-div :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+div :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>shape.from_extent_tensor</tt>.
-pattern FromExtentTensor :: Location -> Type -> operand -> AbstractOperation operand
+pattern FromExtentTensor :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.from_extent_tensor</tt>.
-from_extent_tensor :: MonadBlockBuilder m => Type -> Value -> m Value
+from_extent_tensor :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>shape.from_extents</tt>.
-pattern FromExtents :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern FromExtents :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>shape.from_extents</tt>.
-from_extents :: MonadBlockBuilder m => Type -> [Value] -> m Value
+from_extents :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A builder for <tt>shape.function_library</tt>.
-function_library :: MonadBlockBuilder m => Map Name Attribute -> RegionBuilderT m () -> m ()
+function_library :: () => MonadBlockBuilder m => Map Name Attribute -> RegionBuilderT m () -> m ()
 
 -- | A pattern for <tt>shape.get_extent</tt>.
-pattern GetExtent :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern GetExtent :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.get_extent</tt>.
-get_extent :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+get_extent :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>shape.index_to_size</tt>.
-pattern IndexToSize :: Location -> Type -> operand -> AbstractOperation operand
+pattern IndexToSize :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.index_to_size</tt>.
-index_to_size :: MonadBlockBuilder m => Type -> Value -> m Value
+index_to_size :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>shape.is_broadcastable</tt>.
-pattern IsBroadcastable :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern IsBroadcastable :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>shape.is_broadcastable</tt>.
-is_broadcastable :: MonadBlockBuilder m => Type -> [Value] -> m Value
+is_broadcastable :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A pattern for <tt>shape.max</tt>.
-pattern Max :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Max :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.max</tt>.
-max :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+max :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>shape.meet</tt>.
-pattern Meet :: Location -> Type -> operand -> operand -> Maybe ByteString -> AbstractOperation operand
+pattern Meet :: () => () => Location -> Type -> operand -> operand -> Maybe ByteString -> AbstractOperation operand
 
 -- | A builder for <tt>shape.meet</tt>.
-meet :: MonadBlockBuilder m => Type -> Value -> Value -> Maybe ByteString -> m Value
+meet :: () => MonadBlockBuilder m => Type -> Value -> Value -> Maybe ByteString -> m Value
 
 -- | A pattern for <tt>shape.min</tt>.
-pattern Min :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Min :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.min</tt>.
-min :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+min :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>shape.mul</tt>.
-pattern Mul :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Mul :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.mul</tt>.
-mul :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+mul :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>shape.num_elements</tt>.
-pattern NumElements :: Location -> Type -> operand -> AbstractOperation operand
+pattern NumElements :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.num_elements</tt>.
-num_elements :: MonadBlockBuilder m => Type -> Value -> m Value
+num_elements :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>shape.rank</tt>.
-pattern Rank :: Location -> Type -> operand -> AbstractOperation operand
+pattern Rank :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.rank</tt>.
-rank :: MonadBlockBuilder m => Type -> Value -> m Value
+rank :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>shape.reduce</tt>.
-reduce :: MonadBlockBuilder m => [Type] -> Value -> [Value] -> RegionBuilderT m () -> m Value
+reduce :: () => MonadBlockBuilder m => [Type] -> Value -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>shape.shape_eq</tt>.
-pattern ShapeEq :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern ShapeEq :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>shape.shape_eq</tt>.
-shape_eq :: MonadBlockBuilder m => Type -> [Value] -> m Value
+shape_eq :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A pattern for <tt>shape.shape_of</tt>.
-pattern ShapeOf :: Location -> Type -> operand -> AbstractOperation operand
+pattern ShapeOf :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.shape_of</tt>.
-shape_of :: MonadBlockBuilder m => Type -> Value -> m Value
+shape_of :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>shape.size_to_index</tt>.
-pattern SizeToIndex :: Location -> Type -> operand -> AbstractOperation operand
+pattern SizeToIndex :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.size_to_index</tt>.
-size_to_index :: MonadBlockBuilder m => Type -> Value -> m Value
+size_to_index :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>shape.split_at</tt>.
-pattern SplitAt :: Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
+pattern SplitAt :: () => () => Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.split_at</tt>.
-split_at :: MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
+split_at :: () => MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
 
 -- | A pattern for <tt>shape.to_extent_tensor</tt>.
-pattern ToExtentTensor :: Location -> Type -> operand -> AbstractOperation operand
+pattern ToExtentTensor :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.to_extent_tensor</tt>.
-to_extent_tensor :: MonadBlockBuilder m => Type -> Value -> m Value
+to_extent_tensor :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>shape.with_shape</tt>.
-pattern With :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern With :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>shape.with_shape</tt>.
-with_shape :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+with_shape :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>shape.yield</tt>.
-pattern Yield :: Location -> [operand] -> AbstractOperation operand
+pattern Yield :: () => () => Location -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>shape.yield</tt>.
-yield :: MonadBlockBuilder m => [Value] -> m EndOfBlock
+yield :: () => MonadBlockBuilder m => [Value] -> m EndOfBlock
 
 module MLIR.AST.Dialect.Linalg
 
+-- | A pattern for <tt>linalg.index</tt>.
+pattern Linalg_Index :: () => () => Location -> Type -> Int -> AbstractOperation operand
+
+-- | A builder for <tt>linalg.index</tt>.
+index :: () => MonadBlockBuilder m => Type -> Int -> m Value
+
 -- | A pattern for <tt>linalg.init_tensor</tt>.
-pattern Linalg_InitTensor :: Location -> Type -> [operand] -> [Int] -> AbstractOperation operand
+pattern Linalg_InitTensor :: () => () => Location -> Type -> [operand] -> [Int] -> AbstractOperation operand
 
 -- | A builder for <tt>linalg.init_tensor</tt>.
-init_tensor :: MonadBlockBuilder m => Type -> [Value] -> [Int] -> m Value
+init_tensor :: () => MonadBlockBuilder m => Type -> [Value] -> [Int] -> m Value
 
 -- | A builder for <tt>linalg.pad_tensor</tt>.
-pad_tensor :: MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Int] -> [Int] -> RegionBuilderT m () -> m Value
+pad_tensor :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Int] -> [Int] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>linalg.range</tt>.
-pattern Linalg_Range :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern Linalg_Range :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>linalg.range</tt>.
-range :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+range :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A builder for <tt>linalg.tiled_loop</tt>.
-tiled_loop :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Value] -> [Value] -> [Value] -> [Attribute] -> Maybe [Attribute] -> RegionBuilderT m () -> m Value
+tiled_loop :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Value] -> [Value] -> [Value] -> [Attribute] -> Maybe [Attribute] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>linalg.yield</tt>.
-pattern Linalg_Yield :: Location -> [operand] -> AbstractOperation operand
+pattern Linalg_Yield :: () => () => Location -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>linalg.yield</tt>.
-yield :: MonadBlockBuilder m => [Value] -> m EndOfBlock
+yield :: () => MonadBlockBuilder m => [Value] -> m EndOfBlock
 
 -- | A builder for <tt>linalg.batch_matmul</tt>.
-batch_matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+batch_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.batch_matvec</tt>.
-batch_matvec :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+batch_matvec :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.conv_1d</tt>.
-conv_1d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+conv_1d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.conv_2d</tt>.
-conv_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+conv_2d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.conv_3d</tt>.
-conv_3d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+conv_3d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.copy</tt>.
-copy :: MonadBlockBuilder m => Value -> Value -> Maybe Map -> Maybe Map -> RegionBuilderT m () -> m ()
+copy :: () => MonadBlockBuilder m => Value -> Value -> Maybe Map -> Maybe Map -> RegionBuilderT m () -> m ()
 
 -- | A builder for <tt>linalg.dot</tt>.
-dot :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+dot :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.fill</tt>.
-fill :: MonadBlockBuilder m => Maybe Type -> Value -> Value -> RegionBuilderT m () -> m Value
+fill :: () => MonadBlockBuilder m => Maybe Type -> Value -> Value -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.fill_rng_2d</tt>.
-fill_rng_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+fill_rng_2d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.generic</tt>.
-generic :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> [Attribute] -> Maybe ByteString -> Maybe ByteString -> RegionBuilderT m () -> m Value
+generic :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> [Attribute] -> Maybe ByteString -> Maybe ByteString -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matmul</tt>.
-matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matmul_unsigned</tt>.
-matmul_unsigned :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+matmul_unsigned :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matvec</tt>.
-matvec :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+matvec :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.mmt4d</tt>.
-mmt4d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+mmt4d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.quantized_batch_matmul</tt>.
-quantized_batch_matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+quantized_batch_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.quantized_matmul</tt>.
-quantized_matmul :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+quantized_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.soft_plus_2d</tt>.
-soft_plus_2d :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+soft_plus_2d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.vecmat</tt>.
-vecmat :: MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+vecmat :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 module MLIR.AST.Dialect.LLVM
 data Type
@@ -1156,865 +1167,865 @@ pattern Void :: Type
 pattern LiteralStruct :: [Type] -> Type
 
 -- | A pattern for <tt>llvm.ashr</tt>.
-pattern AShr :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern AShr :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.ashr</tt>.
-ashr :: MonadBlockBuilder m => Value -> Value -> m Value
+ashr :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.add</tt>.
-pattern Add :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Add :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.add</tt>.
-add :: MonadBlockBuilder m => Value -> Value -> m Value
+add :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.addrspacecast</tt>.
-pattern AddrSpaceCast :: Location -> Type -> operand -> AbstractOperation operand
+pattern AddrSpaceCast :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.addrspacecast</tt>.
-addrspacecast :: MonadBlockBuilder m => Type -> Value -> m Value
+addrspacecast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.alloca</tt>.
-pattern Alloca :: Location -> Type -> operand -> AbstractOperation operand
+pattern Alloca :: () => () => Location -> Type -> operand -> Maybe Int -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.alloca</tt>.
-alloca :: MonadBlockBuilder m => Type -> Value -> m Value
+alloca :: () => MonadBlockBuilder m => Type -> Value -> Maybe Int -> m Value
 
 -- | A pattern for <tt>llvm.and</tt>.
-pattern And :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern And :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.and</tt>.
-and :: MonadBlockBuilder m => Value -> Value -> m Value
+and :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.assume</tt>.
-pattern Assume :: Location -> operand -> AbstractOperation operand
+pattern Assume :: () => () => Location -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.assume</tt>.
-intr_assume :: MonadBlockBuilder m => Value -> m ()
+intr_assume :: () => MonadBlockBuilder m => Value -> m ()
 
 -- | A pattern for <tt>llvm.intr.bitreverse</tt>.
-pattern BitReverse :: Location -> Type -> operand -> AbstractOperation operand
+pattern BitReverse :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.bitreverse</tt>.
-intr_bitreverse :: MonadBlockBuilder m => Value -> m Value
+intr_bitreverse :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.bitcast</tt>.
-pattern Bitcast :: Location -> Type -> operand -> AbstractOperation operand
+pattern Bitcast :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.bitcast</tt>.
-bitcast :: MonadBlockBuilder m => Type -> Value -> m Value
+bitcast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.call</tt>.
-call :: MonadBlockBuilder m => [Type] -> [Value] -> m Value
+call :: () => MonadBlockBuilder m => [Type] -> [Value] -> m Value
 
 -- | A pattern for <tt>llvm.mlir.constant</tt>.
-pattern Constant :: Location -> Type -> Attribute -> AbstractOperation operand
+pattern Constant :: () => () => Location -> Type -> Attribute -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.mlir.constant</tt>.
-mlir_constant :: MonadBlockBuilder m => Type -> Attribute -> m Value
+mlir_constant :: () => MonadBlockBuilder m => Type -> Attribute -> m Value
 
 -- | A pattern for <tt>llvm.intr.copysign</tt>.
-pattern CopySign :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern CopySign :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.copysign</tt>.
-intr_copysign :: MonadBlockBuilder m => Value -> Value -> m Value
+intr_copysign :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.coro.begin</tt>.
-pattern CoroBegin :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern CoroBegin :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.coro.begin</tt>.
-intr_coro_begin :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_coro_begin :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.coro.end</tt>.
-pattern CoroEnd :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern CoroEnd :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.coro.end</tt>.
-intr_coro_end :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_coro_end :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.coro.free</tt>.
-pattern CoroFree :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern CoroFree :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.coro.free</tt>.
-intr_coro_free :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_coro_free :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.coro.id</tt>.
-pattern CoroId :: Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern CoroId :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.coro.id</tt>.
-intr_coro_id :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+intr_coro_id :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.coro.resume</tt>.
-pattern CoroResume :: Location -> operand -> AbstractOperation operand
+pattern CoroResume :: () => () => Location -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.coro.resume</tt>.
-intr_coro_resume :: MonadBlockBuilder m => Value -> m ()
+intr_coro_resume :: () => MonadBlockBuilder m => Value -> m ()
 
 -- | A pattern for <tt>llvm.intr.coro.save</tt>.
-pattern CoroSave :: Location -> Type -> operand -> AbstractOperation operand
+pattern CoroSave :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.coro.save</tt>.
-intr_coro_save :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_coro_save :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.coro.size</tt>.
-pattern CoroSize :: Location -> Type -> AbstractOperation operand
+pattern CoroSize :: () => () => Location -> Type -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.coro.size</tt>.
-intr_coro_size :: MonadBlockBuilder m => Type -> m Value
+intr_coro_size :: () => MonadBlockBuilder m => Type -> m Value
 
 -- | A pattern for <tt>llvm.intr.coro.suspend</tt>.
-pattern CoroSuspend :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern CoroSuspend :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.coro.suspend</tt>.
-intr_coro_suspend :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_coro_suspend :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.cos</tt>.
-pattern Cos :: Location -> Type -> operand -> AbstractOperation operand
+pattern Cos :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.cos</tt>.
-intr_cos :: MonadBlockBuilder m => Value -> m Value
+intr_cos :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.ctpop</tt>.
-pattern CtPop :: Location -> Type -> operand -> AbstractOperation operand
+pattern CtPop :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.ctpop</tt>.
-intr_ctpop :: MonadBlockBuilder m => Value -> m Value
+intr_ctpop :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.exp2</tt>.
-pattern Exp2 :: Location -> Type -> operand -> AbstractOperation operand
+pattern Exp2 :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.exp2</tt>.
-intr_exp2 :: MonadBlockBuilder m => Value -> m Value
+intr_exp2 :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.exp</tt>.
-pattern Exp :: Location -> Type -> operand -> AbstractOperation operand
+pattern Exp :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.exp</tt>.
-intr_exp :: MonadBlockBuilder m => Value -> m Value
+intr_exp :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.extractelement</tt>.
-pattern ExtractElement :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern ExtractElement :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.extractelement</tt>.
-extractelement :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+extractelement :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.extractvalue</tt>.
-pattern ExtractValue :: Location -> Type -> operand -> [Attribute] -> AbstractOperation operand
+pattern ExtractValue :: () => () => Location -> Type -> operand -> [Attribute] -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.extractvalue</tt>.
-extractvalue :: MonadBlockBuilder m => Type -> Value -> [Attribute] -> m Value
+extractvalue :: () => MonadBlockBuilder m => Type -> Value -> [Attribute] -> m Value
 
 -- | A pattern for <tt>llvm.intr.fabs</tt>.
-pattern FAbs :: Location -> Type -> operand -> AbstractOperation operand
+pattern FAbs :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.fabs</tt>.
-intr_fabs :: MonadBlockBuilder m => Value -> m Value
+intr_fabs :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.fadd</tt>.
-pattern FAdd :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern FAdd :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.fadd</tt>.
-fadd :: MonadBlockBuilder m => Value -> Value -> m Value
+fadd :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.ceil</tt>.
-pattern FCeil :: Location -> Type -> operand -> AbstractOperation operand
+pattern FCeil :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.ceil</tt>.
-intr_ceil :: MonadBlockBuilder m => Value -> m Value
+intr_ceil :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.fdiv</tt>.
-pattern FDiv :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern FDiv :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.fdiv</tt>.
-fdiv :: MonadBlockBuilder m => Value -> Value -> m Value
+fdiv :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.floor</tt>.
-pattern FFloor :: Location -> Type -> operand -> AbstractOperation operand
+pattern FFloor :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.floor</tt>.
-intr_floor :: MonadBlockBuilder m => Value -> m Value
+intr_floor :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.fma</tt>.
-pattern FMA :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern FMA :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.fma</tt>.
-intr_fma :: MonadBlockBuilder m => Value -> Value -> Value -> m Value
+intr_fma :: () => MonadBlockBuilder m => Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.fmuladd</tt>.
-pattern FMulAdd :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern FMulAdd :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.fmuladd</tt>.
-intr_fmuladd :: MonadBlockBuilder m => Value -> Value -> Value -> m Value
+intr_fmuladd :: () => MonadBlockBuilder m => Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.fmul</tt>.
-pattern FMul :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern FMul :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.fmul</tt>.
-fmul :: MonadBlockBuilder m => Value -> Value -> m Value
+fmul :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.fneg</tt>.
-pattern FNeg :: Location -> Type -> operand -> AbstractOperation operand
+pattern FNeg :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.fneg</tt>.
-fneg :: MonadBlockBuilder m => Value -> m Value
+fneg :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.fpext</tt>.
-pattern FPExt :: Location -> Type -> operand -> AbstractOperation operand
+pattern FPExt :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.fpext</tt>.
-fpext :: MonadBlockBuilder m => Type -> Value -> m Value
+fpext :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.fptosi</tt>.
-pattern FPToSI :: Location -> Type -> operand -> AbstractOperation operand
+pattern FPToSI :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.fptosi</tt>.
-fptosi :: MonadBlockBuilder m => Type -> Value -> m Value
+fptosi :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.fptoui</tt>.
-pattern FPToUI :: Location -> Type -> operand -> AbstractOperation operand
+pattern FPToUI :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.fptoui</tt>.
-fptoui :: MonadBlockBuilder m => Type -> Value -> m Value
+fptoui :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.fptrunc</tt>.
-pattern FPTrunc :: Location -> Type -> operand -> AbstractOperation operand
+pattern FPTrunc :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.fptrunc</tt>.
-fptrunc :: MonadBlockBuilder m => Type -> Value -> m Value
+fptrunc :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.frem</tt>.
-pattern FRem :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern FRem :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.frem</tt>.
-frem :: MonadBlockBuilder m => Value -> Value -> m Value
+frem :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.fsub</tt>.
-pattern FSub :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern FSub :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.fsub</tt>.
-fsub :: MonadBlockBuilder m => Value -> Value -> m Value
+fsub :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.freeze</tt>.
-pattern Freeze :: Location -> Type -> operand -> AbstractOperation operand
+pattern Freeze :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.freeze</tt>.
-freeze :: MonadBlockBuilder m => Value -> m Value
+freeze :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A builder for <tt>llvm.getelementptr</tt>.
-getelementptr :: MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
+getelementptr :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
 
 -- | A pattern for <tt>llvm.intr.get.active.lane.mask</tt>.
-pattern GetActiveLaneMask :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern GetActiveLaneMask :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.get.active.lane.mask</tt>.
-intr_get_active_lane_mask :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_get_active_lane_mask :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A builder for <tt>llvm.inline_asm</tt>.
-inline_asm :: MonadBlockBuilder m => Maybe Type -> [Value] -> ByteString -> ByteString -> m Value
+inline_asm :: () => MonadBlockBuilder m => Maybe Type -> [Value] -> ByteString -> ByteString -> m Value
 
 -- | A pattern for <tt>llvm.insertelement</tt>.
-pattern InsertElement :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern InsertElement :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.insertelement</tt>.
-insertelement :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+insertelement :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.insertvalue</tt>.
-pattern InsertValue :: Location -> Type -> operand -> operand -> [Attribute] -> AbstractOperation operand
+pattern InsertValue :: () => () => Location -> Type -> operand -> operand -> [Attribute] -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.insertvalue</tt>.
-insertvalue :: MonadBlockBuilder m => Type -> Value -> Value -> [Attribute] -> m Value
+insertvalue :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Attribute] -> m Value
 
 -- | A pattern for <tt>llvm.inttoptr</tt>.
-pattern IntToPtr :: Location -> Type -> operand -> AbstractOperation operand
+pattern IntToPtr :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.inttoptr</tt>.
-inttoptr :: MonadBlockBuilder m => Type -> Value -> m Value
+inttoptr :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.func</tt>.
-func :: MonadBlockBuilder m => Maybe [Attribute] -> RegionBuilderT m () -> m ()
+func :: () => MonadBlockBuilder m => Maybe [Attribute] -> RegionBuilderT m () -> m ()
 
 -- | A pattern for <tt>llvm.lshr</tt>.
-pattern LShr :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern LShr :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.lshr</tt>.
-lshr :: MonadBlockBuilder m => Value -> Value -> m Value
+lshr :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.landingpad</tt>.
-pattern Landingpad :: Location -> Type -> [operand] -> AbstractOperation operand
+pattern Landingpad :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.landingpad</tt>.
-landingpad :: MonadBlockBuilder m => Type -> [Value] -> m Value
+landingpad :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A pattern for <tt>llvm.load</tt>.
-pattern Load :: Location -> Type -> operand -> AbstractOperation operand
+pattern Load :: () => () => Location -> Type -> operand -> Maybe Int -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.load</tt>.
-load :: MonadBlockBuilder m => Type -> Value -> m Value
+load :: () => MonadBlockBuilder m => Type -> Value -> Maybe Int -> m Value
 
 -- | A pattern for <tt>llvm.intr.log10</tt>.
-pattern Log10 :: Location -> Type -> operand -> AbstractOperation operand
+pattern Log10 :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.log10</tt>.
-intr_log10 :: MonadBlockBuilder m => Value -> m Value
+intr_log10 :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.log2</tt>.
-pattern Log2 :: Location -> Type -> operand -> AbstractOperation operand
+pattern Log2 :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.log2</tt>.
-intr_log2 :: MonadBlockBuilder m => Value -> m Value
+intr_log2 :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.log</tt>.
-pattern Log :: Location -> Type -> operand -> AbstractOperation operand
+pattern Log :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.log</tt>.
-intr_log :: MonadBlockBuilder m => Value -> m Value
+intr_log :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A builder for <tt>llvm.intr.masked.load</tt>.
-intr_masked_load :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> Int -> m Value
+intr_masked_load :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> Int -> m Value
 
 -- | A pattern for <tt>llvm.intr.masked.store</tt>.
-pattern MaskedStore :: Location -> operand -> operand -> operand -> Int -> AbstractOperation operand
+pattern MaskedStore :: () => () => Location -> operand -> operand -> operand -> Int -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.masked.store</tt>.
-intr_masked_store :: MonadBlockBuilder m => Value -> Value -> Value -> Int -> m ()
+intr_masked_store :: () => MonadBlockBuilder m => Value -> Value -> Value -> Int -> m ()
 
 -- | A pattern for <tt>llvm.intr.matrix.multiply</tt>.
-pattern MatrixMultiply :: Location -> Type -> operand -> operand -> Int -> Int -> Int -> AbstractOperation operand
+pattern MatrixMultiply :: () => () => Location -> Type -> operand -> operand -> Int -> Int -> Int -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.matrix.multiply</tt>.
-intr_matrix_multiply :: MonadBlockBuilder m => Type -> Value -> Value -> Int -> Int -> Int -> m Value
+intr_matrix_multiply :: () => MonadBlockBuilder m => Type -> Value -> Value -> Int -> Int -> Int -> m Value
 
 -- | A pattern for <tt>llvm.intr.matrix.transpose</tt>.
-pattern MatrixTranspose :: Location -> Type -> operand -> Int -> Int -> AbstractOperation operand
+pattern MatrixTranspose :: () => () => Location -> Type -> operand -> Int -> Int -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.matrix.transpose</tt>.
-intr_matrix_transpose :: MonadBlockBuilder m => Type -> Value -> Int -> Int -> m Value
+intr_matrix_transpose :: () => MonadBlockBuilder m => Type -> Value -> Int -> Int -> m Value
 
 -- | A pattern for <tt>llvm.intr.maxnum</tt>.
-pattern MaxNum :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MaxNum :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.maxnum</tt>.
-intr_maxnum :: MonadBlockBuilder m => Value -> Value -> m Value
+intr_maxnum :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.maximum</tt>.
-pattern Maximum :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Maximum :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.maximum</tt>.
-intr_maximum :: MonadBlockBuilder m => Value -> Value -> m Value
+intr_maximum :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.memcpy.inline</tt>.
-pattern MemcpyInline :: Location -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern MemcpyInline :: () => () => Location -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.memcpy.inline</tt>.
-intr_memcpy_inline :: MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
+intr_memcpy_inline :: () => MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
 
 -- | A pattern for <tt>llvm.intr.memcpy</tt>.
-pattern Memcpy :: Location -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern Memcpy :: () => () => Location -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.memcpy</tt>.
-intr_memcpy :: MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
+intr_memcpy :: () => MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
 
 -- | A pattern for <tt>llvm.intr.memset</tt>.
-pattern Memset :: Location -> operand -> operand -> operand -> operand -> AbstractOperation operand
+pattern Memset :: () => () => Location -> operand -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.memset</tt>.
-intr_memset :: MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
+intr_memset :: () => MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
 
 -- | A pattern for <tt>llvm.intr.minnum</tt>.
-pattern MinNum :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MinNum :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.minnum</tt>.
-intr_minnum :: MonadBlockBuilder m => Value -> Value -> m Value
+intr_minnum :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.minimum</tt>.
-pattern Minimum :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Minimum :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.minimum</tt>.
-intr_minimum :: MonadBlockBuilder m => Value -> Value -> m Value
+intr_minimum :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.mul</tt>.
-pattern Mul :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Mul :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.mul</tt>.
-mul :: MonadBlockBuilder m => Value -> Value -> m Value
+mul :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.mlir.null</tt>.
-pattern Null :: Location -> Type -> AbstractOperation operand
+pattern Null :: () => () => Location -> Type -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.mlir.null</tt>.
-mlir_null :: MonadBlockBuilder m => Type -> m Value
+mlir_null :: () => MonadBlockBuilder m => Type -> m Value
 
 -- | A pattern for <tt>llvm.or</tt>.
-pattern Or :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Or :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.or</tt>.
-or :: MonadBlockBuilder m => Value -> Value -> m Value
+or :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.pow</tt>.
-pattern Pow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Pow :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.pow</tt>.
-intr_pow :: MonadBlockBuilder m => Value -> Value -> m Value
+intr_pow :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.prefetch</tt>.
-intr_prefetch :: MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
+intr_prefetch :: () => MonadBlockBuilder m => Value -> Value -> Value -> Value -> m ()
 
 -- | A pattern for <tt>llvm.ptrtoint</tt>.
-pattern PtrToInt :: Location -> Type -> operand -> AbstractOperation operand
+pattern PtrToInt :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.ptrtoint</tt>.
-ptrtoint :: MonadBlockBuilder m => Type -> Value -> m Value
+ptrtoint :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.resume</tt>.
-pattern Resume :: Location -> operand -> AbstractOperation operand
+pattern Resume :: () => () => Location -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.resume</tt>.
-resume :: MonadBlockBuilder m => Value -> m EndOfBlock
+resume :: () => MonadBlockBuilder m => Value -> m EndOfBlock
 
 -- | A pattern for <tt>llvm.return</tt>.
-pattern Return :: Location -> [operand] -> AbstractOperation operand
+pattern Return :: () => () => Location -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.return</tt>.
-return :: MonadBlockBuilder m => [Value] -> m EndOfBlock
+return :: () => MonadBlockBuilder m => [Value] -> m EndOfBlock
 
 -- | A pattern for <tt>llvm.intr.sadd.with.overflow</tt>.
-pattern SAddWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern SAddWithOverflow :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.sadd.with.overflow</tt>.
-intr_sadd_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_sadd_with_overflow :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.sdiv</tt>.
-pattern SDiv :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern SDiv :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.sdiv</tt>.
-sdiv :: MonadBlockBuilder m => Value -> Value -> m Value
+sdiv :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.sext</tt>.
-pattern SExt :: Location -> Type -> operand -> AbstractOperation operand
+pattern SExt :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.sext</tt>.
-sext :: MonadBlockBuilder m => Type -> Value -> m Value
+sext :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.sitofp</tt>.
-pattern SIToFP :: Location -> Type -> operand -> AbstractOperation operand
+pattern SIToFP :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.sitofp</tt>.
-sitofp :: MonadBlockBuilder m => Type -> Value -> m Value
+sitofp :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.smax</tt>.
-pattern SMax :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern SMax :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.smax</tt>.
-intr_smax :: MonadBlockBuilder m => Value -> Value -> m Value
+intr_smax :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.smin</tt>.
-pattern SMin :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern SMin :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.smin</tt>.
-intr_smin :: MonadBlockBuilder m => Value -> Value -> m Value
+intr_smin :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.smul.with.overflow</tt>.
-pattern SMulWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern SMulWithOverflow :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.smul.with.overflow</tt>.
-intr_smul_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_smul_with_overflow :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.srem</tt>.
-pattern SRem :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern SRem :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.srem</tt>.
-srem :: MonadBlockBuilder m => Value -> Value -> m Value
+srem :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.ssub.with.overflow</tt>.
-pattern SSubWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern SSubWithOverflow :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.ssub.with.overflow</tt>.
-intr_ssub_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_ssub_with_overflow :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.select</tt>.
-pattern Select :: Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+pattern Select :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.select</tt>.
-select :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+select :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.shl</tt>.
-pattern Shl :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Shl :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.shl</tt>.
-shl :: MonadBlockBuilder m => Value -> Value -> m Value
+shl :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.shufflevector</tt>.
-pattern ShuffleVector :: Location -> Type -> operand -> operand -> [Attribute] -> AbstractOperation operand
+pattern ShuffleVector :: () => () => Location -> Type -> operand -> operand -> [Attribute] -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.shufflevector</tt>.
-shufflevector :: MonadBlockBuilder m => Type -> Value -> Value -> [Attribute] -> m Value
+shufflevector :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Attribute] -> m Value
 
 -- | A pattern for <tt>llvm.intr.sin</tt>.
-pattern Sin :: Location -> Type -> operand -> AbstractOperation operand
+pattern Sin :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.sin</tt>.
-intr_sin :: MonadBlockBuilder m => Value -> m Value
+intr_sin :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.sqrt</tt>.
-pattern Sqrt :: Location -> Type -> operand -> AbstractOperation operand
+pattern Sqrt :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.sqrt</tt>.
-intr_sqrt :: MonadBlockBuilder m => Value -> m Value
+intr_sqrt :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.stackrestore</tt>.
-pattern StackRestore :: Location -> operand -> AbstractOperation operand
+pattern StackRestore :: () => () => Location -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.stackrestore</tt>.
-intr_stackrestore :: MonadBlockBuilder m => Value -> m ()
+intr_stackrestore :: () => MonadBlockBuilder m => Value -> m ()
 
 -- | A pattern for <tt>llvm.intr.stacksave</tt>.
-pattern StackSave :: Location -> Type -> AbstractOperation operand
+pattern StackSave :: () => () => Location -> Type -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.stacksave</tt>.
-intr_stacksave :: MonadBlockBuilder m => Type -> m Value
+intr_stacksave :: () => MonadBlockBuilder m => Type -> m Value
 
 -- | A pattern for <tt>llvm.store</tt>.
-pattern Store :: Location -> operand -> operand -> AbstractOperation operand
+pattern Store :: () => () => Location -> operand -> operand -> Maybe Int -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.store</tt>.
-store :: MonadBlockBuilder m => Value -> Value -> m ()
+store :: () => MonadBlockBuilder m => Value -> Value -> Maybe Int -> m ()
 
 -- | A pattern for <tt>llvm.sub</tt>.
-pattern Sub :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern Sub :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.sub</tt>.
-sub :: MonadBlockBuilder m => Value -> Value -> m Value
+sub :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.trunc</tt>.
-pattern Trunc :: Location -> Type -> operand -> AbstractOperation operand
+pattern Trunc :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.trunc</tt>.
-trunc :: MonadBlockBuilder m => Type -> Value -> m Value
+trunc :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.uadd.with.overflow</tt>.
-pattern UAddWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern UAddWithOverflow :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.uadd.with.overflow</tt>.
-intr_uadd_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_uadd_with_overflow :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.udiv</tt>.
-pattern UDiv :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern UDiv :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.udiv</tt>.
-udiv :: MonadBlockBuilder m => Value -> Value -> m Value
+udiv :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.uitofp</tt>.
-pattern UIToFP :: Location -> Type -> operand -> AbstractOperation operand
+pattern UIToFP :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.uitofp</tt>.
-uitofp :: MonadBlockBuilder m => Type -> Value -> m Value
+uitofp :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.umul.with.overflow</tt>.
-pattern UMulWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern UMulWithOverflow :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.umul.with.overflow</tt>.
-intr_umul_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_umul_with_overflow :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.urem</tt>.
-pattern URem :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern URem :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.urem</tt>.
-urem :: MonadBlockBuilder m => Value -> Value -> m Value
+urem :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.intr.usub.with.overflow</tt>.
-pattern USubWithOverflow :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern USubWithOverflow :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.intr.usub.with.overflow</tt>.
-intr_usub_with_overflow :: MonadBlockBuilder m => Type -> Value -> Value -> m Value
+intr_usub_with_overflow :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.mlir.undef</tt>.
-pattern Undef :: Location -> Type -> AbstractOperation operand
+pattern Undef :: () => () => Location -> Type -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.mlir.undef</tt>.
-mlir_undef :: MonadBlockBuilder m => Type -> m Value
+mlir_undef :: () => MonadBlockBuilder m => Type -> m Value
 
 -- | A pattern for <tt>llvm.unreachable</tt>.
-pattern Unreachable :: Location -> AbstractOperation operand
+pattern Unreachable :: () => () => Location -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.unreachable</tt>.
-unreachable :: MonadBlockBuilder m => m EndOfBlock
+unreachable :: () => MonadBlockBuilder m => m EndOfBlock
 
 -- | A pattern for <tt>llvm.xor</tt>.
-pattern XOr :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern XOr :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.xor</tt>.
-xor :: MonadBlockBuilder m => Value -> Value -> m Value
+xor :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.zext</tt>.
-pattern ZExt :: Location -> Type -> operand -> AbstractOperation operand
+pattern ZExt :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.zext</tt>.
-zext :: MonadBlockBuilder m => Type -> Value -> m Value
+zext :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.masked.compressstore</tt>.
-intr_masked_compressstore :: MonadBlockBuilder m => Value -> Value -> Value -> m ()
+intr_masked_compressstore :: () => MonadBlockBuilder m => Value -> Value -> Value -> m ()
 
 -- | A builder for <tt>llvm.intr.masked.expandload</tt>.
-intr_masked_expandload :: MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+intr_masked_expandload :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.masked.gather</tt>.
-intr_masked_gather :: MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> Int -> m Value
+intr_masked_gather :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> Int -> m Value
 
 -- | A builder for <tt>llvm.intr.masked.scatter</tt>.
-intr_masked_scatter :: MonadBlockBuilder m => Value -> Value -> Value -> Int -> m ()
+intr_masked_scatter :: () => MonadBlockBuilder m => Value -> Value -> Value -> Int -> m ()
 
 -- | A builder for <tt>llvm.intr.vector.reduce.add</tt>.
-intr_vector_reduce_add :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_add :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.and</tt>.
-intr_vector_reduce_and :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_and :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.fadd</tt>.
-intr_vector_reduce_fadd :: MonadBlockBuilder m => Type -> Value -> Value -> Bool -> m Value
+intr_vector_reduce_fadd :: () => MonadBlockBuilder m => Type -> Value -> Value -> Bool -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.fmax</tt>.
-intr_vector_reduce_fmax :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_fmax :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.fmin</tt>.
-intr_vector_reduce_fmin :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_fmin :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.fmul</tt>.
-intr_vector_reduce_fmul :: MonadBlockBuilder m => Type -> Value -> Value -> Bool -> m Value
+intr_vector_reduce_fmul :: () => MonadBlockBuilder m => Type -> Value -> Value -> Bool -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.mul</tt>.
-intr_vector_reduce_mul :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_mul :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.or</tt>.
-intr_vector_reduce_or :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_or :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.smax</tt>.
-intr_vector_reduce_smax :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_smax :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.smin</tt>.
-intr_vector_reduce_smin :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_smin :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.umax</tt>.
-intr_vector_reduce_umax :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_umax :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.umin</tt>.
-intr_vector_reduce_umin :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_umin :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.intr.vector.reduce.xor</tt>.
-intr_vector_reduce_xor :: MonadBlockBuilder m => Type -> Value -> m Value
+intr_vector_reduce_xor :: () => MonadBlockBuilder m => Type -> Value -> m Value
 instance GHC.Classes.Eq MLIR.AST.Dialect.LLVM.Type
 instance MLIR.AST.Serialize.FromAST MLIR.AST.Dialect.LLVM.Type MLIR.Native.FFI.Type
 
 module MLIR.AST.Dialect.Arith
 
 -- | A pattern for <tt>arith.addf</tt>.
-pattern AddF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern AddF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.addf</tt>.
-addf :: MonadBlockBuilder m => Value -> Value -> m Value
+addf :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.addi</tt>.
-pattern AddI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern AddI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.addi</tt>.
-addi :: MonadBlockBuilder m => Value -> Value -> m Value
+addi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.andi</tt>.
-pattern AndI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern AndI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.andi</tt>.
-andi :: MonadBlockBuilder m => Value -> Value -> m Value
+andi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.bitcast</tt>.
-pattern Bitcast :: Location -> Type -> operand -> AbstractOperation operand
+pattern Bitcast :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.bitcast</tt>.
-bitcast :: MonadBlockBuilder m => Type -> Value -> m Value
+bitcast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.ceildivsi</tt>.
-pattern CeilDivSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern CeilDivSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.ceildivsi</tt>.
-ceildivsi :: MonadBlockBuilder m => Value -> Value -> m Value
+ceildivsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.constant</tt>.
-pattern Constant :: Location -> Type -> Attribute -> AbstractOperation operand
+pattern Constant :: () => () => Location -> Type -> Attribute -> AbstractOperation operand
 
 -- | A builder for <tt>arith.constant</tt>.
-constant :: MonadBlockBuilder m => Type -> Attribute -> m Value
+constant :: () => MonadBlockBuilder m => Type -> Attribute -> m Value
 
 -- | A pattern for <tt>arith.divf</tt>.
-pattern DivF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern DivF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.divf</tt>.
-divf :: MonadBlockBuilder m => Value -> Value -> m Value
+divf :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.divsi</tt>.
-pattern DivSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern DivSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.divsi</tt>.
-divsi :: MonadBlockBuilder m => Value -> Value -> m Value
+divsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.divui</tt>.
-pattern DivUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern DivUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.divui</tt>.
-divui :: MonadBlockBuilder m => Value -> Value -> m Value
+divui :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.extf</tt>.
-pattern ExtF :: Location -> Type -> operand -> AbstractOperation operand
+pattern ExtF :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.extf</tt>.
-extf :: MonadBlockBuilder m => Type -> Value -> m Value
+extf :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.extsi</tt>.
-pattern ExtSI :: Location -> Type -> operand -> AbstractOperation operand
+pattern ExtSI :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.extsi</tt>.
-extsi :: MonadBlockBuilder m => Type -> Value -> m Value
+extsi :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.extui</tt>.
-pattern ExtUI :: Location -> Type -> operand -> AbstractOperation operand
+pattern ExtUI :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.extui</tt>.
-extui :: MonadBlockBuilder m => Type -> Value -> m Value
+extui :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.fptosi</tt>.
-pattern FPToSI :: Location -> Type -> operand -> AbstractOperation operand
+pattern FPToSI :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.fptosi</tt>.
-fptosi :: MonadBlockBuilder m => Type -> Value -> m Value
+fptosi :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.fptoui</tt>.
-pattern FPToUI :: Location -> Type -> operand -> AbstractOperation operand
+pattern FPToUI :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.fptoui</tt>.
-fptoui :: MonadBlockBuilder m => Type -> Value -> m Value
+fptoui :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.floordivsi</tt>.
-pattern FloorDivSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern FloorDivSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.floordivsi</tt>.
-floordivsi :: MonadBlockBuilder m => Value -> Value -> m Value
+floordivsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.index_cast</tt>.
-pattern IndexCast :: Location -> Type -> operand -> AbstractOperation operand
+pattern IndexCast :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.index_cast</tt>.
-index_cast :: MonadBlockBuilder m => Type -> Value -> m Value
+index_cast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.mulf</tt>.
-pattern MulF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MulF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.mulf</tt>.
-mulf :: MonadBlockBuilder m => Value -> Value -> m Value
+mulf :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.muli</tt>.
-pattern MulI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern MulI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.muli</tt>.
-muli :: MonadBlockBuilder m => Value -> Value -> m Value
+muli :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.negf</tt>.
-pattern NegF :: Location -> Type -> operand -> AbstractOperation operand
+pattern NegF :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.negf</tt>.
-negf :: MonadBlockBuilder m => Value -> m Value
+negf :: () => MonadBlockBuilder m => Value -> m Value
 
 -- | A pattern for <tt>arith.ori</tt>.
-pattern OrI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern OrI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.ori</tt>.
-ori :: MonadBlockBuilder m => Value -> Value -> m Value
+ori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.remf</tt>.
-pattern RemF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern RemF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.remf</tt>.
-remf :: MonadBlockBuilder m => Value -> Value -> m Value
+remf :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.remsi</tt>.
-pattern RemSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern RemSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.remsi</tt>.
-remsi :: MonadBlockBuilder m => Value -> Value -> m Value
+remsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.remui</tt>.
-pattern RemUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern RemUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.remui</tt>.
-remui :: MonadBlockBuilder m => Value -> Value -> m Value
+remui :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.sitofp</tt>.
-pattern SIToFP :: Location -> Type -> operand -> AbstractOperation operand
+pattern SIToFP :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.sitofp</tt>.
-sitofp :: MonadBlockBuilder m => Type -> Value -> m Value
+sitofp :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.shli</tt>.
-pattern ShLI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern ShLI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.shli</tt>.
-shli :: MonadBlockBuilder m => Value -> Value -> m Value
+shli :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.shrsi</tt>.
-pattern ShRSI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern ShRSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.shrsi</tt>.
-shrsi :: MonadBlockBuilder m => Value -> Value -> m Value
+shrsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.shrui</tt>.
-pattern ShRUI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern ShRUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.shrui</tt>.
-shrui :: MonadBlockBuilder m => Value -> Value -> m Value
+shrui :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.subf</tt>.
-pattern SubF :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern SubF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.subf</tt>.
-subf :: MonadBlockBuilder m => Value -> Value -> m Value
+subf :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.subi</tt>.
-pattern SubI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern SubI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.subi</tt>.
-subi :: MonadBlockBuilder m => Value -> Value -> m Value
+subi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 -- | A pattern for <tt>arith.truncf</tt>.
-pattern TruncF :: Location -> Type -> operand -> AbstractOperation operand
+pattern TruncF :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.truncf</tt>.
-truncf :: MonadBlockBuilder m => Type -> Value -> m Value
+truncf :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.trunci</tt>.
-pattern TruncI :: Location -> Type -> operand -> AbstractOperation operand
+pattern TruncI :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.trunci</tt>.
-trunci :: MonadBlockBuilder m => Type -> Value -> m Value
+trunci :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.uitofp</tt>.
-pattern UIToFP :: Location -> Type -> operand -> AbstractOperation operand
+pattern UIToFP :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.uitofp</tt>.
-uitofp :: MonadBlockBuilder m => Type -> Value -> m Value
+uitofp :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A pattern for <tt>arith.xori</tt>.
-pattern XOrI :: Location -> Type -> operand -> operand -> AbstractOperation operand
+pattern XOrI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.xori</tt>.
-xori :: MonadBlockBuilder m => Value -> Value -> m Value
+xori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679449666 :: Context -> IO PassManager
+inline_c_ffi_6989586621679454648 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679449675 :: PassManager -> IO ()
+inline_c_ffi_6989586621679454657 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679449688 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679454670 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679449697 :: PassManager -> IO ()
+inline_c_ffi_6989586621679454679 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679449706 :: PassManager -> IO ()
+inline_c_ffi_6989586621679454688 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679449715 :: PassManager -> IO ()
+inline_c_ffi_6989586621679454697 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679449724 :: PassManager -> IO ()
+inline_c_ffi_6989586621679454706 :: PassManager -> IO ()
