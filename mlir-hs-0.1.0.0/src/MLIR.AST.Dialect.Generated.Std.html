@@ -240,7 +240,7 @@ forall (m :: * -&gt; *). Monad m =&gt; m EndOfBlock
 </span><a href="MLIR.AST.Dialect.Generated.Std.html#call_indirect"><span class="hs-identifier hs-var hs-var">call_indirect</span></a></span></span><span> </span><span id="local-6989586621679469562"><span class="annot"><span class="annottext">[Type]
 </span><a href="#local-6989586621679469562"><span class="hs-identifier hs-var">ty0</span></a></span></span><span> </span><span id="local-6989586621679469561"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679469561"><span class="hs-identifier hs-var">callee</span></a></span></span><span> </span><span id="local-6989586621679469560"><span class="annot"><span class="annottext">[Value]
-</span><a href="#local-6989586621679469560"><span class="hs-identifier hs-var">operands</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><a href="#local-6989586621679469560"><span class="hs-identifier hs-var">callee_operands</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-161"></span><span>  </span><span class="annot"><span class="annottext">([Value] -&gt; Value) -&gt; m [Value] -&gt; m Value
 forall (m :: * -&gt; *) a1 r. Monad m =&gt; (a1 -&gt; r) -&gt; m a1 -&gt; m r
 </span><span class="hs-identifier hs-var">Control.Monad.liftM</span></span><span> </span><span class="annot"><span class="annottext">[Value] -&gt; Value
@@ -274,7 +274,7 @@ ByteString
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Value] -&gt; [ByteString]
 </span><a href="MLIR.AST.Builder.html#operands"><span class="hs-identifier hs-var">AST.operands</span></a></span><span> </span><span class="annot"><span class="annottext">[Value]
-</span><a href="#local-6989586621679469560"><span class="hs-identifier hs-var">operands</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679469560"><span class="hs-identifier hs-var">callee_operands</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-166"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opRegions :: [Region]
 </span><a href="MLIR.AST.html#opRegions"><span class="hs-identifier hs-var">opRegions</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
 </span><span id="line-167"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opSuccessors :: [ByteString]
@@ -470,12 +470,12 @@ ByteString
 </span><a href="#local-6989586621679469538"><span class="hs-identifier hs-var">ty0</span></a></span></span><span> </span><span id="local-6989586621679469537"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679469537"><span class="hs-identifier hs-var">memref</span></a></span></span><span> </span><span id="local-6989586621679469536"><span class="annot"><span class="annottext">[Value]
 </span><a href="#local-6989586621679469536"><span class="hs-identifier hs-var">indices</span></a></span></span><span>  </span><span id="local-6989586621679469535"><span class="annot"><span class="annottext">RegionBuilderT m ()
-</span><a href="#local-6989586621679469535"><span class="hs-identifier hs-var">bodyBuilder</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><a href="#local-6989586621679469535"><span class="hs-identifier hs-var">atomic_bodyBuilder</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-308"></span><span>  </span><span id="local-6989586621679469534"><span class="annot"><span class="annottext">Region
-</span><a href="#local-6989586621679469534"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">RegionBuilderT m () -&gt; m Region
+</span><a href="#local-6989586621679469534"><span class="hs-identifier hs-var">atomic_body</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">RegionBuilderT m () -&gt; m Region
 forall (m :: * -&gt; *). Monad m =&gt; RegionBuilderT m () -&gt; m Region
 </span><a href="MLIR.AST.Builder.html#buildRegion"><span class="hs-identifier hs-var">AST.buildRegion</span></a></span><span> </span><span class="annot"><span class="annottext">RegionBuilderT m ()
-</span><a href="#local-6989586621679469535"><span class="hs-identifier hs-var">bodyBuilder</span></a></span><span>
+</span><a href="#local-6989586621679469535"><span class="hs-identifier hs-var">atomic_bodyBuilder</span></a></span><span>
 </span><span id="line-309"></span><span>  </span><span class="annot"><span class="annottext">([Value] -&gt; Value) -&gt; m [Value] -&gt; m Value
 forall (m :: * -&gt; *) a1 r. Monad m =&gt; (a1 -&gt; r) -&gt; m a1 -&gt; m r
 </span><span class="hs-identifier hs-var">Control.Monad.liftM</span></span><span> </span><span class="annot"><span class="annottext">[Value] -&gt; Value
@@ -512,7 +512,7 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><a href="#local-6989586621679469536"><span class="hs-identifier hs-var">indices</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-314"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opRegions :: [Region]
 </span><a href="MLIR.AST.html#opRegions"><span class="hs-identifier hs-var">opRegions</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Region
-</span><a href="#local-6989586621679469534"><span class="hs-identifier hs-var">body</span></a></span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679469534"><span class="hs-identifier hs-var">atomic_body</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-315"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opSuccessors :: [ByteString]
 </span><a href="MLIR.AST.html#opSuccessors"><span class="hs-identifier hs-var">opSuccessors</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
 </span><span id="line-316"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opAttributes :: NamedAttributes
