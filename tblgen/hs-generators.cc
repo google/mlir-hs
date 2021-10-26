@@ -617,9 +617,11 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
   std::vector<std::string> region_binders;
   if (op.getNumRegions() > 0) {
     std::string region_prologue;
+    NameSource gen("_unnamed_region");
     for (const mlir::tblgen::NamedRegion& region : op.getRegions()) {
-      region_builder_binders.push_back(sanitizeName(region.name) + "Builder");
-      region_binders.push_back(sanitizeName(region.name));
+      std::string name = region.name.empty() ? gen.fresh() : sanitizeName(region.name);
+      region_builder_binders.push_back(name + "Builder");
+      region_binders.push_back(name);
       builder_arg_types.push_back("RegionBuilderT m ()");
       region_prologue += llvm::formatv(
           "{0} <- AST.buildRegion {1}\n  ",
