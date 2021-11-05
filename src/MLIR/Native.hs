@@ -41,9 +41,15 @@ module MLIR.Native (
     showOperation,
     showOperationWithLocation,
     verifyOperation,
+    -- * Region
+    Region,
+    getRegionOperation,
+    getFirstBlockRegion,
     -- * Block
     Block,
     showBlock,
+    getFirstOperationBlock,
+    getNextOperationBlock,
     -- * Module
     Module,
     createEmptyModule,
@@ -193,6 +199,21 @@ verifyOperation op =
   (1==) <$> [C.exp| bool { mlirOperationVerify($(MlirOperation op)) } |]
 
 --------------------------------------------------------------------------------
+-- Region
+
+-- | Returns the pos'th region of an Operation.
+getRegionOperation :: C.CIntPtr -> Operation -> IO Region
+getRegionOperation pos op = [C.exp| MlirRegion {
+    mlirOperationGetRegion($(MlirOperation op), $(intptr_t pos))
+  } |]
+
+-- | Returns the first Block in a Region.
+getFirstBlockRegion :: Region -> IO Block
+getFirstBlockRegion region = [C.exp| MlirBlock {
+    mlirRegionGetFirstBlock($(MlirRegion region))
+  } |]
+
+--------------------------------------------------------------------------------
 -- Block
 
 -- | Show the block using the MLIR printer.
@@ -200,6 +221,17 @@ showBlock :: Block -> IO BS.ByteString
 showBlock block = showSomething \ctx -> [C.exp| void {
     mlirBlockPrint($(MlirBlock block), HaskellMlirStringCallback, $(void* ctx))
   } |]
+
+-- | Returns the first operation in a block.
+getFirstOperationBlock :: Block -> IO Operation
+getFirstOperationBlock block =
+  [C.exp| MlirOperation { mlirBlockGetFirstOperation($(MlirBlock block)) } |]
+
+-- | Returns the next operation in the block. Returns 'Nothing' if last
+-- operation in block.
+getNextOperationBlock :: Operation -> IO (Maybe Operation)
+getNextOperationBlock childOp = nullable <$> [C.exp| MlirOperation {
+  mlirOperationGetNextInBlock($(MlirOperation childOp)) } |]
 
 --------------------------------------------------------------------------------
 -- Module

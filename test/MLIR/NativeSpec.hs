@@ -14,7 +14,7 @@
 
 module MLIR.NativeSpec where
 
-import Test.Hspec hiding (shouldContain)
+import Test.Hspec hiding (shouldContain, shouldStartWith)
 
 import Text.RawString.QQ
 
@@ -53,6 +53,9 @@ prepareContext = do
 -- we are predominantly checking if a BS contains some String.
 shouldContain :: BS.ByteString -> BS.ByteString -> Expectation
 shouldContain str sub = str `shouldSatisfy` BS.isInfixOf sub
+
+shouldStartWith :: BS.ByteString -> BS.ByteString -> Expectation
+shouldStartWith str sub = str `shouldSatisfy` BS.isPrefixOf sub
 
 spec :: Spec
 spec = do
@@ -99,6 +102,30 @@ spec = do
         str <- (MLIR.moduleAsOperation >=> MLIR.showOperationWithLocation) m
         MLIR.destroyModule m
         str `shouldContain` "loc(\"WhatIamCalled\")"
+
+    it "Can extract first operation (Function) of module" $ \ctx -> do
+      exampleModule <- liftM fromJust $
+        MLIR.withStringRef exampleModuleStr $ MLIR.parseModule ctx
+      functionStr' <- (MLIR.getModuleBody >=> MLIR.getFirstOperationBlock >=> MLIR.showOperation) exampleModule
+      functionStr' `shouldStartWith` "func @add(%arg0: i32) -> i32"
+      MLIR.destroyModule exampleModule
+
+    it "Can show operations inside region of function" $ \ctx -> do
+      exampleModule <- liftM fromJust $
+        MLIR.withStringRef exampleModuleStr $ MLIR.parseModule ctx
+      function <- (MLIR.getModuleBody >=> MLIR.getFirstOperationBlock) exampleModule
+      firstOp <- ((MLIR.getRegionOperation 0) >=> MLIR.getFirstBlockRegion >=> MLIR.getFirstOperationBlock) function
+      -- Check first operation is add.
+      addStr' <- MLIR.showOperation firstOp
+      addStr' `shouldBe` "%0 = arith.addi %arg0, %arg0 : i32"
+      -- Next is return.
+      return' <- MLIR.getNextOperationBlock firstOp
+      returnStr' <- MLIR.showOperation $ fromJust return'
+      returnStr' `shouldStartWith` "return %0 : i32"
+      -- Then we are past terminator.
+      empty <- MLIR.getNextOperationBlock $ fromJust return'
+      (isNothing $ empty) `shouldBe` True
+      MLIR.destroyModule exampleModule
 
   describe "Evaluation engine" $ beforeAll prepareContext $ do
     it "Can evaluate the example module" $ \ctx -> do
