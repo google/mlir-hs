@@ -43,8 +43,8 @@ module MLIR.Native (
     verifyOperation,
     -- * Region
     Region,
-    getRegionOperation,
-    getFirstBlockRegion,
+    getOperationRegion,
+    getRegionBlocks,
     -- * Block
     Block,
     showBlock,
@@ -201,16 +201,42 @@ verifyOperation op =
 -- Region
 
 -- | Returns the pos'th region of an Operation.
-getRegionOperation :: C.CIntPtr -> Operation -> IO Region
-getRegionOperation pos op = [C.exp| MlirRegion {
+getOperationRegion :: C.CIntPtr -> Operation -> IO Region
+getOperationRegion pos op = [C.exp| MlirRegion {
     mlirOperationGetRegion($(MlirOperation op), $(intptr_t pos))
   } |]
 
 -- | Returns the first Block in a Region.
-getFirstBlockRegion :: Region -> IO Block
-getFirstBlockRegion region = [C.exp| MlirBlock {
+getRegionFirstBlock :: Region -> IO (Maybe Block)
+getRegionFirstBlock region = nullable <$> [C.exp| MlirBlock {
     mlirRegionGetFirstBlock($(MlirRegion region))
   } |]
+
+-- | Returns the next Block in a Region.
+getRegionNextBlock :: Block -> IO (Maybe Block)
+getRegionNextBlock block = nullable <$> [C.exp| MlirBlock {
+    mlirBlockGetNextInRegion($(MlirBlock block))
+  } |]
+
+-- | Returns the Blocks in a Region.
+getRegionBlocks :: Region -> IO [Block]
+getRegionBlocks = go
+    where go :: Region -> IO [Block]
+          go block = do
+            op <- getRegionFirstBlock block
+            case op of
+                Nothing   -> return mzero
+                Just x    -> do
+                    xs <- go' x
+                    return (return x `mplus` xs)
+          go' :: Block -> IO [Block]
+          go' z = do
+            x <- getRegionNextBlock z
+            case x of
+                Nothing   -> return mzero
+                Just x'   -> do
+                    xs <- go' x'
+                    return (return x' `mplus` xs)
 
 --------------------------------------------------------------------------------
 -- Block
