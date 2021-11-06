@@ -48,8 +48,7 @@ module MLIR.Native (
     -- * Block
     Block,
     showBlock,
-    getFirstOperationBlock,
-    getNextOperationBlock,
+    getBlockOperations,
     -- * Module
     Module,
     createEmptyModule,
@@ -223,8 +222,8 @@ showBlock block = showSomething \ctx -> [C.exp| void {
   } |]
 
 -- | Returns the first operation in a block.
-getFirstOperationBlock :: Block -> IO Operation
-getFirstOperationBlock block =
+getFirstOperationBlock :: Block -> IO (Maybe Operation)
+getFirstOperationBlock block = nullable <$>
   [C.exp| MlirOperation { mlirBlockGetFirstOperation($(MlirBlock block)) } |]
 
 -- | Returns the next operation in the block. Returns 'Nothing' if last
@@ -232,6 +231,26 @@ getFirstOperationBlock block =
 getNextOperationBlock :: Operation -> IO (Maybe Operation)
 getNextOperationBlock childOp = nullable <$> [C.exp| MlirOperation {
   mlirOperationGetNextInBlock($(MlirOperation childOp)) } |]
+
+-- | Returns the Operations in a Block.
+getBlockOperations :: Block -> IO [Operation]
+getBlockOperations = go
+    where go :: Block -> IO [Operation]
+          go block = do
+            op <- getFirstOperationBlock block
+            case op of
+                Nothing   -> return mzero
+                Just x    -> do
+                    xs <- go' x
+                    return (return x `mplus` xs)
+          go' :: Operation -> IO [Operation]
+          go' z = do
+            x <- getNextOperationBlock z
+            case x of
+                Nothing   -> return mzero
+                Just x'   -> do
+                    xs <- go' x'
+                    return (return x' `mplus` xs)
 
 --------------------------------------------------------------------------------
 -- Module
