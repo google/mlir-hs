@@ -220,22 +220,14 @@ getRegionNextBlock block = nullable <$> [C.exp| MlirBlock {
 
 -- | Returns the Blocks in a Region.
 getRegionBlocks :: Region -> IO [Block]
-getRegionBlocks = go
-    where go :: Region -> IO [Block]
-          go block = do
-            op <- getRegionFirstBlock block
-            case op of
-                Nothing   -> return mzero
-                Just x    -> do
-                    xs <- go' x
-                    return (return x `mplus` xs)
-          go' :: Block -> IO [Block]
-          go' z = do
-            x <- getRegionNextBlock z
+getRegionBlocks region = go $ getRegionFirstBlock region
+    where go :: IO (Maybe Block) -> IO [Block]
+          go z = do
+            x <- z
             case x of
-                Nothing   -> return mzero
-                Just x'   -> do
-                    xs <- go' x'
+                Nothing -> return mzero
+                Just x' -> do
+                    xs <- go $ getRegionNextBlock x'
                     return (return x' `mplus` xs)
 
 --------------------------------------------------------------------------------
@@ -260,22 +252,14 @@ getNextOperationBlock childOp = nullable <$> [C.exp| MlirOperation {
 
 -- | Returns the Operations in a Block.
 getBlockOperations :: Block -> IO [Operation]
-getBlockOperations = go
-    where go :: Block -> IO [Operation]
-          go block = do
-            op <- getFirstOperationBlock block
-            case op of
-                Nothing   -> return mzero
-                Just x    -> do
-                    xs <- go' x
-                    return (return x `mplus` xs)
-          go' :: Operation -> IO [Operation]
-          go' z = do
-            x <- getNextOperationBlock z
+getBlockOperations block = go $ getFirstOperationBlock block
+    where go :: IO (Maybe Operation) -> IO [Operation]
+          go z = do
+            x <- z
             case x of
-                Nothing   -> return mzero
-                Just x'   -> do
-                    xs <- go' x'
+                Nothing -> return mzero
+                Just x' -> do
+                    xs <- go $ getNextOperationBlock x'
                     return (return x' `mplus` xs)
 
 --------------------------------------------------------------------------------
