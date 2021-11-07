@@ -220,15 +220,7 @@ getRegionNextBlock block = nullable <$> [C.exp| MlirBlock {
 
 -- | Returns the Blocks in a Region.
 getRegionBlocks :: Region -> IO [Block]
-getRegionBlocks region = go $ getRegionFirstBlock region
-    where go :: IO (Maybe Block) -> IO [Block]
-          go z = do
-            x <- z
-            case x of
-                Nothing -> return mzero
-                Just x' -> do
-                    xs <- go $ getRegionNextBlock x'
-                    return (return x' `mplus` xs)
+getRegionBlocks region = unrollIOMaybe getRegionNextBlock (getRegionFirstBlock region)
 
 --------------------------------------------------------------------------------
 -- Block
@@ -252,15 +244,7 @@ getNextOperationBlock childOp = nullable <$> [C.exp| MlirOperation {
 
 -- | Returns the Operations in a Block.
 getBlockOperations :: Block -> IO [Operation]
-getBlockOperations block = go $ getFirstOperationBlock block
-    where go :: IO (Maybe Operation) -> IO [Operation]
-          go z = do
-            x <- z
-            case x of
-                Nothing -> return mzero
-                Just x' -> do
-                    xs <- go $ getNextOperationBlock x'
-                    return (return x' `mplus` xs)
+getBlockOperations block = unrollIOMaybe getNextOperationBlock (getFirstOperationBlock block)
 
 --------------------------------------------------------------------------------
 -- Module
@@ -363,6 +347,16 @@ showSomething action = do
       bs <- peekStringRef $ StringRef dataPtr size
       free dataPtr
       return bs
+
+-- | Unroll using a function that is equivalent to "get next" inside IO.
+unrollIOMaybe :: (a -> IO (Maybe a)) -> IO (Maybe a) -> IO [a]
+unrollIOMaybe fn z = do
+  x <- z
+  case x of
+      Nothing -> return mzero
+      Just x' -> do
+          xs <- unrollIOMaybe fn (fn x')
+          return (return x' `mplus` xs)
 
 --------------------------------------------------------------------------------
 -- Debugging utilities
