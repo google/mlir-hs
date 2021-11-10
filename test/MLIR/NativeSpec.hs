@@ -14,7 +14,7 @@
 
 module MLIR.NativeSpec where
 
-import Test.Hspec hiding (shouldContain)
+import Test.Hspec hiding (shouldContain, shouldStartWith)
 
 import Text.RawString.QQ
 
@@ -53,6 +53,9 @@ prepareContext = do
 -- we are predominantly checking if a BS contains some String.
 shouldContain :: BS.ByteString -> BS.ByteString -> Expectation
 shouldContain str sub = str `shouldSatisfy` BS.isInfixOf sub
+
+shouldStartWith :: BS.ByteString -> BS.ByteString -> Expectation
+shouldStartWith str sub = str `shouldSatisfy` BS.isPrefixOf sub
 
 spec :: Spec
 spec = do
@@ -99,6 +102,24 @@ spec = do
         str <- (MLIR.moduleAsOperation >=> MLIR.showOperationWithLocation) m
         MLIR.destroyModule m
         str `shouldContain` "loc(\"WhatIamCalled\")"
+
+    it "Can extract first operation (Function) of module" $ \ctx -> do
+      exampleModule <- liftM fromJust $
+        MLIR.withStringRef exampleModuleStr $ MLIR.parseModule ctx
+      operations <- (MLIR.getModuleBody >=> MLIR.getBlockOperations) exampleModule
+      functionStr' <- MLIR.showOperation $ head operations
+      functionStr' `shouldStartWith` "func @add(%arg0: i32) -> i32"
+      MLIR.destroyModule exampleModule
+
+    it "Can show operations inside region of function" $ \ctx -> do
+      exampleModule <- liftM fromJust $
+        MLIR.withStringRef exampleModuleStr $ MLIR.parseModule ctx
+      operations <- (MLIR.getModuleBody >=> MLIR.getBlockOperations) exampleModule
+      blocks <- ((MLIR.getOperationRegion 0) >=> MLIR.getRegionBlocks) (head operations)
+      ops <- MLIR.getBlockOperations $ head blocks
+      opStrs <- sequence $ map MLIR.showOperation ops
+      (BS.intercalate " ; " opStrs) `shouldBe` "%0 = arith.addi %arg0, %arg0 : i32 ; return %0 : i32"
+      MLIR.destroyModule exampleModule
 
   describe "Evaluation engine" $ beforeAll prepareContext $ do
     it "Can evaluate the example module" $ \ctx -> do

@@ -41,9 +41,14 @@ module MLIR.Native (
     showOperation,
     showOperationWithLocation,
     verifyOperation,
+    -- * Region
+    Region,
+    getOperationRegion,
+    getRegionBlocks,
     -- * Block
     Block,
     showBlock,
+    getBlockOperations,
     -- * Module
     Module,
     createEmptyModule,
@@ -193,6 +198,31 @@ verifyOperation op =
   (1==) <$> [C.exp| bool { mlirOperationVerify($(MlirOperation op)) } |]
 
 --------------------------------------------------------------------------------
+-- Region
+
+-- | Returns the pos'th region of an Operation.
+getOperationRegion :: C.CIntPtr -> Operation -> IO Region
+getOperationRegion pos op = [C.exp| MlirRegion {
+    mlirOperationGetRegion($(MlirOperation op), $(intptr_t pos))
+  } |]
+
+-- | Returns the first Block in a Region.
+getRegionFirstBlock :: Region -> IO (Maybe Block)
+getRegionFirstBlock region = nullable <$> [C.exp| MlirBlock {
+    mlirRegionGetFirstBlock($(MlirRegion region))
+  } |]
+
+-- | Returns the next Block in a Region.
+getRegionNextBlock :: Block -> IO (Maybe Block)
+getRegionNextBlock block = nullable <$> [C.exp| MlirBlock {
+    mlirBlockGetNextInRegion($(MlirBlock block))
+  } |]
+
+-- | Returns the Blocks in a Region.
+getRegionBlocks :: Region -> IO [Block]
+getRegionBlocks region = unrollIOMaybe getRegionNextBlock (getRegionFirstBlock region)
+
+--------------------------------------------------------------------------------
 -- Block
 
 -- | Show the block using the MLIR printer.
@@ -200,6 +230,21 @@ showBlock :: Block -> IO BS.ByteString
 showBlock block = showSomething \ctx -> [C.exp| void {
     mlirBlockPrint($(MlirBlock block), HaskellMlirStringCallback, $(void* ctx))
   } |]
+
+-- | Returns the first operation in a block.
+getFirstOperationBlock :: Block -> IO (Maybe Operation)
+getFirstOperationBlock block = nullable <$>
+  [C.exp| MlirOperation { mlirBlockGetFirstOperation($(MlirBlock block)) } |]
+
+-- | Returns the next operation in the block. Returns 'Nothing' if last
+-- operation in block.
+getNextOperationBlock :: Operation -> IO (Maybe Operation)
+getNextOperationBlock childOp = nullable <$> [C.exp| MlirOperation {
+  mlirOperationGetNextInBlock($(MlirOperation childOp)) } |]
+
+-- | Returns the Operations in a Block.
+getBlockOperations :: Block -> IO [Operation]
+getBlockOperations block = unrollIOMaybe getNextOperationBlock (getFirstOperationBlock block)
 
 --------------------------------------------------------------------------------
 -- Module
@@ -302,6 +347,14 @@ showSomething action = do
       bs <- peekStringRef $ StringRef dataPtr size
       free dataPtr
       return bs
+
+-- | Unroll using a function that is equivalent to "get next" inside IO.
+unrollIOMaybe :: (a -> IO (Maybe a)) -> IO (Maybe a) -> IO [a]
+unrollIOMaybe fn z = do
+  x <- z
+  case x of
+      Nothing -> return []
+      Just x' -> (x':) <$> unrollIOMaybe fn (fn x')
 
 --------------------------------------------------------------------------------
 -- Debugging utilities
