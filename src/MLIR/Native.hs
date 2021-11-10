@@ -353,10 +353,8 @@ unrollIOMaybe :: (a -> IO (Maybe a)) -> IO (Maybe a) -> IO [a]
 unrollIOMaybe fn z = do
   x <- z
   case x of
-      Nothing -> return mzero
-      Just x' -> do
-          xs <- unrollIOMaybe fn (fn x')
-          return (return x' `mplus` xs)
+      Nothing -> return []
+      Just x' -> (x':) <$> unrollIOMaybe fn (fn x')
 
 --------------------------------------------------------------------------------
 -- Debugging utilities
