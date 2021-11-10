@@ -115,7 +115,8 @@ spec = do
       exampleModule <- liftM fromJust $
         MLIR.withStringRef exampleModuleStr $ MLIR.parseModule ctx
       operations <- (MLIR.getModuleBody >=> MLIR.getBlockOperations) exampleModule
-      blocks <- ((MLIR.getOperationRegion 0) >=> MLIR.getRegionBlocks) (head operations)
+      regions <- MLIR.getOperationRegions (head operations)
+      blocks <- MLIR.getRegionBlocks (head regions)
       ops <- MLIR.getBlockOperations $ head blocks
       opStrs <- sequence $ map MLIR.showOperation ops
       (BS.intercalate " ; " opStrs) `shouldBe` "%0 = arith.addi %arg0, %arg0 : i32 ; return %0 : i32"

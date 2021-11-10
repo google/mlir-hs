@@ -43,7 +43,7 @@ module MLIR.Native (
     verifyOperation,
     -- * Region
     Region,
-    getOperationRegion,
+    getOperationRegions,
     getRegionBlocks,
     -- * Block
     Block,
@@ -200,11 +200,21 @@ verifyOperation op =
 --------------------------------------------------------------------------------
 -- Region
 
--- | Returns the pos'th region of an Operation.
-getOperationRegion :: C.CIntPtr -> Operation -> IO Region
-getOperationRegion pos op = [C.exp| MlirRegion {
-    mlirOperationGetRegion($(MlirOperation op), $(intptr_t pos))
+-- | Returns the first Region in a Operation.
+getOperationFirstRegion :: Operation -> IO (Maybe Region)
+getOperationFirstRegion op = nullable <$> [C.exp| MlirRegion {
+    mlirOperationGetFirstRegion($(MlirOperation op))
   } |]
+
+-- | Returns the next Block in a Region.
+getOperationNextRegion :: Region -> IO (Maybe Region)
+getOperationNextRegion region = nullable <$> [C.exp| MlirRegion {
+    mlirRegionGetNextInOperation($(MlirRegion region))
+  } |]
+
+-- | Returns the regions of an Operation.
+getOperationRegions :: Operation -> IO [Region]
+getOperationRegions op = unrollIOMaybe getOperationNextRegion (getOperationFirstRegion op)
 
 -- | Returns the first Block in a Region.
 getRegionFirstBlock :: Region -> IO (Maybe Block)
