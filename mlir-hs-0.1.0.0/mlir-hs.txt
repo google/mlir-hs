@@ -1069,6 +1069,12 @@ pattern ToExtentTensor :: () => () => Location -> Type -> operand -> AbstractOpe
 -- | A builder for <tt>shape.to_extent_tensor</tt>.
 to_extent_tensor :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
+-- | A pattern for <tt>shape.value_as_shape</tt>.
+pattern ValueAsShape :: () => () => Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>shape.value_as_shape</tt>.
+value_as_shape :: () => MonadBlockBuilder m => Type -> Value -> m Value
+
 -- | A pattern for <tt>shape.with_shape</tt>.
 pattern With :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
@@ -1857,6 +1863,12 @@ pattern CeilDivSI :: () => () => Location -> Type -> operand -> operand -> Abstr
 -- | A builder for <tt>arith.ceildivsi</tt>.
 ceildivsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
+-- | A pattern for <tt>arith.ceildivui</tt>.
+pattern CeilDivUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.ceildivui</tt>.
+ceildivui :: () => MonadBlockBuilder m => Value -> Value -> m Value
+
 -- | A pattern for <tt>arith.constant</tt>.
 pattern Constant :: () => () => Location -> Type -> Attribute -> AbstractOperation operand
 
@@ -2027,17 +2039,17 @@ xori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679456885 :: Context -> IO PassManager
+inline_c_ffi_6989586621679458812 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679456894 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458821 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679456907 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679458834 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679456916 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458843 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679456925 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458852 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679456934 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458861 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679456943 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458870 :: PassManager -> IO ()
