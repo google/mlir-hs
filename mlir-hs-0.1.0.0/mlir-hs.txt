@@ -824,42 +824,6 @@ constant :: () => MonadBlockBuilder m => Type -> Attribute -> m Value
 -- | A builder for <tt>std.generic_atomic_rmw</tt>.
 generic_atomic_rmw :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> RegionBuilderT m () -> m Value
 
--- | A pattern for <tt>std.maxf</tt>.
-pattern MaxF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.maxf</tt>.
-maxf :: () => MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.maxsi</tt>.
-pattern MaxSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.maxsi</tt>.
-maxsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.maxui</tt>.
-pattern MaxUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.maxui</tt>.
-maxui :: () => MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.minf</tt>.
-pattern MinF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.minf</tt>.
-minf :: () => MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.minsi</tt>.
-pattern MinSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.minsi</tt>.
-minsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
-
--- | A pattern for <tt>std.minui</tt>.
-pattern MinUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.minui</tt>.
-minui :: () => MonadBlockBuilder m => Value -> Value -> m Value
-
 -- | A pattern for <tt>std.rank</tt>.
 pattern Rank :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
@@ -1935,6 +1899,42 @@ pattern IndexCast :: () => () => Location -> Type -> operand -> AbstractOperatio
 -- | A builder for <tt>arith.index_cast</tt>.
 index_cast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
+-- | A pattern for <tt>arith.maxf</tt>.
+pattern MaxF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.maxf</tt>.
+maxf :: () => MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.maxsi</tt>.
+pattern MaxSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.maxsi</tt>.
+maxsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.maxui</tt>.
+pattern MaxUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.maxui</tt>.
+maxui :: () => MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.minf</tt>.
+pattern MinF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.minf</tt>.
+minf :: () => MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.minsi</tt>.
+pattern MinSI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.minsi</tt>.
+minsi :: () => MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.minui</tt>.
+pattern MinUI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.minui</tt>.
+minui :: () => MonadBlockBuilder m => Value -> Value -> m Value
+
 -- | A pattern for <tt>arith.mulf</tt>.
 pattern MulF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
@@ -2039,17 +2039,17 @@ xori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679458812 :: Context -> IO PassManager
+inline_c_ffi_6989586621679458806 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679458821 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458815 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679458834 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679458828 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458843 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458837 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458852 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458846 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458861 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458855 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458870 :: PassManager -> IO ()
+inline_c_ffi_6989586621679458864 :: PassManager -> IO ()
