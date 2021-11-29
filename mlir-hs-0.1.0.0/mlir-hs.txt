@@ -625,11 +625,8 @@ create_mask :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 -- | A builder for <tt>vector.expandload</tt>.
 expandload :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> m Value
 
--- | A pattern for <tt>vector.extractelement</tt>.
-pattern ExtractElement :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
-
 -- | A builder for <tt>vector.extractelement</tt>.
-extractelement :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
+extractelement :: () => MonadBlockBuilder m => Type -> Value -> Maybe Value -> m Value
 
 -- | A builder for <tt>vector.extract_map</tt>.
 extract_map :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
@@ -661,11 +658,8 @@ flat_transpose :: () => MonadBlockBuilder m => Type -> Value -> Int -> Int -> m 
 -- | A builder for <tt>vector.gather</tt>.
 gather :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> Value -> m Value
 
--- | A pattern for <tt>vector.insertelement</tt>.
-pattern InsertElement :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
-
 -- | A builder for <tt>vector.insertelement</tt>.
-insertelement :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+insertelement :: () => MonadBlockBuilder m => Type -> Value -> Value -> Maybe Value -> m Value
 
 -- | A builder for <tt>vector.insert_map</tt>.
 insert_map :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Value
@@ -2039,17 +2033,17 @@ xori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679458806 :: Context -> IO PassManager
+inline_c_ffi_6989586621679457487 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679458815 :: PassManager -> IO ()
+inline_c_ffi_6989586621679457496 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679458828 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679457509 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458837 :: PassManager -> IO ()
+inline_c_ffi_6989586621679457518 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458846 :: PassManager -> IO ()
+inline_c_ffi_6989586621679457527 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458855 :: PassManager -> IO ()
+inline_c_ffi_6989586621679457536 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679458864 :: PassManager -> IO ()
+inline_c_ffi_6989586621679457545 :: PassManager -> IO ()
