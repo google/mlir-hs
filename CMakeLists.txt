@@ -50,7 +50,7 @@ add_mlir_aggregate(MLIRHaskell
   EMBED_LIBS
   MLIRCAPIConversion
   MLIRCAPIDebug
-  MLIRCEXECUTIONENGINE
+  MLIRCAPIExecutionEngine
   MLIRCAPIIR
   MLIRCAPIRegistration
   MLIRCAPITransforms
