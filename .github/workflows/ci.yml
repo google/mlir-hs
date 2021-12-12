@@ -53,7 +53,7 @@ jobs:
         cmake -B llvm-project/build -DLLVM_CCACHE_BUILD=ON \
           -DLLVM_BUILD_LLVM_DYLIB=ON -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_INSTALL_PREFIX=$HOME/mlir_shared llvm-project/llvm
-        cd llvm-project/build && ninja -j4 install
+        cmake --build llvm-project/build -t install
         echo "$HOME/mlir_shared/bin" >> $GITHUB_PATH
       env:
         CC: clang
