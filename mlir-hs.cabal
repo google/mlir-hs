@@ -95,7 +95,7 @@ library
     , bytestring
     , transformers
   extra-libraries:
-    MLIRHaskell
+    MLIR-C
 
 test-suite spec
   import: defaults
