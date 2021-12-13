@@ -1259,6 +1259,18 @@ pattern Cos :: () => () => Location -> Type -> operand -> AbstractOperation oper
 -- | A builder for <tt>llvm.intr.cos</tt>.
 intr_cos :: () => MonadBlockBuilder m => Value -> m Value
 
+-- | A pattern for <tt>llvm.intr.ctlz</tt>.
+pattern CountLeadingZeros :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.ctlz</tt>.
+intr_ctlz :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.cttz</tt>.
+pattern CountTrailingZeros :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.cttz</tt>.
+intr_cttz :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
 -- | A pattern for <tt>llvm.intr.ctpop</tt>.
 pattern CtPop :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
@@ -2033,17 +2045,17 @@ xori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679457487 :: Context -> IO PassManager
+inline_c_ffi_6989586621679459479 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679457496 :: PassManager -> IO ()
+inline_c_ffi_6989586621679459488 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679457509 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679459501 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679457518 :: PassManager -> IO ()
+inline_c_ffi_6989586621679459510 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679457527 :: PassManager -> IO ()
+inline_c_ffi_6989586621679459519 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679457536 :: PassManager -> IO ()
+inline_c_ffi_6989586621679459528 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679457545 :: PassManager -> IO ()
+inline_c_ffi_6989586621679459537 :: PassManager -> IO ()
