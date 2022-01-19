@@ -30,7 +30,7 @@ import qualified MLIR.Native.Pass as MLIR
 import qualified MLIR.Native.ExecutionEngine as MLIR
 
 exampleModuleStr :: BS.ByteString
-exampleModuleStr = pack $ [r|module  {
+exampleModuleStr = pack $ [r|module {
   func @add(%arg0: i32) -> i32 attributes {llvm.emit_c_interface} {
     %0 = arith.addi %arg0, %arg0 : i32
     return %0 : i32
@@ -74,7 +74,7 @@ spec = do
       m <- MLIR.createEmptyModule loc
       str <- MLIR.showModule m
       MLIR.destroyModule m
-      str `shouldBe` "module  {\n}\n"
+      str `shouldBe` "module {\n}\n"
 
     it "Can parse an example module" $ \ctx -> do
       exampleModule <- liftM fromJust $

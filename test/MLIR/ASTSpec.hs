@@ -139,7 +139,7 @@ spec = do
     it "Can translate an empty module" $ do
       let m = ModuleOp $ Block "0" [] []
       m `shouldShowAs` [r|
-        module  {
+        module {
         }|]
 
     it "Can translate a module with location" $ do
@@ -159,7 +159,7 @@ spec = do
         , opAttributes = NoAttrs
         }
       m `shouldShowWithLocationAs` [r|
-        module  {
+        module {
         } loc(#loc)
         #loc = loc(fused["first", "last"])|]
 
@@ -183,7 +183,7 @@ spec = do
                 ]
               ]
       m `shouldShowAs` [r|
-        module  {
+        module {
           func @matmul8x8x8(%arg0: memref<vector<64xf32>>, %arg1: memref<vector<64xf32>>, %arg2: memref<vector<64xf32>>) attributes {llvm.emit_c_interface} {
             %0 = memref.load %arg0[] : memref<vector<64xf32>>
             %1 = memref.load %arg1[] : memref<vector<64xf32>>
@@ -219,7 +219,7 @@ spec = do
         #map0 = affine_map<(d0, d1, d2) -> (d0, d2)>
         #map1 = affine_map<(d0, d1, d2) -> (d2, d1)>
         #map2 = affine_map<(d0, d1, d2) -> (d0, d1)>
-        module  {
+        module {
           func @matmul8x8x8(%arg0: memref<vector<8x8xf32>>, %arg1: memref<vector<8x8xf32>>, %arg2: memref<vector<8x8xf32>>) attributes {llvm.emit_c_interface} {
             %0 = memref.load %arg0[] : memref<vector<8x8xf32>>
             %1 = memref.load %arg1[] : memref<vector<8x8xf32>>
