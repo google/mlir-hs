@@ -2072,17 +2072,17 @@ xori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679463896 :: Context -> IO PassManager
+inline_c_ffi_6989586621679463920 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679463905 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463929 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679463918 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679463942 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463927 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463951 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463936 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463960 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463945 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463969 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463954 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463978 :: PassManager -> IO ()
