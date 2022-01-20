@@ -364,7 +364,7 @@ instance FromAST Region Native.Region where
       initBlock :: Block -> IO Native.Block
       initBlock Block{..} = do
         -- TODO: Use proper locations
-        let locations = take 2 (repeat UnknownLocation)
+        let locations = take (length blockArgs) (repeat UnknownLocation)
         evalContT $ do
           let blockArgTypes = snd <$> blockArgs
           (numBlockArgs, nativeArgTypes) <- packFromAST ctx env blockArgTypes
