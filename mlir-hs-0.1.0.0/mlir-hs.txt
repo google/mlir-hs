@@ -780,6 +780,9 @@ insert :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Va
 -- | A builder for <tt>tensor.insert_slice</tt>.
 insert_slice :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> [Value] -> [Value] -> [Int] -> [Int] -> [Int] -> m Value
 
+-- | A builder for <tt>tensor.pad</tt>.
+pad :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Int] -> [Int] -> RegionBuilderT m () -> m Value
+
 -- | A pattern for <tt>tensor.rank</tt>.
 pattern Rank :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
@@ -809,12 +812,6 @@ pattern Assert :: () => () => Location -> operand -> ByteString -> AbstractOpera
 -- | A builder for <tt>std.assert</tt>.
 assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
--- | A pattern for <tt>std.atomic_yield</tt>.
-pattern AtomicYield :: () => () => Location -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.atomic_yield</tt>.
-atomic_yield :: () => MonadBlockBuilder m => Value -> m EndOfBlock
-
 -- | A builder for <tt>std.call_indirect</tt>.
 call_indirect :: () => MonadBlockBuilder m => [Type] -> Value -> [Value] -> m Value
 
@@ -823,9 +820,6 @@ pattern Constant :: () => () => Location -> Type -> Attribute -> AbstractOperati
 
 -- | A builder for <tt>std.constant</tt>.
 constant :: () => MonadBlockBuilder m => Type -> Attribute -> m Value
-
--- | A builder for <tt>std.generic_atomic_rmw</tt>.
-generic_atomic_rmw :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>std.return</tt>.
 pattern Return :: () => () => Location -> [operand] -> AbstractOperation operand
@@ -1062,9 +1056,6 @@ pattern Linalg_InitTensor :: () => () => Location -> Type -> [operand] -> [Int] 
 -- | A builder for <tt>linalg.init_tensor</tt>.
 init_tensor :: () => MonadBlockBuilder m => Type -> [Value] -> [Int] -> m Value
 
--- | A builder for <tt>linalg.pad_tensor</tt>.
-pad_tensor :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> [Value] -> [Int] -> [Int] -> RegionBuilderT m () -> m Value
-
 -- | A builder for <tt>linalg.tiled_loop</tt>.
 tiled_loop :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Value] -> [Value] -> [Value] -> [Attribute] -> Maybe [Attribute] -> RegionBuilderT m () -> m Value
 
@@ -1201,6 +1192,12 @@ pattern CopySign :: () => () => Location -> Type -> operand -> operand -> Abstra
 
 -- | A builder for <tt>llvm.intr.copysign</tt>.
 intr_copysign :: () => MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.coro.align</tt>.
+pattern CoroAlign :: () => () => Location -> Type -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.coro.align</tt>.
+intr_coro_align :: () => MonadBlockBuilder m => Type -> m Value
 
 -- | A pattern for <tt>llvm.intr.coro.begin</tt>.
 pattern CoroBegin :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -2072,17 +2069,17 @@ xori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679463920 :: Context -> IO PassManager
+inline_c_ffi_6989586621679463372 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679463929 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463381 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679463942 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679463394 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463951 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463403 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463960 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463412 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463969 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463421 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463978 :: PassManager -> IO ()
+inline_c_ffi_6989586621679463430 :: PassManager -> IO ()
