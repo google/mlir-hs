@@ -724,6 +724,12 @@ pattern Shuffle :: () => () => Location -> Type -> operand -> operand -> [Int] -
 -- | A builder for <tt>vector.shuffle</tt>.
 shuffle :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Int] -> m Value
 
+-- | A pattern for <tt>vector.splat</tt>.
+pattern Splat :: () => () => Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>vector.splat</tt>.
+splat :: () => MonadBlockBuilder m => Type -> Value -> m Value
+
 -- | A builder for <tt>vector.store</tt>.
 store :: () => MonadBlockBuilder m => Value -> Value -> [Value] -> m ()
 
@@ -795,6 +801,12 @@ pattern Reshape :: () => () => Location -> Type -> operand -> operand -> Abstrac
 -- | A builder for <tt>tensor.reshape</tt>.
 reshape :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
+-- | A pattern for <tt>tensor.splat</tt>.
+pattern Splat :: () => () => Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>tensor.splat</tt>.
+splat :: () => MonadBlockBuilder m => Type -> Value -> m Value
+
 -- | A pattern for <tt>tensor.yield</tt>.
 pattern Yield :: () => () => Location -> operand -> AbstractOperation operand
 
@@ -815,29 +827,11 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 -- | A builder for <tt>std.call_indirect</tt>.
 call_indirect :: () => MonadBlockBuilder m => [Type] -> Value -> [Value] -> m Value
 
--- | A pattern for <tt>std.constant</tt>.
-pattern Constant :: () => () => Location -> Type -> Attribute -> AbstractOperation operand
-
--- | A builder for <tt>std.constant</tt>.
-constant :: () => MonadBlockBuilder m => Type -> Attribute -> m Value
-
 -- | A pattern for <tt>std.return</tt>.
 pattern Return :: () => () => Location -> [operand] -> AbstractOperation operand
 
 -- | A builder for <tt>std.return</tt>.
 return :: () => MonadBlockBuilder m => [Value] -> m EndOfBlock
-
--- | A pattern for <tt>std.select</tt>.
-pattern Select :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.select</tt>.
-select :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
-
--- | A pattern for <tt>std.splat</tt>.
-pattern Splat :: () => () => Location -> Type -> operand -> AbstractOperation operand
-
--- | A builder for <tt>std.splat</tt>.
-splat :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 module MLIR.AST.Dialect.Shape
 
@@ -1079,9 +1073,6 @@ conv_2d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBu
 
 -- | A builder for <tt>linalg.conv_3d</tt>.
 conv_3d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.copy</tt>.
-copy :: () => MonadBlockBuilder m => Value -> Value -> Maybe Map -> Maybe Map -> RegionBuilderT m () -> m ()
 
 -- | A builder for <tt>linalg.dot</tt>.
 dot :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1404,7 +1395,7 @@ pattern GetActiveLaneMask :: () => () => Location -> Type -> operand -> operand 
 intr_get_active_lane_mask :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 -- | A builder for <tt>llvm.inline_asm</tt>.
-inline_asm :: () => MonadBlockBuilder m => Maybe Type -> [Value] -> ByteString -> ByteString -> m Value
+inline_asm :: () => MonadBlockBuilder m => Maybe Type -> [Value] -> ByteString -> ByteString -> Maybe [Attribute] -> m Value
 
 -- | A pattern for <tt>llvm.insertelement</tt>.
 pattern InsertElement :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
@@ -2067,19 +2058,22 @@ pattern XOrI :: () => () => Location -> Type -> operand -> operand -> AbstractOp
 -- | A builder for <tt>arith.xori</tt>.
 xori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
+-- | A builder for <tt>arith.select</tt>.
+select :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679463372 :: Context -> IO PassManager
+inline_c_ffi_6989586621679461170 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679463381 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461179 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679463394 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679461192 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463403 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461201 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463412 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461210 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463421 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461219 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679463430 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461228 :: PassManager -> IO ()
