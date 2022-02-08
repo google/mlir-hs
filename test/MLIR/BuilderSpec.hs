@@ -23,6 +23,7 @@ import MLIR.AST.Builder
 import MLIR.AST.Serialize
 import qualified Data.ByteString as BS
 import qualified MLIR.AST.Dialect.Arith as Arith
+import qualified MLIR.AST.Dialect.ControlFlow as Cf
 import qualified MLIR.AST.Dialect.Std as Std
 import qualified MLIR.Native as MLIR
 
@@ -63,15 +64,15 @@ spec = do
                 buildFunction "one_shot_loop" [f32] NoAttrs mdo
                   _entry <- buildBlock do
                     false <- Arith.constant i1 $ IntegerAttr i1 0
-                    Std.br header [false]
+                    Cf.br header [false]
                   header <- buildBlock do
                     isDone <- blockArgument i1
                     result <- Arith.constant f32 $ FloatAttr f32 1234.0
-                    Std.cond_br isDone exit [result] body [result]
+                    Cf.cond_br isDone exit [result] body [result]
                   body <- buildBlock do
                     _ <- blockArgument f32
                     true <- Arith.constant i1 $ IntegerAttr i1 1
-                    Std.br header [true]
+                    Cf.br header [true]
                   exit <- buildBlock do
                     result <- blockArgument f32
                     Std.return [result]

@@ -129,6 +129,7 @@ main = defaultMainWithHooks simpleUserHooks
       let dialects =
             [ ("Std"             , "mlir/Dialect/StandardOps/IR/Ops.td", [])
             , ("Arith"           , "mlir/Dialect/Arithmetic/IR/ArithmeticOps.td", ["-strip-prefix", "Arith_"])
+            , ("ControlFlow"     , "mlir/Dialect/ControlFlow/IR/ControlFlowOps.td", ["-dialect-name", "ControlFlow"])
             , ("Vector"          , "mlir/Dialect/Vector/IR/VectorOps.td", ["-strip-prefix", "Vector_"])
             , ("Shape"           , "mlir/Dialect/Shape/IR/ShapeOps.td", ["-strip-prefix", "Shape_"])
             , ("LLVM"            , "mlir/Dialect/LLVMIR/LLVMOps.td", ["-strip-prefix", "LLVM_", "-dialect-name", "LLVM"])
@@ -160,9 +161,9 @@ main = defaultMainWithHooks simpleUserHooks
 
       ensureDirectory "test/MLIR/AST/Dialect/Generated"
       generatedSpecModules <- liftM catMaybes $ forM dialects $ \(dialect, tdPath, opts) -> do
-        case dialect == "LinalgStructured" of
-          True -> return Nothing
-          False -> do
+        case dialect of
+          "LinalgStructured" -> return Nothing
+          _ -> do
             tblgen TestGenerator tdPath ("test/MLIR/AST/Dialect/Generated/" <> dialect <> "Spec.hs") opts
             return $ Just $ fromString $ "MLIR.AST.Dialect.Generated." <> dialect <> "Spec"
       let [(testSuiteName, condTestSuite)] = condTestSuites genericPackageDesc

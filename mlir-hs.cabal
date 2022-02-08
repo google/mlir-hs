@@ -59,6 +59,7 @@ library
     , MLIR.AST.Builder
     , MLIR.AST.Dialect.Affine
     , MLIR.AST.Dialect.Arith
+    , MLIR.AST.Dialect.ControlFlow
     , MLIR.AST.Dialect.LLVM
     , MLIR.AST.Dialect.Linalg
     , MLIR.AST.Dialect.MemRef
@@ -77,6 +78,7 @@ library
     , MLIR.Native.Pass
   other-modules:
       MLIR.AST.Dialect.Generated.Arith
+    , MLIR.AST.Dialect.Generated.ControlFlow
     , MLIR.AST.Dialect.Generated.LLVM
     , MLIR.AST.Dialect.Generated.Linalg
     , MLIR.AST.Dialect.Generated.LinalgStructured
