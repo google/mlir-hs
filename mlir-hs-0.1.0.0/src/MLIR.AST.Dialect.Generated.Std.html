@@ -24,350 +24,194 @@
 </span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="MLIR.AST.PatternUtil.html"><span class="hs-identifier">MLIR.AST.PatternUtil</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PatternUtil</span></span><span>
 </span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Affine.html"><span class="hs-identifier">MLIR.AST.Dialect.Affine</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Affine</span></span><span>
 </span><span id="line-26"></span><span>
-</span><span id="line-27"></span><span class="hs-comment">-- * assert</span><span>
-</span><span id="line-28"></span><span class="hs-comment">-- $assert</span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- * call_indirect</span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- $call_indirect</span><span>
 </span><span id="line-29"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-30"></span><span class="hs-comment">-- Assert operation with single boolean operand and an error message attribute.</span><span>
-</span><span id="line-31"></span><span class="hs-comment">-- If the argument is @true@ this operation has no effect. Otherwise, the</span><span>
-</span><span id="line-32"></span><span class="hs-comment">-- program execution will abort. The provided error message may be used by a</span><span>
-</span><span id="line-33"></span><span class="hs-comment">-- runtime to propagate the error to the user.</span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- The @call_indirect@ operation represents an indirect call to a value of</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- function type. Functions are first class types in MLIR, and may be passed as</span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- arguments and merged together with block arguments. The operands and result</span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- types of the call must match the specified function type.</span><span>
 </span><span id="line-34"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-35"></span><span class="hs-comment">-- Example:</span><span>
-</span><span id="line-36"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-37"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-38"></span><span class="hs-comment">-- assert %b, \&quot;Expected ... to be true\&quot;</span><span>
-</span><span id="line-39"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-40"></span><span class="hs-comment">--   </span><span>
-</span><span id="line-41"></span><span>
-</span><span id="line-42"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#InternalAssertOpAttributes"><span class="hs-identifier hs-type">InternalAssertOpAttributes</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BS.ByteString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.html#NamedAttributes"><span class="hs-identifier hs-type">NamedAttributes</span></a></span><span>
-</span><span id="line-43"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bInternalAssertOpAttributes"><span id="%24mInternalAssertOpAttributes"><span id="InternalAssertOpAttributes"><span class="annot"><span class="annottext">$bInternalAssertOpAttributes :: ByteString -&gt; NamedAttributes
-$mInternalAssertOpAttributes :: forall r. NamedAttributes -&gt; (ByteString -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
-</span><a href="MLIR.AST.Dialect.Generated.Std.html#%24bInternalAssertOpAttributes"><span class="hs-identifier hs-var hs-var hs-var hs-var">InternalAssertOpAttributes</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679476071"><span class="hs-identifier hs-type">msg</span></a></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679476070"><span class="annot"><a href="#local-6989586621679476070"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">M.lookup</span></span><span> </span><span class="annot"><span class="hs-string">&quot;msg&quot;</span></span><span> </span><span class="annot"><a href="#local-6989586621679476070"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="MLIR.AST.html#StringAttr"><span class="hs-identifier hs-type">StringAttr</span></a></span><span> </span><span id="local-6989586621679476071"><span class="annot"><a href="#local-6989586621679476071"><span class="hs-identifier hs-var">msg</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-44"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#InternalAssertOpAttributes"><span class="hs-identifier hs-var">InternalAssertOpAttributes</span></a></span><span> </span><span id="local-6989586621679476067"><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679476067"><span class="hs-identifier hs-var">msg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(ByteString, Attribute)] -&gt; NamedAttributes
-forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
-</span><span class="hs-identifier hs-var">M.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(ByteString, Attribute)] -&gt; NamedAttributes)
--&gt; [(ByteString, Attribute)] -&gt; NamedAttributes
-forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString
-</span><span class="hs-string">&quot;msg&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Attribute
-</span><a href="MLIR.AST.html#StringAttr"><span class="hs-identifier hs-var">StringAttr</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679476067"><span class="hs-identifier hs-var">msg</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- Function values can be created with the</span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- @constant@ operation.</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- Example:</span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- %31 = call_indirect %15(%0, %1)</span><span>
+</span><span id="line-42"></span><span class="hs-comment">--         : (tensor\&lt;16xf32&gt;, tensor\&lt;16xf32&gt;) -&gt; tensor\&lt;16xf32&gt;</span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-44"></span><span class="hs-comment">--   </span><span>
 </span><span id="line-45"></span><span>
-</span><span id="line-46"></span><span class="hs-comment">-- | A pattern for @std.assert@.</span><span>
-</span><span id="line-47"></span><span id="local-6989586621679476110"><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#Assert"><span class="hs-identifier hs-type">Assert</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.html#Location"><span class="hs-identifier hs-type">Location</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679476110"><span class="hs-identifier hs-type">operand</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BS.ByteString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.html#AbstractOperation"><span class="hs-identifier hs-type">AbstractOperation</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679476110"><span class="hs-identifier hs-type">operand</span></a></span></span><span>
-</span><span id="line-48"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bAssert"><span id="%24mAssert"><span id="Assert"><span class="annot"><span class="annottext">$bAssert :: Location -&gt; operand -&gt; ByteString -&gt; AbstractOperation operand
-$mAssert :: forall r operand.
-AbstractOperation operand
--&gt; (Location -&gt; operand -&gt; ByteString -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
-</span><a href="MLIR.AST.Dialect.Generated.Std.html#%24bAssert"><span class="hs-identifier hs-var hs-var hs-var">Assert</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679476062"><span class="hs-identifier hs-type">loc</span></a></span><span>  </span><span class="annot"><a href="#local-6989586621679476061"><span class="hs-identifier hs-type">arg</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679476060"><span class="hs-identifier hs-type">msg</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="MLIR.AST.html#Operation"><span class="hs-identifier hs-type">Operation</span></a></span><span>
-</span><span id="line-49"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="MLIR.AST.html#opName"><span class="hs-identifier hs-var">opName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;std.assert&quot;</span></span><span>
-</span><span id="line-50"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opLocation"><span class="hs-identifier hs-var">opLocation</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679476062"><span class="annot"><a href="#local-6989586621679476062"><span class="hs-identifier hs-var">loc</span></a></span></span><span>
-</span><span id="line-51"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opResultTypes"><span class="hs-identifier hs-var">opResultTypes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="MLIR.AST.html#Explicit"><span class="hs-identifier hs-type">Explicit</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-52"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opOperands"><span class="hs-identifier hs-var">opOperands</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span id="local-6989586621679476061"><span class="annot"><a href="#local-6989586621679476061"><span class="hs-identifier hs-var">arg</span></a></span></span><span class="hs-special">]</span><span>
-</span><span id="line-53"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opRegions"><span class="hs-identifier hs-var">opRegions</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-54"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opSuccessors"><span class="hs-identifier hs-var">opSuccessors</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-55"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opAttributes"><span class="hs-identifier hs-var">opAttributes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#InternalAssertOpAttributes"><span class="hs-identifier hs-type">InternalAssertOpAttributes</span></a></span><span> </span><span id="local-6989586621679476060"><span class="annot"><a href="#local-6989586621679476060"><span class="hs-identifier hs-var">msg</span></a></span></span><span class="hs-special">)</span><span>
-</span><span id="line-56"></span><span>          </span><span class="hs-special">}</span><span>
-</span><span id="line-57"></span><span>
-</span><span id="line-58"></span><span class="hs-comment">-- | A builder for @std.assert@.</span><span>
-</span><span id="line-59"></span><span id="local-6989586621679476050"><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#assert"><span class="hs-identifier hs-type">assert</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#MonadBlockBuilder"><span class="hs-identifier hs-type">MonadBlockBuilder</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679476050"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#Value"><span class="hs-identifier hs-type">Value</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BS.ByteString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679476050"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
-</span><span id="line-60"></span><span id="assert"><span class="annot"><span class="annottext">assert :: Value -&gt; ByteString -&gt; m ()
-</span><a href="MLIR.AST.Dialect.Generated.Std.html#assert"><span class="hs-identifier hs-var hs-var">assert</span></a></span></span><span>  </span><span id="local-6989586621679476048"><span class="annot"><span class="annottext">Value
-</span><a href="#local-6989586621679476048"><span class="hs-identifier hs-var">arg</span></a></span></span><span> </span><span id="local-6989586621679476047"><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679476047"><span class="hs-identifier hs-var">msg</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-61"></span><span>  </span><span class="annot"><span class="annottext">m [Value] -&gt; m ()
-forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
-</span><span class="hs-identifier hs-var">Control.Monad.void</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Operation -&gt; m [Value]
-forall (m :: * -&gt; *). MonadBlockBuilder m =&gt; Operation -&gt; m [Value]
-</span><a href="MLIR.AST.Builder.html#emitOp"><span class="hs-identifier hs-var">AST.emitOp</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Operation :: forall operand.
-ByteString
--&gt; Location
--&gt; ResultTypes
--&gt; [operand]
--&gt; [Region]
--&gt; [ByteString]
--&gt; NamedAttributes
--&gt; AbstractOperation operand
-</span><a href="MLIR.AST.html#Operation"><span class="hs-identifier hs-type">Operation</span></a></span><span>
-</span><span id="line-62"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">opName :: ByteString
-</span><a href="MLIR.AST.html#opName"><span class="hs-identifier hs-var">opName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><span class="hs-string">&quot;std.assert&quot;</span></span><span>
-</span><span id="line-63"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opLocation :: Location
-</span><a href="MLIR.AST.html#opLocation"><span class="hs-identifier hs-var">opLocation</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Location
-</span><a href="MLIR.AST.html#UnknownLocation"><span class="hs-identifier hs-var">UnknownLocation</span></a></span><span>
-</span><span id="line-64"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opResultTypes :: ResultTypes
-</span><a href="MLIR.AST.html#opResultTypes"><span class="hs-identifier hs-var">opResultTypes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Type] -&gt; ResultTypes
-</span><a href="MLIR.AST.html#Explicit"><span class="hs-identifier hs-var">Explicit</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-65"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opOperands :: [ByteString]
-</span><a href="MLIR.AST.html#opOperands"><span class="hs-identifier hs-var">opOperands</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; ByteString
-</span><a href="MLIR.AST.Builder.html#operand"><span class="hs-identifier hs-var">AST.operand</span></a></span><span> </span><span class="annot"><span class="annottext">Value
-</span><a href="#local-6989586621679476048"><span class="hs-identifier hs-var">arg</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
-</span><span id="line-66"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opRegions :: [Region]
-</span><a href="MLIR.AST.html#opRegions"><span class="hs-identifier hs-var">opRegions</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-67"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opSuccessors :: [ByteString]
-</span><a href="MLIR.AST.html#opSuccessors"><span class="hs-identifier hs-var">opSuccessors</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-68"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opAttributes :: NamedAttributes
-</span><a href="MLIR.AST.html#opAttributes"><span class="hs-identifier hs-var">opAttributes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; NamedAttributes
-</span><a href="MLIR.AST.Dialect.Generated.Std.html#InternalAssertOpAttributes"><span class="hs-identifier hs-var">InternalAssertOpAttributes</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679476047"><span class="hs-identifier hs-var">msg</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-69"></span><span>          </span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-70"></span><span>
-</span><span id="line-71"></span><span class="hs-comment">-- * br</span><span>
-</span><span id="line-72"></span><span class="hs-comment">-- $br</span><span>
-</span><span id="line-73"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-74"></span><span class="hs-comment">-- The @br@ operation represents a branch operation in a function.</span><span>
-</span><span id="line-75"></span><span class="hs-comment">-- The operation takes variable number of operands and produces no results.</span><span>
-</span><span id="line-76"></span><span class="hs-comment">-- The operand number and types for each successor must match the arguments of</span><span>
-</span><span id="line-77"></span><span class="hs-comment">-- the block successor.</span><span>
-</span><span id="line-78"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-79"></span><span class="hs-comment">-- Example:</span><span>
-</span><span id="line-80"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-81"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-82"></span><span class="hs-comment">-- ^bb2:</span><span>
-</span><span id="line-83"></span><span class="hs-comment">--   %2 = call \@someFn()</span><span>
-</span><span id="line-84"></span><span class="hs-comment">--   br ^bb3(%2 : tensor\&lt;*xf32&gt;)</span><span>
-</span><span id="line-85"></span><span class="hs-comment">-- ^bb3(%3: tensor\&lt;*xf32&gt;):</span><span>
-</span><span id="line-86"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-87"></span><span class="hs-comment">--   </span><span>
-</span><span id="line-88"></span><span>
-</span><span id="line-89"></span><span class="hs-comment">-- * call_indirect</span><span>
-</span><span id="line-90"></span><span class="hs-comment">-- $call_indirect</span><span>
-</span><span id="line-91"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-92"></span><span class="hs-comment">-- The @call_indirect@ operation represents an indirect call to a value of</span><span>
-</span><span id="line-93"></span><span class="hs-comment">-- function type. Functions are first class types in MLIR, and may be passed as</span><span>
-</span><span id="line-94"></span><span class="hs-comment">-- arguments and merged together with block arguments. The operands and result</span><span>
-</span><span id="line-95"></span><span class="hs-comment">-- types of the call must match the specified function type.</span><span>
-</span><span id="line-96"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-97"></span><span class="hs-comment">-- Function values can be created with the</span><span>
-</span><span id="line-98"></span><span class="hs-comment">-- @constant@ operation.</span><span>
-</span><span id="line-99"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-100"></span><span class="hs-comment">-- Example:</span><span>
-</span><span id="line-101"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-102"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-103"></span><span class="hs-comment">-- %31 = call_indirect %15(%0, %1)</span><span>
-</span><span id="line-104"></span><span class="hs-comment">--         : (tensor\&lt;16xf32&gt;, tensor\&lt;16xf32&gt;) -&gt; tensor\&lt;16xf32&gt;</span><span>
-</span><span id="line-105"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-106"></span><span class="hs-comment">--   </span><span>
-</span><span id="line-107"></span><span>
-</span><span id="line-108"></span><span class="hs-comment">-- | A builder for @std.call_indirect@.</span><span>
-</span><span id="line-109"></span><span id="local-6989586621679476042"><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#call_indirect"><span class="hs-identifier hs-type">call_indirect</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#MonadBlockBuilder"><span class="hs-identifier hs-type">MonadBlockBuilder</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679476042"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="MLIR.AST.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#Value"><span class="hs-identifier hs-type">Value</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="MLIR.AST.Builder.html#Value"><span class="hs-identifier hs-type">Value</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679476042"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#Value"><span class="hs-identifier hs-type">Value</span></a></span></span><span>
-</span><span id="line-110"></span><span id="call_indirect"><span class="annot"><span class="annottext">call_indirect :: [Type] -&gt; Value -&gt; [Value] -&gt; m Value
-</span><a href="MLIR.AST.Dialect.Generated.Std.html#call_indirect"><span class="hs-identifier hs-var hs-var">call_indirect</span></a></span></span><span> </span><span id="local-6989586621679476040"><span class="annot"><span class="annottext">[Type]
-</span><a href="#local-6989586621679476040"><span class="hs-identifier hs-var">ty0</span></a></span></span><span> </span><span id="local-6989586621679476039"><span class="annot"><span class="annottext">Value
-</span><a href="#local-6989586621679476039"><span class="hs-identifier hs-var">callee</span></a></span></span><span> </span><span id="local-6989586621679476038"><span class="annot"><span class="annottext">[Value]
-</span><a href="#local-6989586621679476038"><span class="hs-identifier hs-var">callee_operands</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-111"></span><span>  </span><span class="annot"><span class="annottext">([Value] -&gt; Value) -&gt; m [Value] -&gt; m Value
+</span><span id="line-46"></span><span class="hs-comment">-- | A builder for @std.call_indirect@.</span><span>
+</span><span id="line-47"></span><span id="local-6989586621679476109"><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#call_indirect"><span class="hs-identifier hs-type">call_indirect</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#MonadBlockBuilder"><span class="hs-identifier hs-type">MonadBlockBuilder</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679476109"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="MLIR.AST.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#Value"><span class="hs-identifier hs-type">Value</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="MLIR.AST.Builder.html#Value"><span class="hs-identifier hs-type">Value</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679476109"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#Value"><span class="hs-identifier hs-type">Value</span></a></span></span><span>
+</span><span id="line-48"></span><span id="call_indirect"><span class="annot"><span class="annottext">call_indirect :: [Type] -&gt; Value -&gt; [Value] -&gt; m Value
+</span><a href="MLIR.AST.Dialect.Generated.Std.html#call_indirect"><span class="hs-identifier hs-var hs-var">call_indirect</span></a></span></span><span> </span><span id="local-6989586621679476107"><span class="annot"><span class="annottext">[Type]
+</span><a href="#local-6989586621679476107"><span class="hs-identifier hs-var">ty0</span></a></span></span><span> </span><span id="local-6989586621679476106"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679476106"><span class="hs-identifier hs-var">callee</span></a></span></span><span> </span><span id="local-6989586621679476105"><span class="annot"><span class="annottext">[Value]
+</span><a href="#local-6989586621679476105"><span class="hs-identifier hs-var">callee_operands</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-49"></span><span>  </span><span class="annot"><span class="annottext">([Value] -&gt; Value) -&gt; m [Value] -&gt; m Value
 forall (m :: * -&gt; *) a1 r. Monad m =&gt; (a1 -&gt; r) -&gt; m a1 -&gt; m r
 </span><span class="hs-identifier hs-var">Control.Monad.liftM</span></span><span> </span><span class="annot"><span class="annottext">[Value] -&gt; Value
 forall a. [a] -&gt; a
 </span><span class="hs-identifier hs-var">Prelude.head</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Operation -&gt; m [Value]
 forall (m :: * -&gt; *). MonadBlockBuilder m =&gt; Operation -&gt; m [Value]
 </span><a href="MLIR.AST.Builder.html#emitOp"><span class="hs-identifier hs-var">AST.emitOp</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Operation :: forall operand.
-ByteString
+Name
 -&gt; Location
 -&gt; ResultTypes
 -&gt; [operand]
 -&gt; [Region]
--&gt; [ByteString]
--&gt; NamedAttributes
+-&gt; [Name]
+-&gt; Map Name Attribute
 -&gt; AbstractOperation operand
 </span><a href="MLIR.AST.html#Operation"><span class="hs-identifier hs-type">Operation</span></a></span><span>
-</span><span id="line-112"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">opName :: ByteString
-</span><a href="MLIR.AST.html#opName"><span class="hs-identifier hs-var">opName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><span id="line-50"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">opName :: Name
+</span><a href="MLIR.AST.html#opName"><span class="hs-identifier hs-var">opName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Name
 </span><span class="hs-string">&quot;std.call_indirect&quot;</span></span><span>
-</span><span id="line-113"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opLocation :: Location
+</span><span id="line-51"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opLocation :: Location
 </span><a href="MLIR.AST.html#opLocation"><span class="hs-identifier hs-var">opLocation</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Location
 </span><a href="MLIR.AST.html#UnknownLocation"><span class="hs-identifier hs-var">UnknownLocation</span></a></span><span>
-</span><span id="line-114"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opResultTypes :: ResultTypes
+</span><span id="line-52"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opResultTypes :: ResultTypes
 </span><a href="MLIR.AST.html#opResultTypes"><span class="hs-identifier hs-var">opResultTypes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Type] -&gt; ResultTypes
 </span><a href="MLIR.AST.html#Explicit"><span class="hs-identifier hs-var">Explicit</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Type]
-</span><a href="#local-6989586621679476040"><span class="hs-identifier hs-var">ty0</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-115"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opOperands :: [ByteString]
-</span><a href="MLIR.AST.html#opOperands"><span class="hs-identifier hs-var">opOperands</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; ByteString
+</span><a href="#local-6989586621679476107"><span class="hs-identifier hs-var">ty0</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opOperands :: [Name]
+</span><a href="MLIR.AST.html#opOperands"><span class="hs-identifier hs-var">opOperands</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; Name
 </span><a href="MLIR.AST.Builder.html#operand"><span class="hs-identifier hs-var">AST.operand</span></a></span><span> </span><span class="annot"><span class="annottext">Value
-</span><a href="#local-6989586621679476039"><span class="hs-identifier hs-var">callee</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[ByteString] -&gt; [ByteString] -&gt; [ByteString]
+</span><a href="#local-6989586621679476106"><span class="hs-identifier hs-var">callee</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Name] -&gt; [Name] -&gt; [Name]
 forall a. [a] -&gt; [a] -&gt; [a]
-</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Value] -&gt; [ByteString]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Value] -&gt; [Name]
 </span><a href="MLIR.AST.Builder.html#operands"><span class="hs-identifier hs-var">AST.operands</span></a></span><span> </span><span class="annot"><span class="annottext">[Value]
-</span><a href="#local-6989586621679476038"><span class="hs-identifier hs-var">callee_operands</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-116"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opRegions :: [Region]
+</span><a href="#local-6989586621679476105"><span class="hs-identifier hs-var">callee_operands</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opRegions :: [Region]
 </span><a href="MLIR.AST.html#opRegions"><span class="hs-identifier hs-var">opRegions</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-117"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opSuccessors :: [ByteString]
+</span><span id="line-55"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opSuccessors :: [Name]
 </span><a href="MLIR.AST.html#opSuccessors"><span class="hs-identifier hs-var">opSuccessors</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-118"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opAttributes :: NamedAttributes
-</span><a href="MLIR.AST.html#opAttributes"><span class="hs-identifier hs-var">opAttributes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NamedAttributes
+</span><span id="line-56"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opAttributes :: Map Name Attribute
+</span><a href="MLIR.AST.html#opAttributes"><span class="hs-identifier hs-var">opAttributes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Name Attribute
 </span><a href="MLIR.AST.html#NoAttrs"><span class="hs-identifier hs-var">NoAttrs</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-119"></span><span>          </span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span>          </span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- * call</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- $call</span><span>
+</span><span id="line-61"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- The @call@ operation represents a direct call to a function that is within</span><span>
+</span><span id="line-63"></span><span class="hs-comment">-- the same symbol scope as the call. The operands and result types of the</span><span>
+</span><span id="line-64"></span><span class="hs-comment">-- call must match the specified function type. The callee is encoded as a</span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- symbol reference attribute named \&quot;callee\&quot;.</span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- Example:</span><span>
+</span><span id="line-68"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-70"></span><span class="hs-comment">-- %2 = call \@my_add(%0, %1) : (f32, f32) -&gt; f32</span><span>
+</span><span id="line-71"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-72"></span><span class="hs-comment">--   </span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-comment">-- * constant</span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- $constant</span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- Syntax:</span><span>
+</span><span id="line-78"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-79"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-80"></span><span class="hs-comment">-- operation ::= ssa-id @=@ @std.constant@ attribute-value @:@ type</span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-82"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- The @constant@ operation produces an SSA value from a symbol reference to a</span><span>
+</span><span id="line-84"></span><span class="hs-comment">-- @builtin.func@ operation</span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- Example:</span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-88"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- // Reference to function \@myfn.</span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- %2 = constant \@myfn : (tensor\&lt;16xf32&gt;, f32) -&gt; tensor\&lt;16xf32&gt;</span><span>
+</span><span id="line-91"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-92"></span><span class="hs-comment">-- // Equivalent generic forms</span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- %2 = \&quot;std.constant\&quot;() {value = \@myfn}</span><span>
+</span><span id="line-94"></span><span class="hs-comment">--    : () -&gt; ((tensor\&lt;16xf32&gt;, f32) -&gt; tensor\&lt;16xf32&gt;)</span><span>
+</span><span id="line-95"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-96"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-97"></span><span class="hs-comment">-- MLIR does not allow direct references to functions in SSA operands because</span><span>
+</span><span id="line-98"></span><span class="hs-comment">-- the compiler is multithreaded, and disallowing SSA values to directly</span><span>
+</span><span id="line-99"></span><span class="hs-comment">-- reference a function simplifies this</span><span>
+</span><span id="line-100"></span><span class="hs-comment">-- (rationale.</span><span>
+</span><span id="line-101"></span><span class="hs-comment">--   </span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- * return</span><span>
+</span><span id="line-104"></span><span class="hs-comment">-- $return</span><span>
+</span><span id="line-105"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-106"></span><span class="hs-comment">-- The @return@ operation represents a return operation within a function.</span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- The operation takes variable number of operands and produces no results.</span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- The operand number and types must match the signature of the function</span><span>
+</span><span id="line-109"></span><span class="hs-comment">-- that contains the operation.</span><span>
+</span><span id="line-110"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-111"></span><span class="hs-comment">-- Example:</span><span>
+</span><span id="line-112"></span><span class="hs-comment">-- </span><span>
+</span><span id="line-113"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- func \@foo() : (i32, f8) {</span><span>
+</span><span id="line-115"></span><span class="hs-comment">--   ...</span><span>
+</span><span id="line-116"></span><span class="hs-comment">--   return %0, %1 : i32, f8</span><span>
+</span><span id="line-117"></span><span class="hs-comment">-- }</span><span>
+</span><span id="line-118"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-119"></span><span class="hs-comment">--   </span><span>
 </span><span id="line-120"></span><span>
-</span><span id="line-121"></span><span class="hs-comment">-- * call</span><span>
-</span><span id="line-122"></span><span class="hs-comment">-- $call</span><span>
-</span><span id="line-123"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-124"></span><span class="hs-comment">-- The @call@ operation represents a direct call to a function that is within</span><span>
-</span><span id="line-125"></span><span class="hs-comment">-- the same symbol scope as the call. The operands and result types of the</span><span>
-</span><span id="line-126"></span><span class="hs-comment">-- call must match the specified function type. The callee is encoded as a</span><span>
-</span><span id="line-127"></span><span class="hs-comment">-- symbol reference attribute named \&quot;callee\&quot;.</span><span>
-</span><span id="line-128"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-129"></span><span class="hs-comment">-- Example:</span><span>
-</span><span id="line-130"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-131"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-132"></span><span class="hs-comment">-- %2 = call \@my_add(%0, %1) : (f32, f32) -&gt; f32</span><span>
-</span><span id="line-133"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-134"></span><span class="hs-comment">--   </span><span>
-</span><span id="line-135"></span><span>
-</span><span id="line-136"></span><span class="hs-comment">-- * cond_br</span><span>
-</span><span id="line-137"></span><span class="hs-comment">-- $cond_br</span><span>
-</span><span id="line-138"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-139"></span><span class="hs-comment">-- The @cond_br@ terminator operation represents a conditional branch on a</span><span>
-</span><span id="line-140"></span><span class="hs-comment">-- boolean (1-bit integer) value. If the bit is set, then the first destination</span><span>
-</span><span id="line-141"></span><span class="hs-comment">-- is jumped to; if it is false, the second destination is chosen. The count</span><span>
-</span><span id="line-142"></span><span class="hs-comment">-- and types of operands must align with the arguments in the corresponding</span><span>
-</span><span id="line-143"></span><span class="hs-comment">-- target blocks.</span><span>
-</span><span id="line-144"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-145"></span><span class="hs-comment">-- The MLIR conditional branch operation is not allowed to target the entry</span><span>
-</span><span id="line-146"></span><span class="hs-comment">-- block for a region. The two destinations of the conditional branch operation</span><span>
-</span><span id="line-147"></span><span class="hs-comment">-- are allowed to be the same.</span><span>
-</span><span id="line-148"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-149"></span><span class="hs-comment">-- The following example illustrates a function with a conditional branch</span><span>
-</span><span id="line-150"></span><span class="hs-comment">-- operation that targets the same block.</span><span>
-</span><span id="line-151"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-152"></span><span class="hs-comment">-- Example:</span><span>
-</span><span id="line-153"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-154"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-155"></span><span class="hs-comment">-- func \@select(%a: i32, %b: i32, %flag: i1) -&gt; i32 {</span><span>
-</span><span id="line-156"></span><span class="hs-comment">--   // Both targets are the same, operands differ</span><span>
-</span><span id="line-157"></span><span class="hs-comment">--   cond_br %flag, ^bb1(%a : i32), ^bb1(%b : i32)</span><span>
-</span><span id="line-158"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-159"></span><span class="hs-comment">-- ^bb1(%x : i32) :</span><span>
-</span><span id="line-160"></span><span class="hs-comment">--   return %x : i32</span><span>
-</span><span id="line-161"></span><span class="hs-comment">-- }</span><span>
-</span><span id="line-162"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-163"></span><span class="hs-comment">--   </span><span>
-</span><span id="line-164"></span><span>
-</span><span id="line-165"></span><span class="hs-comment">-- * constant</span><span>
-</span><span id="line-166"></span><span class="hs-comment">-- $constant</span><span>
-</span><span id="line-167"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-168"></span><span class="hs-comment">-- Syntax:</span><span>
-</span><span id="line-169"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-170"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-171"></span><span class="hs-comment">-- operation ::= ssa-id @=@ @std.constant@ attribute-value @:@ type</span><span>
-</span><span id="line-172"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-173"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-174"></span><span class="hs-comment">-- The @constant@ operation produces an SSA value from a symbol reference to a</span><span>
-</span><span id="line-175"></span><span class="hs-comment">-- @builtin.func@ operation</span><span>
-</span><span id="line-176"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-177"></span><span class="hs-comment">-- Example:</span><span>
-</span><span id="line-178"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-179"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-180"></span><span class="hs-comment">-- // Reference to function \@myfn.</span><span>
-</span><span id="line-181"></span><span class="hs-comment">-- %2 = constant \@myfn : (tensor\&lt;16xf32&gt;, f32) -&gt; tensor\&lt;16xf32&gt;</span><span>
-</span><span id="line-182"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-183"></span><span class="hs-comment">-- // Equivalent generic forms</span><span>
-</span><span id="line-184"></span><span class="hs-comment">-- %2 = \&quot;std.constant\&quot;() {value = \@myfn}</span><span>
-</span><span id="line-185"></span><span class="hs-comment">--    : () -&gt; ((tensor\&lt;16xf32&gt;, f32) -&gt; tensor\&lt;16xf32&gt;)</span><span>
-</span><span id="line-186"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-187"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-188"></span><span class="hs-comment">-- MLIR does not allow direct references to functions in SSA operands because</span><span>
-</span><span id="line-189"></span><span class="hs-comment">-- the compiler is multithreaded, and disallowing SSA values to directly</span><span>
-</span><span id="line-190"></span><span class="hs-comment">-- reference a function simplifies this</span><span>
-</span><span id="line-191"></span><span class="hs-comment">-- (rationale.</span><span>
-</span><span id="line-192"></span><span class="hs-comment">--   </span><span>
-</span><span id="line-193"></span><span>
-</span><span id="line-194"></span><span class="hs-comment">-- * return</span><span>
-</span><span id="line-195"></span><span class="hs-comment">-- $return</span><span>
-</span><span id="line-196"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-197"></span><span class="hs-comment">-- The @return@ operation represents a return operation within a function.</span><span>
-</span><span id="line-198"></span><span class="hs-comment">-- The operation takes variable number of operands and produces no results.</span><span>
-</span><span id="line-199"></span><span class="hs-comment">-- The operand number and types must match the signature of the function</span><span>
-</span><span id="line-200"></span><span class="hs-comment">-- that contains the operation.</span><span>
-</span><span id="line-201"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-202"></span><span class="hs-comment">-- Example:</span><span>
-</span><span id="line-203"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-204"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-205"></span><span class="hs-comment">-- func \@foo() : (i32, f8) {</span><span>
-</span><span id="line-206"></span><span class="hs-comment">--   ...</span><span>
-</span><span id="line-207"></span><span class="hs-comment">--   return %0, %1 : i32, f8</span><span>
-</span><span id="line-208"></span><span class="hs-comment">-- }</span><span>
-</span><span id="line-209"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-210"></span><span class="hs-comment">--   </span><span>
-</span><span id="line-211"></span><span>
-</span><span id="line-212"></span><span class="hs-comment">-- | A pattern for @std.return@.</span><span>
-</span><span id="line-213"></span><span id="local-6989586621679476086"><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#Return"><span class="hs-identifier hs-type">Return</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.html#Location"><span class="hs-identifier hs-type">Location</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679476086"><span class="hs-identifier hs-type">operand</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.html#AbstractOperation"><span class="hs-identifier hs-type">AbstractOperation</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679476086"><span class="hs-identifier hs-type">operand</span></a></span></span><span>
-</span><span id="line-214"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bReturn"><span id="%24mReturn"><span id="Return"><span class="annot"><span class="annottext">$bReturn :: Location -&gt; [operand] -&gt; AbstractOperation operand
+</span><span id="line-121"></span><span class="hs-comment">-- | A pattern for @std.return@.</span><span>
+</span><span id="line-122"></span><span id="local-6989586621679476123"><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#Return"><span class="hs-identifier hs-type">Return</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.html#Location"><span class="hs-identifier hs-type">Location</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679476123"><span class="hs-identifier hs-type">operand</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.html#AbstractOperation"><span class="hs-identifier hs-type">AbstractOperation</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679476123"><span class="hs-identifier hs-type">operand</span></a></span></span><span>
+</span><span id="line-123"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bReturn"><span id="%24mReturn"><span id="Return"><span class="annot"><span class="annottext">$bReturn :: Location -&gt; [operand] -&gt; AbstractOperation operand
 $mReturn :: forall r operand.
 AbstractOperation operand
 -&gt; (Location -&gt; [operand] -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
-</span><a href="MLIR.AST.Dialect.Generated.Std.html#%24bReturn"><span class="hs-identifier hs-var hs-var hs-var">Return</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679476031"><span class="hs-identifier hs-type">loc</span></a></span><span>  </span><span class="annot"><a href="#local-6989586621679476030"><span class="hs-identifier hs-type">operands</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="MLIR.AST.html#Operation"><span class="hs-identifier hs-type">Operation</span></a></span><span>
-</span><span id="line-215"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="MLIR.AST.html#opName"><span class="hs-identifier hs-var">opName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;std.return&quot;</span></span><span>
-</span><span id="line-216"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opLocation"><span class="hs-identifier hs-var">opLocation</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679476031"><span class="annot"><a href="#local-6989586621679476031"><span class="hs-identifier hs-var">loc</span></a></span></span><span>
-</span><span id="line-217"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opResultTypes"><span class="hs-identifier hs-var">opResultTypes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="MLIR.AST.html#Explicit"><span class="hs-identifier hs-type">Explicit</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-218"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opOperands"><span class="hs-identifier hs-var">opOperands</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679476030"><span class="annot"><a href="#local-6989586621679476030"><span class="hs-identifier hs-var">operands</span></a></span></span><span>
-</span><span id="line-219"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opRegions"><span class="hs-identifier hs-var">opRegions</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-220"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opSuccessors"><span class="hs-identifier hs-var">opSuccessors</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-221"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opAttributes"><span class="hs-identifier hs-var">opAttributes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="MLIR.AST.html#NoAttrs"><span class="hs-identifier hs-type">NoAttrs</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-222"></span><span>          </span><span class="hs-special">}</span><span>
-</span><span id="line-223"></span><span>
-</span><span id="line-224"></span><span class="hs-comment">-- | A builder for @std.return@.</span><span>
-</span><span id="line-225"></span><span id="local-6989586621679476029"><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#return"><span class="hs-identifier hs-type">return</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#MonadBlockBuilder"><span class="hs-identifier hs-type">MonadBlockBuilder</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679476029"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="MLIR.AST.Builder.html#Value"><span class="hs-identifier hs-type">Value</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679476029"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#EndOfBlock"><span class="hs-identifier hs-type">EndOfBlock</span></a></span></span><span>
-</span><span id="line-226"></span><span id="return"><span class="annot"><span class="annottext">return :: [Value] -&gt; m EndOfBlock
-</span><a href="MLIR.AST.Dialect.Generated.Std.html#return"><span class="hs-identifier hs-var hs-var">return</span></a></span></span><span>  </span><span id="local-6989586621679476027"><span class="annot"><span class="annottext">[Value]
-</span><a href="#local-6989586621679476027"><span class="hs-identifier hs-var">operands</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-227"></span><span>  </span><span class="annot"><span class="annottext">m [Value] -&gt; m ()
+</span><a href="MLIR.AST.Dialect.Generated.Std.html#%24bReturn"><span class="hs-identifier hs-var hs-var hs-var">Return</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679476086"><span class="hs-identifier hs-type">loc</span></a></span><span>  </span><span class="annot"><a href="#local-6989586621679476085"><span class="hs-identifier hs-type">operands</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="MLIR.AST.html#Operation"><span class="hs-identifier hs-type">Operation</span></a></span><span>
+</span><span id="line-124"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="MLIR.AST.html#opName"><span class="hs-identifier hs-var">opName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;std.return&quot;</span></span><span>
+</span><span id="line-125"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opLocation"><span class="hs-identifier hs-var">opLocation</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679476086"><span class="annot"><a href="#local-6989586621679476086"><span class="hs-identifier hs-var">loc</span></a></span></span><span>
+</span><span id="line-126"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opResultTypes"><span class="hs-identifier hs-var">opResultTypes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="MLIR.AST.html#Explicit"><span class="hs-identifier hs-type">Explicit</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-127"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opOperands"><span class="hs-identifier hs-var">opOperands</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679476085"><span class="annot"><a href="#local-6989586621679476085"><span class="hs-identifier hs-var">operands</span></a></span></span><span>
+</span><span id="line-128"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opRegions"><span class="hs-identifier hs-var">opRegions</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-129"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opSuccessors"><span class="hs-identifier hs-var">opSuccessors</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-130"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="MLIR.AST.html#opAttributes"><span class="hs-identifier hs-var">opAttributes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="MLIR.AST.html#NoAttrs"><span class="hs-identifier hs-type">NoAttrs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-131"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="hs-comment">-- | A builder for @std.return@.</span><span>
+</span><span id="line-134"></span><span id="local-6989586621679476084"><span class="annot"><a href="MLIR.AST.Dialect.Generated.Std.html#return"><span class="hs-identifier hs-type">return</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#MonadBlockBuilder"><span class="hs-identifier hs-type">MonadBlockBuilder</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679476084"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="MLIR.AST.Builder.html#Value"><span class="hs-identifier hs-type">Value</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679476084"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="MLIR.AST.Builder.html#EndOfBlock"><span class="hs-identifier hs-type">EndOfBlock</span></a></span></span><span>
+</span><span id="line-135"></span><span id="return"><span class="annot"><span class="annottext">return :: [Value] -&gt; m EndOfBlock
+</span><a href="MLIR.AST.Dialect.Generated.Std.html#return"><span class="hs-identifier hs-var hs-var">return</span></a></span></span><span>  </span><span id="local-6989586621679476082"><span class="annot"><span class="annottext">[Value]
+</span><a href="#local-6989586621679476082"><span class="hs-identifier hs-var">operands</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-136"></span><span>  </span><span class="annot"><span class="annottext">m [Value] -&gt; m ()
 forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
 </span><span class="hs-identifier hs-var">Control.Monad.void</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Operation -&gt; m [Value]
 forall (m :: * -&gt; *). MonadBlockBuilder m =&gt; Operation -&gt; m [Value]
 </span><a href="MLIR.AST.Builder.html#emitOp"><span class="hs-identifier hs-var">AST.emitOp</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Operation :: forall operand.
-ByteString
+Name
 -&gt; Location
 -&gt; ResultTypes
 -&gt; [operand]
 -&gt; [Region]
--&gt; [ByteString]
--&gt; NamedAttributes
+-&gt; [Name]
+-&gt; Map Name Attribute
 -&gt; AbstractOperation operand
 </span><a href="MLIR.AST.html#Operation"><span class="hs-identifier hs-type">Operation</span></a></span><span>
-</span><span id="line-228"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">opName :: ByteString
-</span><a href="MLIR.AST.html#opName"><span class="hs-identifier hs-var">opName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><span id="line-137"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">opName :: Name
+</span><a href="MLIR.AST.html#opName"><span class="hs-identifier hs-var">opName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Name
 </span><span class="hs-string">&quot;std.return&quot;</span></span><span>
-</span><span id="line-229"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opLocation :: Location
+</span><span id="line-138"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opLocation :: Location
 </span><a href="MLIR.AST.html#opLocation"><span class="hs-identifier hs-var">opLocation</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Location
 </span><a href="MLIR.AST.html#UnknownLocation"><span class="hs-identifier hs-var">UnknownLocation</span></a></span><span>
-</span><span id="line-230"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opResultTypes :: ResultTypes
+</span><span id="line-139"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opResultTypes :: ResultTypes
 </span><a href="MLIR.AST.html#opResultTypes"><span class="hs-identifier hs-var">opResultTypes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Type] -&gt; ResultTypes
 </span><a href="MLIR.AST.html#Explicit"><span class="hs-identifier hs-var">Explicit</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-231"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opOperands :: [ByteString]
-</span><a href="MLIR.AST.html#opOperands"><span class="hs-identifier hs-var">opOperands</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Value] -&gt; [ByteString]
+</span><span id="line-140"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opOperands :: [Name]
+</span><a href="MLIR.AST.html#opOperands"><span class="hs-identifier hs-var">opOperands</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Value] -&gt; [Name]
 </span><a href="MLIR.AST.Builder.html#operands"><span class="hs-identifier hs-var">AST.operands</span></a></span><span> </span><span class="annot"><span class="annottext">[Value]
-</span><a href="#local-6989586621679476027"><span class="hs-identifier hs-var">operands</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-232"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opRegions :: [Region]
+</span><a href="#local-6989586621679476082"><span class="hs-identifier hs-var">operands</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-141"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opRegions :: [Region]
 </span><a href="MLIR.AST.html#opRegions"><span class="hs-identifier hs-var">opRegions</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-233"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opSuccessors :: [ByteString]
+</span><span id="line-142"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opSuccessors :: [Name]
 </span><a href="MLIR.AST.html#opSuccessors"><span class="hs-identifier hs-var">opSuccessors</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-234"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opAttributes :: NamedAttributes
-</span><a href="MLIR.AST.html#opAttributes"><span class="hs-identifier hs-var">opAttributes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NamedAttributes
+</span><span id="line-143"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">opAttributes :: Map Name Attribute
+</span><a href="MLIR.AST.html#opAttributes"><span class="hs-identifier hs-var">opAttributes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Name Attribute
 </span><a href="MLIR.AST.html#NoAttrs"><span class="hs-identifier hs-var">NoAttrs</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-235"></span><span>          </span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-236"></span><span>  </span><span class="annot"><span class="annottext">m EndOfBlock
+</span><span id="line-144"></span><span>          </span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-145"></span><span>  </span><span class="annot"><span class="annottext">m EndOfBlock
 forall (m :: * -&gt; *). Monad m =&gt; m EndOfBlock
 </span><a href="MLIR.AST.Builder.html#terminateBlock"><span class="hs-identifier hs-var">AST.terminateBlock</span></a></span><span>
-</span><span id="line-237"></span><span>
-</span><span id="line-238"></span><span class="hs-comment">-- * switch</span><span>
-</span><span id="line-239"></span><span class="hs-comment">-- $switch</span><span>
-</span><span id="line-240"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-241"></span><span class="hs-comment">-- The @switch@ terminator operation represents a switch on a signless integer</span><span>
-</span><span id="line-242"></span><span class="hs-comment">-- value. If the flag matches one of the specified cases, then the</span><span>
-</span><span id="line-243"></span><span class="hs-comment">-- corresponding destination is jumped to. If the flag does not match any of</span><span>
-</span><span id="line-244"></span><span class="hs-comment">-- the cases, the default destination is jumped to. The count and types of</span><span>
-</span><span id="line-245"></span><span class="hs-comment">-- operands must align with the arguments in the corresponding target blocks.</span><span>
-</span><span id="line-246"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-247"></span><span class="hs-comment">-- Example:</span><span>
-</span><span id="line-248"></span><span class="hs-comment">-- </span><span>
-</span><span id="line-249"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-250"></span><span class="hs-comment">-- switch %flag : i32, [</span><span>
-</span><span id="line-251"></span><span class="hs-comment">--   default: ^bb1(%a : i32),</span><span>
-</span><span id="line-252"></span><span class="hs-comment">--   42: ^bb1(%b : i32),</span><span>
-</span><span id="line-253"></span><span class="hs-comment">--   43: ^bb3(%c : i32)</span><span>
-</span><span id="line-254"></span><span class="hs-comment">-- ]</span><span>
-</span><span id="line-255"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-256"></span><span class="hs-comment">--   </span><span>
-</span><span id="line-257"></span></pre></body></html>
+</span><span id="line-146"></span></pre></body></html>

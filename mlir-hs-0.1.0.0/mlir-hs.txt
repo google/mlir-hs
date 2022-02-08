@@ -814,15 +814,6 @@ pattern Yield :: () => () => Location -> operand -> AbstractOperation operand
 yield :: () => MonadBlockBuilder m => Value -> m EndOfBlock
 
 module MLIR.AST.Dialect.Std
-pattern Branch :: Location -> BlockName -> [Name] -> Operation
-br :: MonadBlockBuilder m => BlockName -> [Value] -> m EndOfBlock
-cond_br :: MonadBlockBuilder m => Value -> BlockName -> [Value] -> BlockName -> [Value] -> m EndOfBlock
-
--- | A pattern for <tt>std.assert</tt>.
-pattern Assert :: () => () => Location -> operand -> ByteString -> AbstractOperation operand
-
--- | A builder for <tt>std.assert</tt>.
-assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 -- | A builder for <tt>std.call_indirect</tt>.
 call_indirect :: () => MonadBlockBuilder m => [Type] -> Value -> [Value] -> m Value
@@ -2061,19 +2052,30 @@ xori :: () => MonadBlockBuilder m => Value -> Value -> m Value
 -- | A builder for <tt>arith.select</tt>.
 select :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
 
+module MLIR.AST.Dialect.ControlFlow
+pattern Branch :: Location -> BlockName -> [Name] -> Operation
+br :: MonadBlockBuilder m => BlockName -> [Value] -> m EndOfBlock
+cond_br :: MonadBlockBuilder m => Value -> BlockName -> [Value] -> BlockName -> [Value] -> m EndOfBlock
+
+-- | A pattern for <tt>cf.assert</tt>.
+pattern Assert :: () => () => Location -> operand -> ByteString -> AbstractOperation operand
+
+-- | A builder for <tt>cf.assert</tt>.
+assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
+
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679461170 :: Context -> IO PassManager
+inline_c_ffi_6989586621679461224 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679461179 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461233 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679461192 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679461246 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679461201 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461255 :: PassManager -> IO ()
 addConvertStandardToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679461210 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461264 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679461219 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461273 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679461228 :: PassManager -> IO ()
+inline_c_ffi_6989586621679461282 :: PassManager -> IO ()
