@@ -24,7 +24,7 @@ import MLIR.AST.Serialize
 import qualified Data.ByteString as BS
 import qualified MLIR.AST.Dialect.Arith as Arith
 import qualified MLIR.AST.Dialect.ControlFlow as Cf
-import qualified MLIR.AST.Dialect.Std as Std
+import qualified MLIR.AST.Dialect.Func as Func
 import qualified MLIR.Native as MLIR
 
 
@@ -45,7 +45,7 @@ spec = do
             x <- blockArgument ty
             y <- blockArgument ty
             z <- combine x y
-            Std.return [z]
+            Func.return [z]
 
     it "Can construct a simple add function" $ do
       let m = runIdentity $ buildModule $ combineFunc "add" Float32Type Arith.addf
@@ -75,7 +75,7 @@ spec = do
                     Cf.br header [true]
                   exit <- buildBlock do
                     result <- blockArgument f32
-                    Std.return [result]
+                    Func.return [result]
                   endOfRegion
       verifyAndDump m
 
@@ -87,7 +87,7 @@ spec = do
                   y <- Arith.addf x x
                   setDefaultLocation (FileLocation "file.mlir" 4 10)
                   z <- Arith.addf y y
-                  Std.return [z]
+                  Func.return [z]
       MLIR.withContext \ctx -> do
         MLIR.registerAllDialects ctx
         nativeOp <- fromAST ctx (mempty, mempty) m

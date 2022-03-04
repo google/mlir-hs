@@ -32,7 +32,7 @@ import Control.Monad.IO.Class
 import MLIR.AST
 import MLIR.AST.Serialize
 import qualified MLIR.AST.Dialect.Arith  as Arith
-import qualified MLIR.AST.Dialect.Std    as Std
+import qualified MLIR.AST.Dialect.Func   as Func
 import qualified MLIR.AST.Dialect.MemRef as MemRef
 import qualified MLIR.AST.Dialect.Affine as Affine
 import qualified MLIR.AST.Dialect.Vector as Vector
@@ -178,7 +178,7 @@ spec = do
                     , "3" := MemRef.Load v64Ty "arg2" []
                     , "4" := Arith.AddF UnknownLocation v64Ty "3" "2"
                     , Do $ MemRef.Store "4" "arg2" []
-                    , Do $ Std.Return UnknownLocation []
+                    , Do $ Func.Return UnknownLocation []
                     ]
                 ]
               ]
@@ -210,7 +210,7 @@ spec = do
                                 (Affine.Map 3 0 [Affine.Dimension 0, Affine.Dimension 1])
                                 [Vector.Parallel, Vector.Parallel, Vector.Reduction]
                     , Do $ MemRef.Store "3" "arg2" []
-                    , Do $ Std.Return UnknownLocation []
+                    , Do $ Func.Return UnknownLocation []
                     ]
                 ]
               ]

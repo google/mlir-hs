@@ -60,11 +60,11 @@ library
     , MLIR.AST.Dialect.Affine
     , MLIR.AST.Dialect.Arith
     , MLIR.AST.Dialect.ControlFlow
+    , MLIR.AST.Dialect.Func
     , MLIR.AST.Dialect.LLVM
     , MLIR.AST.Dialect.Linalg
     , MLIR.AST.Dialect.MemRef
     , MLIR.AST.Dialect.Shape
-    , MLIR.AST.Dialect.Std
     , MLIR.AST.Dialect.Tensor
     , MLIR.AST.Dialect.Vector
     , MLIR.AST.Dialect.X86Vector
@@ -79,11 +79,11 @@ library
   other-modules:
       MLIR.AST.Dialect.Generated.Arith
     , MLIR.AST.Dialect.Generated.ControlFlow
+    , MLIR.AST.Dialect.Generated.Func
     , MLIR.AST.Dialect.Generated.LLVM
     , MLIR.AST.Dialect.Generated.Linalg
     , MLIR.AST.Dialect.Generated.LinalgStructured
     , MLIR.AST.Dialect.Generated.Shape
-    , MLIR.AST.Dialect.Generated.Std
     , MLIR.AST.Dialect.Generated.Tensor
     , MLIR.AST.Dialect.Generated.Vector
     , MLIR.AST.Dialect.Generated.X86Vector

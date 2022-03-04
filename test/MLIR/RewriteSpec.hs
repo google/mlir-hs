@@ -23,7 +23,7 @@ import MLIR.AST.Builder
 import MLIR.AST.Serialize
 import MLIR.AST.Rewrite
 import qualified MLIR.AST.Dialect.Arith as Arith
-import qualified MLIR.AST.Dialect.Std as Std
+import qualified MLIR.AST.Dialect.Func as Func
 import qualified MLIR.Native as MLIR
 
 
@@ -46,7 +46,7 @@ spec = do
                   y <- blockArgument Float32Type
                   z <- Arith.addf x y
                   w <- Arith.addf z z
-                  Std.return [w]
+                  Func.return [w]
       let m' = applyClosedOpRewrite replaceAddWithMul m
       verifyAndDump m'
       where

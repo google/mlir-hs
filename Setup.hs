@@ -127,7 +127,7 @@ main = defaultMainWithHooks simpleUserHooks
   , confHook = \(genericPackageDesc, hookedBuildInfo) confFlags -> do
       tblgen <- buildTblgen confFlags
       let dialects =
-            [ ("Std"             , "mlir/Dialect/StandardOps/IR/Ops.td", [])
+            [ ("Func"            , "mlir/Dialect/Func/IR/FuncOps.td", [])
             , ("Arith"           , "mlir/Dialect/Arithmetic/IR/ArithmeticOps.td", ["-strip-prefix", "Arith_"])
             , ("ControlFlow"     , "mlir/Dialect/ControlFlow/IR/ControlFlowOps.td", ["-dialect-name", "ControlFlow"])
             , ("Vector"          , "mlir/Dialect/Vector/IR/VectorOps.td", ["-strip-prefix", "Vector_"])
