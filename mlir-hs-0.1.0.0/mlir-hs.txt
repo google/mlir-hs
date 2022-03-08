@@ -2130,7 +2130,7 @@ runPasses :: PassManager -> Module -> IO LogicalResult
 inline_c_ffi_6989586621679480734 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
 inline_c_ffi_6989586621679480743 :: PassManager -> IO ()
-addConvertStandardToLLVMPass :: PassManager -> IO ()
+addConvertFuncToLLVMPass :: PassManager -> IO ()
 inline_c_ffi_6989586621679480752 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
 inline_c_ffi_6989586621679480761 :: PassManager -> IO ()
