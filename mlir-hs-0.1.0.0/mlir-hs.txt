@@ -1060,6 +1060,9 @@ conv_3d_ndhwc_dhwcf :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value]
 -- | A builder for <tt>linalg.conv_3d</tt>.
 conv_3d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A builder for <tt>linalg.copy</tt>.
+copy :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A builder for <tt>linalg.depthwise_conv_1d_nwc_wc</tt>.
 depthwise_conv_1d_nwc_wc :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1085,13 +1088,10 @@ elemwise_binary :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> 
 elemwise_unary :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.fill</tt>.
-fill :: () => MonadBlockBuilder m => Maybe Type -> Value -> Value -> RegionBuilderT m () -> m Value
+fill :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.fill_rng_2d</tt>.
 fill_rng_2d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.fill_tensor</tt>.
-fill_tensor :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.generic</tt>.
 generic :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> [Attribute] -> Maybe ByteString -> Maybe ByteString -> RegionBuilderT m () -> m Value
@@ -1140,9 +1140,6 @@ quantized_batch_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Val
 
 -- | A builder for <tt>linalg.quantized_matmul</tt>.
 quantized_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
-
--- | A builder for <tt>linalg.soft_plus_2d</tt>.
-soft_plus_2d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.vecmat</tt>.
 vecmat :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1451,9 +1448,6 @@ pattern IntToPtr :: () => () => Location -> Type -> operand -> AbstractOperation
 
 -- | A builder for <tt>llvm.inttoptr</tt>.
 inttoptr :: () => MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A builder for <tt>llvm.func</tt>.
-func :: () => MonadBlockBuilder m => Maybe ByteString -> Maybe [Attribute] -> RegionBuilderT m () -> m ()
 
 -- | A pattern for <tt>llvm.lshr</tt>.
 pattern LShr :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -2122,17 +2116,17 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679480712 :: Context -> IO PassManager
+inline_c_ffi_6989586621679478863 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679480721 :: PassManager -> IO ()
+inline_c_ffi_6989586621679478872 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679480734 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679478885 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679480743 :: PassManager -> IO ()
+inline_c_ffi_6989586621679478894 :: PassManager -> IO ()
 addConvertFuncToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679480752 :: PassManager -> IO ()
+inline_c_ffi_6989586621679478903 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679480761 :: PassManager -> IO ()
+inline_c_ffi_6989586621679478912 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679480770 :: PassManager -> IO ()
+inline_c_ffi_6989586621679478921 :: PassManager -> IO ()
