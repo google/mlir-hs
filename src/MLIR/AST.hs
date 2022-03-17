@@ -208,11 +208,11 @@ pattern FuncAttrs name ty <-
   ((\d -> (M.lookup "sym_name" d, M.lookup "type" d)) ->
    (Just (StringAttr name), Just (TypeAttr ty)))
   where FuncAttrs name ty = M.fromList [("sym_name", StringAttr name),
-                                        ("type", TypeAttr ty)]
+                                        ("function_type", TypeAttr ty)]
 
 pattern FuncOp :: Location -> Name -> Type -> Region -> Operation
 pattern FuncOp loc name ty body = Operation
-  { opName = "builtin.func"
+  { opName = "func.func"
   , opLocation = loc
   , opResultTypes = Explicit []
   , opOperands = []
