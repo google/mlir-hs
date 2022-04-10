@@ -1111,6 +1111,9 @@ mmt4d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuil
 -- | A builder for <tt>linalg.pooling_nchw_max</tt>.
 pooling_nchw_max :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A builder for <tt>linalg.pooling_nchw_sum</tt>.
+pooling_nchw_sum :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A builder for <tt>linalg.pooling_ndhwc_max</tt>.
 pooling_ndhwc_max :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1701,6 +1704,12 @@ pattern StackSave :: () => () => Location -> Type -> AbstractOperation operand
 -- | A builder for <tt>llvm.intr.stacksave</tt>.
 intr_stacksave :: () => MonadBlockBuilder m => Type -> m Value
 
+-- | A pattern for <tt>llvm.intr.experimental.stepvector</tt>.
+pattern StepVector :: () => () => Location -> Type -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.experimental.stepvector</tt>.
+intr_experimental_stepvector :: () => MonadBlockBuilder m => Type -> m Value
+
 -- | A pattern for <tt>llvm.store</tt>.
 pattern Store :: () => () => Location -> operand -> operand -> Maybe Int -> AbstractOperation operand
 
@@ -1778,6 +1787,204 @@ pattern Unreachable :: () => () => Location -> AbstractOperation operand
 
 -- | A builder for <tt>llvm.unreachable</tt>.
 unreachable :: () => MonadBlockBuilder m => m EndOfBlock
+
+-- | A pattern for <tt>llvm.intr.vp.ashr</tt>.
+pattern VPAShr :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.ashr</tt>.
+intr_vp_ashr :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.add</tt>.
+pattern VPAdd :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.add</tt>.
+intr_vp_add :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.and</tt>.
+pattern VPAnd :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.and</tt>.
+intr_vp_and :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.fadd</tt>.
+pattern VPFAdd :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.fadd</tt>.
+intr_vp_fadd :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.fdiv</tt>.
+pattern VPFDiv :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.fdiv</tt>.
+intr_vp_fdiv :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.fmul</tt>.
+pattern VPFMul :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.fmul</tt>.
+intr_vp_fmul :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.fneg</tt>.
+pattern VPFNeg :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.fneg</tt>.
+intr_vp_fneg :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.frem</tt>.
+pattern VPFRem :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.frem</tt>.
+intr_vp_frem :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.fsub</tt>.
+pattern VPFSub :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.fsub</tt>.
+intr_vp_fsub :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.fma</tt>.
+pattern VPFma :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.fma</tt>.
+intr_vp_fma :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.lshr</tt>.
+pattern VPLShr :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.lshr</tt>.
+intr_vp_lshr :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.mul</tt>.
+pattern VPMul :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.mul</tt>.
+intr_vp_mul :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.or</tt>.
+pattern VPOr :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.or</tt>.
+intr_vp_or :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.add</tt>.
+pattern VPReduceAdd :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.add</tt>.
+intr_vp_reduce_add :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.and</tt>.
+pattern VPReduceAnd :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.and</tt>.
+intr_vp_reduce_and :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.fadd</tt>.
+pattern VPReduceFAdd :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.fadd</tt>.
+intr_vp_reduce_fadd :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.fmax</tt>.
+pattern VPReduceFMax :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.fmax</tt>.
+intr_vp_reduce_fmax :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.fmin</tt>.
+pattern VPReduceFMin :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.fmin</tt>.
+intr_vp_reduce_fmin :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.fmul</tt>.
+pattern VPReduceFMul :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.fmul</tt>.
+intr_vp_reduce_fmul :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.mul</tt>.
+pattern VPReduceMul :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.mul</tt>.
+intr_vp_reduce_mul :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.or</tt>.
+pattern VPReduceOr :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.or</tt>.
+intr_vp_reduce_or :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.smax</tt>.
+pattern VPReduceSMax :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.smax</tt>.
+intr_vp_reduce_smax :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.smin</tt>.
+pattern VPReduceSMin :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.smin</tt>.
+intr_vp_reduce_smin :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.umax</tt>.
+pattern VPReduceUMax :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.umax</tt>.
+intr_vp_reduce_umax :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.umin</tt>.
+pattern VPReduceUMin :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.umin</tt>.
+intr_vp_reduce_umin :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.reduce.xor</tt>.
+pattern VPReduceXor :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.reduce.xor</tt>.
+intr_vp_reduce_xor :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.sdiv</tt>.
+pattern VPSDiv :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.sdiv</tt>.
+intr_vp_sdiv :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.srem</tt>.
+pattern VPSRem :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.srem</tt>.
+intr_vp_srem :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.shl</tt>.
+pattern VPShl :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.shl</tt>.
+intr_vp_shl :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.sub</tt>.
+pattern VPSub :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.sub</tt>.
+intr_vp_sub :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.udiv</tt>.
+pattern VPUDiv :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.udiv</tt>.
+intr_vp_udiv :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.urem</tt>.
+pattern VPURem :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.urem</tt>.
+intr_vp_urem :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>llvm.intr.vp.xor</tt>.
+pattern VPXor :: () => () => Location -> Type -> operand -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>llvm.intr.vp.xor</tt>.
+intr_vp_xor :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> Value -> m Value
 
 -- | A pattern for <tt>llvm.xor</tt>.
 pattern XOr :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -2116,17 +2323,17 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679478863 :: Context -> IO PassManager
+inline_c_ffi_6989586621679519235 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679478872 :: PassManager -> IO ()
+inline_c_ffi_6989586621679519244 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679478885 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679519257 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679478894 :: PassManager -> IO ()
+inline_c_ffi_6989586621679519266 :: PassManager -> IO ()
 addConvertFuncToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679478903 :: PassManager -> IO ()
+inline_c_ffi_6989586621679519275 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679478912 :: PassManager -> IO ()
+inline_c_ffi_6989586621679519284 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679478921 :: PassManager -> IO ()
+inline_c_ffi_6989586621679519293 :: PassManager -> IO ()
