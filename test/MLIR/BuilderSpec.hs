@@ -95,7 +95,7 @@ spec = do
         MLIR.showOperationWithLocation nativeOp >>= (`shouldBe` BS.intercalate "\n" [
             "#loc0 = loc(unknown)"
           , "module {"
-          , "  func @f_loc(%arg0: f32 loc(unknown)) -> f32 {"
+          , "  func.func @f_loc(%arg0: f32 loc(unknown)) -> f32 {"
           , "    %0 = arith.addf %arg0, %arg0 : f32 loc(#loc0)"
           , "    %1 = arith.addf %0, %0 : f32 loc(#loc1)"
           , "    return %1 : f32 loc(#loc1)"

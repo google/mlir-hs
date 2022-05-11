@@ -31,7 +31,7 @@ import qualified MLIR.Native.ExecutionEngine as MLIR
 
 exampleModuleStr :: BS.ByteString
 exampleModuleStr = pack $ [r|module {
-  func @add(%arg0: i32) -> i32 attributes {llvm.emit_c_interface} {
+  func.func @add(%arg0: i32) -> i32 attributes {llvm.emit_c_interface} {
     %0 = arith.addi %arg0, %arg0 : i32
     return %0 : i32
   }
@@ -108,7 +108,7 @@ spec = do
         MLIR.withStringRef exampleModuleStr $ MLIR.parseModule ctx
       operations <- (MLIR.getModuleBody >=> MLIR.getBlockOperations) exampleModule
       functionStr' <- MLIR.showOperation $ head operations
-      functionStr' `shouldStartWith` "func @add(%arg0: i32) -> i32"
+      functionStr' `shouldStartWith` "func.func @add(%arg0: i32) -> i32"
       MLIR.destroyModule exampleModule
 
     it "Can show operations inside region of function" $ \ctx -> do
@@ -119,7 +119,7 @@ spec = do
       blocks <- MLIR.getRegionBlocks (head regions)
       ops <- MLIR.getBlockOperations $ head blocks
       opStrs <- sequence $ map MLIR.showOperation ops
-      (BS.intercalate " ; " opStrs) `shouldBe` "%0 = arith.addi %arg0, %arg0 : i32 ; return %0 : i32"
+      (BS.intercalate " ; " opStrs) `shouldBe` "%0 = arith.addi %arg0, %arg0 : i32 ; func.return %0 : i32"
       MLIR.destroyModule exampleModule
 
   describe "Evaluation engine" $ beforeAll prepareContext $ do
