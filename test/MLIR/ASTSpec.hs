@@ -184,7 +184,7 @@ spec = do
               ]
       m `shouldShowAs` [r|
         module {
-          func @matmul8x8x8(%arg0: memref<vector<64xf32>>, %arg1: memref<vector<64xf32>>, %arg2: memref<vector<64xf32>>) attributes {llvm.emit_c_interface} {
+          func.func @matmul8x8x8(%arg0: memref<vector<64xf32>>, %arg1: memref<vector<64xf32>>, %arg2: memref<vector<64xf32>>) attributes {llvm.emit_c_interface} {
             %0 = memref.load %arg0[] : memref<vector<64xf32>>
             %1 = memref.load %arg1[] : memref<vector<64xf32>>
             %2 = vector.matrix_multiply %0, %1 {lhs_columns = 8 : i32, lhs_rows = 8 : i32, rhs_columns = 8 : i32} : (vector<64xf32>, vector<64xf32>) -> vector<64xf32>
@@ -220,7 +220,7 @@ spec = do
         #map1 = affine_map<(d0, d1, d2) -> (d2, d1)>
         #map2 = affine_map<(d0, d1, d2) -> (d0, d1)>
         module {
-          func @matmul8x8x8(%arg0: memref<vector<8x8xf32>>, %arg1: memref<vector<8x8xf32>>, %arg2: memref<vector<8x8xf32>>) attributes {llvm.emit_c_interface} {
+          func.func @matmul8x8x8(%arg0: memref<vector<8x8xf32>>, %arg1: memref<vector<8x8xf32>>, %arg2: memref<vector<8x8xf32>>) attributes {llvm.emit_c_interface} {
             %0 = memref.load %arg0[] : memref<vector<8x8xf32>>
             %1 = memref.load %arg1[] : memref<vector<8x8xf32>>
             %2 = memref.load %arg2[] : memref<vector<8x8xf32>>
