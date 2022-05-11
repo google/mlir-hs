@@ -108,7 +108,7 @@
  flexibility allows to progressively drop unit dimensions while lowering
  between different flavors of ops on that operate on tensors.
  The rank-altering behavior of tensor.insert_slice matches the rank-reducing
- behavior of tensor.extract_slice.</p><p>Example:</p><pre>// Rank-reducing extract_slice.
+ behavior of tensor.extract_slice.</p><p>Example:</p><pre>// Rank-altering insert_slice.
 %1 = tensor.insert_slice %t into %0[0, 0, 0][1, 16, 4][1, 1, 1] :
   tensor&lt;16x4xf32&gt; into tensor&lt;8x16x4xf32&gt;
 %3 = tensor.insert_slice %tt into %2[%o0, 4, %o2][1, %sz1, 1][1, %st1, 1] :
