@@ -96,7 +96,7 @@ C.include "mlir-c/Debug.h"
 C.include "mlir-c/IR.h"
 C.include "mlir-c/Pass.h"
 C.include "mlir-c/Conversion.h"
-C.include "mlir-c/Registration.h"
+C.include "mlir-c/RegisterEverything.h"
 
 C.verbatim stringCallbackDecl
 
@@ -128,7 +128,13 @@ class HasContext a where
 
 -- | Register all builtin MLIR dialects in the specified 'Context'.
 registerAllDialects :: Context -> IO ()
-registerAllDialects ctx = [C.exp| void { mlirRegisterAllDialects($(MlirContext ctx)) } |]
+registerAllDialects ctx = [C.block| void {
+    MlirDialectRegistry registry = mlirDialectRegistryCreate();
+    mlirRegisterAllDialects(registry);
+    mlirContextAppendDialectRegistry($(MlirContext ctx), registry);
+    mlirDialectRegistryDestroy(registry);
+    mlirContextLoadAllAvailableDialects($(MlirContext ctx));
+  } |]
 
 -- | Retrieve the count of dialects currently registered in the 'Context'.
 getNumLoadedDialects :: Context -> IO Int
