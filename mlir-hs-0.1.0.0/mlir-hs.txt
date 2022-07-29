@@ -1096,6 +1096,9 @@ depthwise_conv_1d_nwc_wc :: () => MonadBlockBuilder m => [Type] -> [Value] -> [V
 -- | A builder for <tt>linalg.depthwise_conv_1d_nwc_wcm</tt>.
 depthwise_conv_1d_nwc_wcm :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A builder for <tt>linalg.depthwise_conv_2d_nchw_chw</tt>.
+depthwise_conv_2d_nchw_chw :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A builder for <tt>linalg.depthwise_conv_2d_nhwc_hwc</tt>.
 depthwise_conv_2d_nhwc_hwc :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1765,17 +1768,17 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679426586 :: Context -> IO PassManager
+inline_c_ffi_6989586621679427639 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679426595 :: PassManager -> IO ()
+inline_c_ffi_6989586621679427648 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679426608 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679427661 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679426617 :: PassManager -> IO ()
+inline_c_ffi_6989586621679427670 :: PassManager -> IO ()
 addConvertFuncToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679426626 :: PassManager -> IO ()
+inline_c_ffi_6989586621679427679 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679426635 :: PassManager -> IO ()
+inline_c_ffi_6989586621679427688 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679426644 :: PassManager -> IO ()
+inline_c_ffi_6989586621679427697 :: PassManager -> IO ()
