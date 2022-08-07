@@ -559,8 +559,8 @@ Name
 </span><span id="line-318"></span><span class="hs-comment">-- Example:</span><span>
 </span><span id="line-319"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-320"></span><span class="hs-comment">-- @</span><span>
-</span><span id="line-321"></span><span class="hs-comment">-- %r1 = arith.cmpf \&quot;oeq\&quot; %0, %1 : f32</span><span>
-</span><span id="line-322"></span><span class="hs-comment">-- %r2 = arith.cmpf \&quot;ult\&quot; %0, %1 : tensor\&lt;42x42xf64&gt;</span><span>
+</span><span id="line-321"></span><span class="hs-comment">-- %r1 = arith.cmpf oeq, %0, %1 : f32</span><span>
+</span><span id="line-322"></span><span class="hs-comment">-- %r2 = arith.cmpf ult, %0, %1 : tensor\&lt;42x42xf64&gt;</span><span>
 </span><span id="line-323"></span><span class="hs-comment">-- %r3 = \&quot;arith.cmpf\&quot;(%0, %1) {predicate: 0} : (f8, f8) -&gt; i1</span><span>
 </span><span id="line-324"></span><span class="hs-comment">-- @</span><span>
 </span><span id="line-325"></span><span class="hs-comment">--   </span><span>
@@ -617,13 +617,13 @@ Name
 </span><span id="line-376"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-377"></span><span class="hs-comment">-- @</span><span>
 </span><span id="line-378"></span><span class="hs-comment">-- // Custom form of scalar \&quot;signed less than\&quot; comparison.</span><span>
-</span><span id="line-379"></span><span class="hs-comment">-- %x = arith.cmpi \&quot;slt\&quot;, %lhs, %rhs : i32</span><span>
+</span><span id="line-379"></span><span class="hs-comment">-- %x = arith.cmpi slt, %lhs, %rhs : i32</span><span>
 </span><span id="line-380"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-381"></span><span class="hs-comment">-- // Generic form of the same operation.</span><span>
 </span><span id="line-382"></span><span class="hs-comment">-- %x = \&quot;arith.cmpi\&quot;(%lhs, %rhs) {predicate = 2 : i64} : (i32, i32) -&gt; i1</span><span>
 </span><span id="line-383"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-384"></span><span class="hs-comment">-- // Custom form of vector equality comparison.</span><span>
-</span><span id="line-385"></span><span class="hs-comment">-- %x = arith.cmpi \&quot;eq\&quot;, %lhs, %rhs : vector\&lt;4xi64&gt;</span><span>
+</span><span id="line-385"></span><span class="hs-comment">-- %x = arith.cmpi eq, %lhs, %rhs : vector\&lt;4xi64&gt;</span><span>
 </span><span id="line-386"></span><span class="hs-comment">-- </span><span>
 </span><span id="line-387"></span><span class="hs-comment">-- // Generic form of the same operation.</span><span>
 </span><span id="line-388"></span><span class="hs-comment">-- %x = \&quot;arith.cmpi\&quot;(%lhs, %rhs) {predicate = 0 : i64}</span><span>

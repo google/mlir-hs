@@ -65,8 +65,8 @@
  this attribute corresponds to lower-cased name of the predicate constant,
  e.g., &quot;one&quot; means &quot;ordered not equal&quot;.  The string representation of the
  attribute is merely a syntactic sugar and is converted to an integer
- attribute by the parser.</p><p>Example:</p><pre>%r1 = arith.cmpf &quot;oeq&quot; %0, %1 : f32
-%r2 = arith.cmpf &quot;ult&quot; %0, %1 : tensor&lt;42x42xf64&gt;
+ attribute by the parser.</p><p>Example:</p><pre>%r1 = arith.cmpf oeq, %0, %1 : f32
+%r2 = arith.cmpf ult, %0, %1 : tensor&lt;42x42xf64&gt;
 %r3 = &quot;arith.cmpf&quot;(%0, %1) {predicate: 0} : (f8, f8) -&gt; i1
 </pre></div><a href="#g:8" id="g:8"><h1>cmpi</h1></a><div class="doc"><p>The <code>cmpi</code> operation is a generic comparison for integer-like types. Its two
  arguments can be integers, vectors or tensors thereof as long as their types
@@ -93,13 +93,13 @@
  to interpret values with the foremost bit being set: negatives in two's
  complement or large positives
  (rationale.</p><p>Example:</p><pre>// Custom form of scalar &quot;signed less than&quot; comparison.
-%x = arith.cmpi &quot;slt&quot;, %lhs, %rhs : i32
+%x = arith.cmpi slt, %lhs, %rhs : i32
 
 // Generic form of the same operation.
 %x = &quot;arith.cmpi&quot;(%lhs, %rhs) {predicate = 2 : i64} : (i32, i32) -&gt; i1
 
 // Custom form of vector equality comparison.
-%x = arith.cmpi &quot;eq&quot;, %lhs, %rhs : vector&lt;4xi64&gt;
+%x = arith.cmpi eq, %lhs, %rhs : vector&lt;4xi64&gt;
 
 // Generic form of the same operation.
 %x = &quot;arith.cmpi&quot;(%lhs, %rhs) {predicate = 0 : i64}
