@@ -139,6 +139,7 @@ data Attribute =
   | TypeAttr       Type
   | AffineMapAttr  Affine.Map
   | UnitAttr
+  | DenseArrayAttr DenseElements
   | DenseElementsAttr Type DenseElements
   deriving Eq
   -- TODO(apaszke): (Flat) SymbolRef, IntegerSet, Opaque
@@ -457,6 +458,69 @@ instance FromAST Attribute Native.Attribute where
       nativeMap <- fromAST ctx env afMap
       [C.exp| MlirAttribute { mlirAffineMapAttrGet($(MlirAffineMap nativeMap)) } |]
     UnitAttr -> [C.exp| MlirAttribute { mlirUnitAttrGet($(MlirContext ctx)) } |]
+    DenseArrayAttr storage -> do
+      case storage of
+        -- TODO(jpienaar): Update once unsigned is supported.
+        DenseUInt8 arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseI8ArrayGet($(MlirContext ctx), $(intptr_t size),
+                                           $(const uint8_t* valuesPtr))
+            } |]
+        DenseInt8 arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseI8ArrayGet($(MlirContext ctx), $(intptr_t size),
+                                           $(const int8_t* valuesPtr))
+            } |]
+        -- TODO(jpienaar): Update once unsigned is supported.
+        DenseUInt32 arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseI32ArrayGet($(MlirContext ctx), $(intptr_t size),
+                                            $(const uint32_t* valuesPtr))
+            } |]
+        DenseInt32 arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseI32ArrayGet($(MlirContext ctx), $(intptr_t size),
+                                            $(const int32_t* valuesPtr))
+            } |]
+        -- TODO(jpienaar): Update once unsigned is supported.
+        DenseUInt64 arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseI64ArrayGet($(MlirContext ctx), $(intptr_t size),
+                                            $(const uint64_t* valuesPtr))
+            } |]
+        DenseInt64 arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtr ->
+            [C.exp| MlirAttribute {
+              mlirDenseI64ArrayGet($(MlirContext ctx), $(intptr_t size),
+                                            $(const int64_t* valuesPtr))
+            } |]
+        DenseFloat arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtrHs -> do
+            let valuesPtr = castPtr valuesPtrHs
+            [C.exp| MlirAttribute {
+              mlirDenseF32ArrayGet($(MlirContext ctx), $(intptr_t size),
+                                            $(const float* valuesPtr))
+            } |]
+        DenseDouble arr -> do
+          let size = fromIntegral $ rangeSize $ bounds arr
+          unsafeWithIStorableArray arr \valuesPtrHs -> do
+            let valuesPtr = castPtr valuesPtrHs
+            [C.exp| MlirAttribute {
+              mlirDenseF64ArrayGet($(MlirContext ctx), $(intptr_t size),
+                                             $(const double* valuesPtr))
+            } |]
     DenseElementsAttr ty storage -> do
       nativeType <- fromAST ctx env ty
       case storage of
