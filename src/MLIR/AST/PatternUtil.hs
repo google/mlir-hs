@@ -13,7 +13,8 @@
 -- limitations under the License.
 
 module MLIR.AST.PatternUtil
-  ( pattern I64ArrayAttr
+  ( pattern I32ArrayAttr
+  , pattern I64ArrayAttr
   , pattern AffineMapArrayAttr
   , DummyIx
   ) where
@@ -23,6 +24,16 @@ import Data.Array
 
 import MLIR.AST
 import qualified MLIR.AST.Dialect.Affine as Affine
+
+unwrapI32ArrayAttr :: Attribute -> Maybe [Int]
+unwrapI32ArrayAttr (ArrayAttr vals) = for vals \case
+  IntegerAttr (IntegerType Signed 32) v -> Just v
+  _                                     -> Nothing
+unwrapI32ArrayAttr _ = Nothing
+
+pattern I32ArrayAttr :: [Int] -> Attribute
+pattern I32ArrayAttr vals <- (unwrapI32ArrayAttr -> Just vals)
+  where I32ArrayAttr vals = ArrayAttr $ fmap (IntegerAttr (IntegerType Signed 32)) vals
 
 unwrapI64ArrayAttr :: Attribute -> Maybe [Int]
 unwrapI64ArrayAttr (ArrayAttr vals) = for vals \case
