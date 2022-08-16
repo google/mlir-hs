@@ -216,7 +216,6 @@ const attr_pattern_map& getAttrPatternTemplates() {
       {"AffineMapAttr", {"AffineMapAttr {0}", "Affine.Map", {}, {}}},
       {"ArrayAttr", {"ArrayAttr {0}", "[Attribute]", {}, {}}},
       {"BoolAttr", {"BoolAttr {0}", "Bool", {}, {}}},
-      {"DenseI32ArrayAttr", {"PatternUtil.I32ArrayAttr {0}", "[Int]", {}, {}}},
       {"DictionaryAttr", {"DictionaryAttr {0}", "(M.Map Name Attribute)", {}, {}}},
       {"F32Attr", {"FloatAttr Float32Type {0}", "Double", {}, {}}},
       {"F64Attr", {"FloatAttr Float64Type {0}", "Double", {}, {}}},
@@ -321,7 +320,7 @@ class OpAttrPattern {
                                named_attr.attr.getAttrDefName()));
         return llvm::None;
       }
-      binders.push_back(sanitizeName(named_attr.name) + "_");
+      binders.push_back(sanitizeName(named_attr.name));
       attrs.push_back(named_attr);
       patterns.push_back(std::move(pattern));
     }
@@ -572,7 +571,7 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
              op.getTrait("::mlir::OpTrait::SameOperandsAndResultType")) {
     for (const mlir::tblgen::NamedTypeConstraint& operand : op.getOperands()) {
       if (operand.isVariableLength()) continue;
-      type_exprs.push_back("(AST.typeOf " + sanitizeName(operand.name) + "_)");
+      type_exprs.push_back("(AST.typeOf " + sanitizeName(operand.name) + ")");
       break;
     }
     if (type_exprs.empty()) return fail("type inference failed");
@@ -597,7 +596,7 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
   operand_name_exprs.reserve(op.getNumOperands());
   for (int i = 0; i < op.getNumOperands(); ++i) {
     const auto& operand = op.getOperand(i);
-    std::string operand_name = sanitizeName(operand.name, i) + "_";
+    std::string operand_name = sanitizeName(operand.name, i);
     operand_binders.push_back(operand_name);
     if (operand.isOptional()) {
       builder_arg_types.push_back("Maybe Value");
@@ -622,7 +621,7 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
     std::string region_prologue;
     NameSource gen("_unnamed_region");
     for (const mlir::tblgen::NamedRegion& region : op.getRegions()) {
-      std::string name = region.name.empty() ? gen.fresh() : sanitizeName(region.name) + "_";
+      std::string name = region.name.empty() ? gen.fresh() : sanitizeName(region.name);
       region_builder_binders.push_back(name + "Builder");
       region_binders.push_back(name);
       builder_arg_types.push_back("RegionBuilderT m ()");
@@ -702,7 +701,7 @@ void emitPattern(const llvm::Record* def, const OpAttrPattern& attr_pattern,
   if (op.getNumOperands() == 1 && op.getOperand(0).isVariadic()) {
     // Single variadic arg is easy to handle
     pattern_arg_types.push_back("[operand]");
-    operand_binders.push_back(sanitizeName(op.getOperand(0).name, 0) + "_");
+    operand_binders.push_back(sanitizeName(op.getOperand(0).name, 0));
   } else {
     // Non-variadic case
     for (int i = 0; i < op.getNumOperands(); ++i) {
@@ -710,7 +709,7 @@ void emitPattern(const llvm::Record* def, const OpAttrPattern& attr_pattern,
       if (operand.isVariableLength())
         return fail("unsupported variable length operand");
       pattern_arg_types.push_back("operand");
-      operand_binders.push_back(sanitizeName(operand.name, i) + "_");
+      operand_binders.push_back(sanitizeName(operand.name, i));
     }
   }
 
