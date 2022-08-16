@@ -460,14 +460,6 @@ instance FromAST Attribute Native.Attribute where
     UnitAttr -> [C.exp| MlirAttribute { mlirUnitAttrGet($(MlirContext ctx)) } |]
     DenseArrayAttr storage -> do
       case storage of
-        -- TODO(jpienaar): Update once unsigned is supported.
-        DenseUInt8 arr -> do
-          let size = fromIntegral $ rangeSize $ bounds arr
-          unsafeWithIStorableArray arr \valuesPtr ->
-            [C.exp| MlirAttribute {
-              mlirDenseI8ArrayGet($(MlirContext ctx), $(intptr_t size),
-                                           $(const uint8_t* valuesPtr))
-            } |]
         DenseInt8 arr -> do
           let size = fromIntegral $ rangeSize $ bounds arr
           unsafeWithIStorableArray arr \valuesPtr ->
@@ -475,28 +467,12 @@ instance FromAST Attribute Native.Attribute where
               mlirDenseI8ArrayGet($(MlirContext ctx), $(intptr_t size),
                                            $(const int8_t* valuesPtr))
             } |]
-        -- TODO(jpienaar): Update once unsigned is supported.
-        DenseUInt32 arr -> do
-          let size = fromIntegral $ rangeSize $ bounds arr
-          unsafeWithIStorableArray arr \valuesPtr ->
-            [C.exp| MlirAttribute {
-              mlirDenseI32ArrayGet($(MlirContext ctx), $(intptr_t size),
-                                            $(const uint32_t* valuesPtr))
-            } |]
         DenseInt32 arr -> do
           let size = fromIntegral $ rangeSize $ bounds arr
           unsafeWithIStorableArray arr \valuesPtr ->
             [C.exp| MlirAttribute {
               mlirDenseI32ArrayGet($(MlirContext ctx), $(intptr_t size),
                                             $(const int32_t* valuesPtr))
-            } |]
-        -- TODO(jpienaar): Update once unsigned is supported.
-        DenseUInt64 arr -> do
-          let size = fromIntegral $ rangeSize $ bounds arr
-          unsafeWithIStorableArray arr \valuesPtr ->
-            [C.exp| MlirAttribute {
-              mlirDenseI64ArrayGet($(MlirContext ctx), $(intptr_t size),
-                                            $(const uint64_t* valuesPtr))
             } |]
         DenseInt64 arr -> do
           let size = fromIntegral $ rangeSize $ bounds arr
@@ -521,6 +497,7 @@ instance FromAST Attribute Native.Attribute where
               mlirDenseF64ArrayGet($(MlirContext ctx), $(intptr_t size),
                                              $(const double* valuesPtr))
             } |]
+        _ -> error "Not implemented: not all dense array types are supported!"
     DenseElementsAttr ty storage -> do
       nativeType <- fromAST ctx env ty
       case storage of
