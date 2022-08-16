@@ -70,9 +70,9 @@
    e.g. 1x6x1 could potentially rank-reduce to either 1x6 or 6x1 2-D shapes.</p><p>To disambiguate, the inference helpers <code>inferCanonicalRankReducedResultType</code>
  only drop the first unit dimensions, in order:
    e.g. 1x6x1 rank-reduced to 2-D will infer the 6x1 2-D shape, but not 1x6.</p><p>Verification however has access to result type and does not need to infer.
- The verifier calls <code>isRankReducedType(getSource(), getResult())</code> to 
+ The verifier calls <code>isRankReducedType(getSource(), getResult())</code> to
  determine whether the result type is rank-reduced from the source type.
- This computes a so-called rank-reduction mask, consisting of dropped unit 
+ This computes a so-called rank-reduction mask, consisting of dropped unit
  dims, to map the rank-reduced type to the source type by dropping ones:
    e.g. 1x6 is a rank-reduced version of 1x6x1 by mask {2}
         6x1 is a rank-reduced version of 1x6x1 by mask {0}
@@ -163,11 +163,11 @@
   ^bb0(%arg1: index, %arg2: index):
     tensor.yield %pad_value : f32
   } : tensor&lt;2x3xf32&gt; to tensor&lt;2x3xf32&gt;
-</pre></div><div class="top"><p class="src"><a id="v:pad" class="def">pad</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST-Builder.html#t:RegionBuilderT" title="MLIR.AST.Builder">RegionBuilderT</a> m () -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Tensor.html#pad" class="link">Source</a> <a href="#v:pad" class="selflink">#</a></p><div class="doc"><p>A builder for <code>tensor.pad</code>.</p></div></div><a href="#g:12" id="g:12"><h1>parallel_insert_slice</h1></a><div class="doc"><p>The <code>parallel_insert_slice</code> yields a subset tensor value to its parent 
+</pre></div><div class="top"><p class="src"><a id="v:pad" class="def">pad</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; [<a href="../base-4.14.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a>] -&gt; <a href="MLIR-AST-Builder.html#t:RegionBuilderT" title="MLIR.AST.Builder">RegionBuilderT</a> m () -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Tensor.html#pad" class="link">Source</a> <a href="#v:pad" class="selflink">#</a></p><div class="doc"><p>A builder for <code>tensor.pad</code>.</p></div></div><a href="#g:12" id="g:12"><h1>parallel_insert_slice</h1></a><div class="doc"><p>The <code>parallel_insert_slice</code> yields a subset tensor value to its parent
  ParallelCombiningOpInterface. These subset tensor values are aggregated to
- in some unspecified order into a full tensor value returned by the parent 
- parallel iterating op. 
- The <code>parallel_insert_slice</code> is one such op allowed in the 
+ in some unspecified order into a full tensor value returned by the parent
+ parallel iterating op.
+ The <code>parallel_insert_slice</code> is one such op allowed in the
  ParallelCombiningOpInterface op.</p><p>Conflicting writes result in undefined semantics, in that the indices written
  to by multiple parallel updates might contain data from any of the updates,
  or even a malformed bit pattern.</p><p>If an index is updated exactly once, the value contained at that index
@@ -186,12 +186,12 @@
  ShapedType::kDynamicStrideOrOffset encodes that the corresponding entry has
  a dynamic value.</p><p>After buffer allocation, the &quot;parallel_insert_slice&quot; op is expected to lower
  into a memref.subview op.</p><p>A parallel_insert_slice operation may additionally specify insertion into a
- tensor of higher rank than the source tensor, along dimensions that are 
+ tensor of higher rank than the source tensor, along dimensions that are
  statically known to be of size 1.
  This rank-altering behavior is not required by the op semantics: this
  flexibility allows to progressively drop unit dimensions while lowering
  between different flavors of ops on that operate on tensors.
- The rank-altering behavior of tensor.parallel_insert_slice matches the 
+ The rank-altering behavior of tensor.parallel_insert_slice matches the
  rank-reducing behavior of tensor.insert_slice and tensor.extract_slice.</p><p>Verification in the rank-reduced case:
  ======================================
  The same verification discussion and mechanisms apply as for ExtractSliceOp.
