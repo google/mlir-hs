@@ -569,9 +569,10 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
     // Nothing to do.
   } else if (op.getNumVariableLengthResults() == 0 &&
              op.getTrait("::mlir::OpTrait::SameOperandsAndResultType")) {
-    for (const mlir::tblgen::NamedTypeConstraint& operand : op.getOperands()) {
+    for (int i = 0; i < op.getNumOperands(); ++i) {
+      const auto& operand = op.getOperand(i);
       if (operand.isVariableLength()) continue;
-      type_exprs.push_back("(AST.typeOf " + sanitizeName(operand.name) + ")");
+      type_exprs.push_back("(AST.typeOf " + sanitizeName(operand.name, i) + "_arg)");
       break;
     }
     if (type_exprs.empty()) return fail("type inference failed");
@@ -597,6 +598,7 @@ void emitBuilderMethod(mlir::tblgen::Operator& op,
   for (int i = 0; i < op.getNumOperands(); ++i) {
     const auto& operand = op.getOperand(i);
     std::string operand_name = sanitizeName(operand.name, i);
+    operand_name += "_arg";
     operand_binders.push_back(operand_name);
     if (operand.isOptional()) {
       builder_arg_types.push_back("Maybe Value");
