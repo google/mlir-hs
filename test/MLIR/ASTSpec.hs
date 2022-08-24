@@ -224,7 +224,7 @@ spec = do
             %0 = memref.load %arg0[] : memref<vector<8x8xf32>>
             %1 = memref.load %arg1[] : memref<vector<8x8xf32>>
             %2 = memref.load %arg2[] : memref<vector<8x8xf32>>
-            %3 = vector.contract {indexing_maps = [#map0, #map1, #map2], iterator_types = ["parallel", "parallel", "reduction"]} %0, %1, %2 : vector<8x8xf32>, vector<8x8xf32> into vector<8x8xf32>
+            %3 = vector.contract {indexing_maps = [#map0, #map1, #map2], iterator_types = ["parallel", "parallel", "reduction"], kind = #vector.kind<add>} %0, %1, %2 : vector<8x8xf32>, vector<8x8xf32> into vector<8x8xf32>
             memref.store %3, %arg2[] : memref<vector<8x8xf32>>
             return
           }
