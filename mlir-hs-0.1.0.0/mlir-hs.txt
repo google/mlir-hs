@@ -623,9 +623,6 @@ pattern ConstantMask :: () => () => Location -> Type -> [Int] -> AbstractOperati
 -- | A builder for <tt>vector.constant_mask</tt>.
 constant_mask :: () => MonadBlockBuilder m => Type -> [Int] -> m Value
 
--- | A builder for <tt>vector.contract</tt>.
-contract :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> [Value] -> [Attribute] -> [Attribute] -> m Value
-
 -- | A pattern for <tt>vector.create_mask</tt>.
 pattern CreateMask :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
 
@@ -1076,6 +1073,9 @@ batch_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> Reg
 -- | A builder for <tt>linalg.batch_matvec</tt>.
 batch_matvec :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A builder for <tt>linalg.conv_1d_ncw_fcw</tt>.
+conv_1d_ncw_fcw :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A builder for <tt>linalg.conv_1d_nwc_wcf</tt>.
 conv_1d_nwc_wcf :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1525,17 +1525,17 @@ pattern AddF :: () => () => Location -> Type -> operand -> operand -> AbstractOp
 -- | A builder for <tt>arith.addf</tt>.
 addf :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
--- | A pattern for <tt>arith.addi_carry</tt>.
-pattern AddICarry :: () => () => Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
-
--- | A builder for <tt>arith.addi_carry</tt>.
-addi_carry :: () => MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
-
 -- | A pattern for <tt>arith.addi</tt>.
 pattern AddI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
 -- | A builder for <tt>arith.addi</tt>.
 addi :: () => MonadBlockBuilder m => Value -> Value -> m Value
+
+-- | A pattern for <tt>arith.addui_carry</tt>.
+pattern AddUICarry :: () => () => Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.addui_carry</tt>.
+addui_carry :: () => MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
 
 -- | A pattern for <tt>arith.andi</tt>.
 pattern AndI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -1781,17 +1781,17 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679433673 :: Context -> IO PassManager
+inline_c_ffi_6989586621679433652 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679433682 :: PassManager -> IO ()
+inline_c_ffi_6989586621679433661 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679433695 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679433674 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679433704 :: PassManager -> IO ()
+inline_c_ffi_6989586621679433683 :: PassManager -> IO ()
 addConvertFuncToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679433713 :: PassManager -> IO ()
+inline_c_ffi_6989586621679433692 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679433722 :: PassManager -> IO ()
+inline_c_ffi_6989586621679433701 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679433731 :: PassManager -> IO ()
+inline_c_ffi_6989586621679433710 :: PassManager -> IO ()
