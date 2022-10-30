@@ -635,9 +635,6 @@ expandload :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> 
 -- | A builder for <tt>vector.extractelement</tt>.
 extractelement :: () => MonadBlockBuilder m => Type -> Value -> Maybe Value -> m Value
 
--- | A builder for <tt>vector.extract_map</tt>.
-extract_map :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
-
 -- | A pattern for <tt>vector.extract</tt>.
 pattern Extract :: () => () => Location -> Type -> operand -> [Int] -> AbstractOperation operand
 
@@ -668,9 +665,6 @@ gather :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Valu
 -- | A builder for <tt>vector.insertelement</tt>.
 insertelement :: () => MonadBlockBuilder m => Type -> Value -> Value -> Maybe Value -> m Value
 
--- | A builder for <tt>vector.insert_map</tt>.
-insert_map :: () => MonadBlockBuilder m => Type -> Value -> Value -> [Value] -> m Value
-
 -- | A pattern for <tt>vector.insert</tt>.
 pattern Insert :: () => () => Location -> Type -> operand -> operand -> [Int] -> AbstractOperation operand
 
@@ -685,6 +679,9 @@ insert_strided_slice :: () => MonadBlockBuilder m => Type -> Value -> Value -> [
 
 -- | A builder for <tt>vector.load</tt>.
 load :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
+
+-- | A builder for <tt>vector.mask</tt>.
+mask :: () => MonadBlockBuilder m => Maybe Type -> Value -> Maybe Value -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>vector.maskedload</tt>.
 maskedload :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> m Value
@@ -774,6 +771,12 @@ pattern Dim :: () => () => Location -> Type -> operand -> operand -> AbstractOpe
 
 -- | A builder for <tt>tensor.dim</tt>.
 dim :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
+
+-- | A pattern for <tt>tensor.empty</tt>.
+pattern Empty :: () => () => Location -> Type -> [operand] -> AbstractOperation operand
+
+-- | A builder for <tt>tensor.empty</tt>.
+empty :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
 -- | A builder for <tt>tensor.extract</tt>.
 extract :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
@@ -1055,12 +1058,6 @@ pattern Linalg_Index :: () => () => Location -> Type -> Int -> AbstractOperation
 -- | A builder for <tt>linalg.index</tt>.
 index :: () => MonadBlockBuilder m => Type -> Int -> m Value
 
--- | A pattern for <tt>linalg.init_tensor</tt>.
-pattern Linalg_InitTensor :: () => () => Location -> Type -> [operand] -> [Int] -> AbstractOperation operand
-
--- | A builder for <tt>linalg.init_tensor</tt>.
-init_tensor :: () => MonadBlockBuilder m => Type -> [Value] -> [Int] -> m Value
-
 -- | A pattern for <tt>linalg.yield</tt>.
 pattern Linalg_Yield :: () => () => Location -> [operand] -> AbstractOperation operand
 
@@ -1072,6 +1069,9 @@ batch_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> Reg
 
 -- | A builder for <tt>linalg.batch_matvec</tt>.
 batch_matvec :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.batch_reduce_matmul</tt>.
+batch_reduce_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.conv_1d_ncw_fcw</tt>.
 conv_1d_ncw_fcw :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1153,6 +1153,9 @@ fill_rng_2d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> Regi
 
 -- | A builder for <tt>linalg.generic</tt>.
 generic :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> [Attribute] -> Maybe ByteString -> Maybe ByteString -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.map</tt>.
+map :: () => MonadBlockBuilder m => [Type] -> [Value] -> Value -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matmul</tt>.
 matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1627,6 +1630,12 @@ pattern IndexCast :: () => () => Location -> Type -> operand -> AbstractOperatio
 -- | A builder for <tt>arith.index_cast</tt>.
 index_cast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
+-- | A pattern for <tt>arith.index_castui</tt>.
+pattern IndexCastUI :: () => () => Location -> Type -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.index_castui</tt>.
+index_castui :: () => MonadBlockBuilder m => Type -> Value -> m Value
+
 -- | A pattern for <tt>arith.maxf</tt>.
 pattern MaxF :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
@@ -1781,17 +1790,17 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679433652 :: Context -> IO PassManager
+inline_c_ffi_6989586621679435254 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679433661 :: PassManager -> IO ()
+inline_c_ffi_6989586621679435263 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679433674 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679435276 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679433683 :: PassManager -> IO ()
+inline_c_ffi_6989586621679435285 :: PassManager -> IO ()
 addConvertFuncToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679433692 :: PassManager -> IO ()
+inline_c_ffi_6989586621679435294 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679433701 :: PassManager -> IO ()
+inline_c_ffi_6989586621679435303 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679433710 :: PassManager -> IO ()
+inline_c_ffi_6989586621679435312 :: PassManager -> IO ()
