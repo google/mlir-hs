@@ -130,17 +130,19 @@ data Block = Block {
 data Region = Region [Block]
 
 data Attribute =
-    ArrayAttr      [Attribute]
-  | DictionaryAttr (M.Map Name Attribute)
-  | FloatAttr      Type Double
-  | IntegerAttr    Type Int
-  | BoolAttr       Bool
-  | StringAttr     BS.ByteString
-  | TypeAttr       Type
-  | AffineMapAttr  Affine.Map
+    ArrayAttr         [Attribute]
+  | DictionaryAttr    (M.Map Name Attribute)
+  | FloatAttr         Type Double
+  | IntegerAttr       Type Int
+  | BoolAttr          Bool
+  | StringAttr        BS.ByteString
+  | TypeAttr          Type
+  | AffineMapAttr     Affine.Map
   | UnitAttr
-  | DenseArrayAttr DenseElements
+  | DenseArrayAttr    DenseElements
   | DenseElementsAttr Type DenseElements
+  -- Represents Attribute textually represented.
+  | TextuallyReprAttr BS.ByteString
   deriving Eq
   -- TODO(apaszke): (Flat) SymbolRef, IntegerSet, Opaque
 
@@ -450,6 +452,11 @@ instance FromAST Attribute Native.Attribute where
       Native.withStringRef value \(Native.StringRef ptr len) ->
         [C.exp| MlirAttribute {
           mlirStringAttrGet($(MlirContext ctx), (MlirStringRef){$(char* ptr), $(size_t len)})
+        } |]
+    TextuallyReprAttr value ->
+      Native.withStringRef value \(Native.StringRef ptr len) ->
+        [C.exp| MlirAttribute {
+          mlirAttributeParseGet($(MlirContext ctx), (MlirStringRef){$(char* ptr), $(size_t len)})
         } |]
     TypeAttr ty -> do
       nativeType <- fromAST ctx env ty
