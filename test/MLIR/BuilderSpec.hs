@@ -93,14 +93,14 @@ spec = do
         nativeOp <- fromAST ctx (mempty, mempty) m
         MLIR.verifyOperation nativeOp >>= (`shouldBe` True)
         MLIR.showOperationWithLocation nativeOp >>= (`shouldBe` BS.intercalate "\n" [
-            "#loc0 = loc(unknown)"
+            "#loc = loc(unknown)"
           , "module {"
           , "  func.func @f_loc(%arg0: f32 loc(unknown)) -> f32 {"
-          , "    %0 = arith.addf %arg0, %arg0 : f32 loc(#loc0)"
+          , "    %0 = arith.addf %arg0, %arg0 : f32 loc(#loc)"
           , "    %1 = arith.addf %0, %0 : f32 loc(#loc1)"
           , "    return %1 : f32 loc(#loc1)"
-          , "  } loc(#loc0)"
-          , "} loc(#loc0)"
+          , "  } loc(#loc)"
+          , "} loc(#loc)"
           , "#loc1 = loc(\"file.mlir\":4:10)"
           , ""])
 

@@ -159,9 +159,12 @@ spec = do
         , opAttributes = NoAttrs
         }
       m `shouldShowWithLocationAs` [r|
+        #loc = loc(unknown)
+        #loc1 = loc("first")
+        #loc2 = loc("last")
         module {
-        } loc(#loc)
-        #loc = loc(fused["first", "last"])|]
+        } loc(#loc3)
+        #loc3 = loc(fused["first", "last"])|]
 
     it "Can construct a matmul via vector.matrix_multiply" $ do
       let v64Ty = VectorType [64] Float32Type

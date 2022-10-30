@@ -40,7 +40,7 @@ C.include "mlir-c/ExecutionEngine.h"
 -- TODO(apaszke): Allow loading shared libraries
 createExecutionEngine :: Module -> IO (Maybe ExecutionEngine)
 createExecutionEngine m = nullable <$>
-  [C.exp| MlirExecutionEngine { mlirExecutionEngineCreate($(MlirModule m), 3, 0, NULL) } |]
+  [C.exp| MlirExecutionEngine { mlirExecutionEngineCreate($(MlirModule m), 3, 0, NULL, false) } |]
 
 destroyExecutionEngine :: ExecutionEngine -> IO ()
 destroyExecutionEngine eng =
