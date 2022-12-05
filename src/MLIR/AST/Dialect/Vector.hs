@@ -36,13 +36,13 @@ itersFromAttribute :: Attribute -> Maybe [IteratorType]
 itersFromAttribute attr = case attr of
   ArrayAttr subAttrs -> traverse iterFromString subAttrs
   _                  -> Nothing
-  where iterFromString (TextuallyReprAttr "#vector.iterator_type<parallel>")  = Just Parallel
-        iterFromString (TextuallyReprAttr "#vector.iterator_type<reduction>") = Just Reduction
+  where iterFromString (AsmTextAttr "#vector.iterator_type<parallel>")  = Just Parallel
+        iterFromString (AsmTextAttr "#vector.iterator_type<reduction>") = Just Reduction
         iterFromString _                        = Nothing
 
 pattern IteratorAttrs :: [IteratorType] -> Attribute
 pattern IteratorAttrs iterTypes <- (itersFromAttribute -> Just iterTypes)
-  where IteratorAttrs iterTypes = ArrayAttr $ fmap (TextuallyReprAttr . showIterator) iterTypes
+  where IteratorAttrs iterTypes = ArrayAttr $ fmap (AsmTextAttr . showIterator) iterTypes
 
 pattern ContractAttrs :: Affine.Map -> Affine.Map -> Affine.Map -> [IteratorType] -> NamedAttributes
 pattern ContractAttrs lhsMap rhsMap accMap iterTypes <-

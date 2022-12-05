@@ -142,7 +142,7 @@ data Attribute =
   | DenseArrayAttr    DenseElements
   | DenseElementsAttr Type DenseElements
   -- Represents Attribute textually represented.
-  | TextuallyReprAttr BS.ByteString
+  | AsmTextAttr BS.ByteString
   deriving Eq
   -- TODO(apaszke): (Flat) SymbolRef, IntegerSet, Opaque
 
@@ -453,7 +453,7 @@ instance FromAST Attribute Native.Attribute where
         [C.exp| MlirAttribute {
           mlirStringAttrGet($(MlirContext ctx), (MlirStringRef){$(char* ptr), $(size_t len)})
         } |]
-    TextuallyReprAttr value ->
+    AsmTextAttr value ->
       Native.withStringRef value \(Native.StringRef ptr len) ->
         [C.exp| MlirAttribute {
           mlirAttributeParseGet($(MlirContext ctx), (MlirStringRef){$(char* ptr), $(size_t len)})
