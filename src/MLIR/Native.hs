@@ -192,7 +192,7 @@ showOperationWithLocation :: Operation -> IO BS.ByteString
 showOperationWithLocation op = showSomething \ctx ->
   [C.block| void {
     MlirOpPrintingFlags flags = mlirOpPrintingFlagsCreate();
-    mlirOpPrintingFlagsEnableDebugInfo(flags, /*prettyForm=*/false);
+    mlirOpPrintingFlagsEnableDebugInfo(flags, /*enable=*/true, /*prettyForm=*/false);
     mlirOperationPrintWithFlags($(MlirOperation op), flags,
                                 HaskellMlirStringCallback, $(void* ctx));
     mlirOpPrintingFlagsDestroy(flags);
