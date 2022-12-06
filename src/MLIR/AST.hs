@@ -143,8 +143,29 @@ data Attribute =
   | DenseElementsAttr Type DenseElements
   -- Represents Attribute textually represented.
   | AsmTextAttr BS.ByteString
-  deriving Eq
+  | forall t. (Typeable t, Eq t, Show t, FromAST t Native.Attribute) => DialectAttr t
+  -- GHC cannot derive Eq due to the existential case, so we implement Eq below
+  -- deriving Eq
   -- TODO(apaszke): (Flat) SymbolRef, IntegerSet, Opaque
+
+instance Eq Attribute where
+  a == b = case (a, b) of
+    (ArrayAttr a1, ArrayAttr b1) -> a1 == b1
+    (DictionaryAttr a1, DictionaryAttr b1) -> a1 == b1
+    (FloatAttr a1 a2, FloatAttr b1 b2) -> (a1, a2) == (b1, b2)
+    (IntegerAttr a1 a2, IntegerAttr b1 b2) -> (a1, a2) == (b1, b2)
+    (BoolAttr a1, BoolAttr b1) -> a1 == b1
+    (StringAttr a1, StringAttr b1) -> a1 == b1
+    (TypeAttr a1, TypeAttr b1) -> a1 == b1
+    (AffineMapAttr a1, AffineMapAttr b1) -> a1 == b1
+    (UnitAttr, UnitAttr) -> True
+    (DenseArrayAttr a1, DenseArrayAttr b1) -> a1 == b1
+    (DenseElementsAttr a1 a2, DenseElementsAttr b1 b2) -> (a1, a2) == (b1, b2)
+    (AsmTextAttr a1, AsmTextAttr b1) -> a1 == b1
+    (DialectAttr a1, DialectAttr b1) -> case cast a1 of
+      Just a1' -> a1' == b1
+      Nothing  -> False
+    _ -> False
 
 data DenseElements
   = forall i. (Show i, Ix i) => DenseUInt8  (IStorableArray i Word8 )
@@ -431,6 +452,7 @@ instance FromAST Attribute Native.Attribute where
       liftIO $ [C.exp| MlirAttribute {
         mlirDictionaryAttrGet($(MlirContext ctx), $(intptr_t numAttrs), $(MlirNamedAttribute* nativeAttrs))
       } |]
+    DialectAttr at -> fromAST ctx env at
     FloatAttr ty value -> do
       nativeType <- fromAST ctx env ty
       let nativeValue = coerce value
