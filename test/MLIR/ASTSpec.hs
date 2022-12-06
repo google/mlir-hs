@@ -159,12 +159,11 @@ spec = do
         , opAttributes = NoAttrs
         }
       m `shouldShowWithLocationAs` [r|
-        #loc = loc(unknown)
-        #loc1 = loc("first")
-        #loc2 = loc("last")
         module {
-        } loc(#loc3)
-        #loc3 = loc(fused["first", "last"])|]
+        } loc(#loc2)
+        #loc = loc("first")
+        #loc1 = loc("last")
+        #loc2 = loc(fused[#loc, #loc1])|]
 
     it "Can construct a matmul via vector.matrix_multiply" $ do
       let v64Ty = VectorType [64] Float32Type
@@ -219,7 +218,7 @@ spec = do
               ]
       shouldImplementMatmul m
       m `shouldShowAs` [r|
-        #map0 = affine_map<(d0, d1, d2) -> (d0, d2)>
+        #map = affine_map<(d0, d1, d2) -> (d0, d2)>
         #map1 = affine_map<(d0, d1, d2) -> (d2, d1)>
         #map2 = affine_map<(d0, d1, d2) -> (d0, d1)>
         module {
@@ -227,7 +226,7 @@ spec = do
             %0 = memref.load %arg0[] : memref<vector<8x8xf32>>
             %1 = memref.load %arg1[] : memref<vector<8x8xf32>>
             %2 = memref.load %arg2[] : memref<vector<8x8xf32>>
-            %3 = vector.contract {indexing_maps = [#map0, #map1, #map2], iterator_types = ["parallel", "parallel", "reduction"], kind = #vector.kind<add>} %0, %1, %2 : vector<8x8xf32>, vector<8x8xf32> into vector<8x8xf32>
+            %3 = vector.contract {indexing_maps = [#map, #map1, #map2], iterator_types = ["parallel", "parallel", "reduction"], kind = #vector.kind<add>} %0, %1, %2 : vector<8x8xf32>, vector<8x8xf32> into vector<8x8xf32>
             memref.store %3, %arg2[] : memref<vector<8x8xf32>>
             return
           }

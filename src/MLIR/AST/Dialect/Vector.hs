@@ -29,20 +29,20 @@ import qualified MLIR.AST.Dialect.Affine as Affine
 data IteratorType = Parallel | Reduction
 
 showIterator :: IteratorType -> BS.ByteString
-showIterator Parallel  = "parallel"
-showIterator Reduction = "reduction"
+showIterator Parallel  = "#vector.iterator_type<parallel>"
+showIterator Reduction = "#vector.iterator_type<reduction>"
 
 itersFromAttribute :: Attribute -> Maybe [IteratorType]
 itersFromAttribute attr = case attr of
   ArrayAttr subAttrs -> traverse iterFromString subAttrs
   _                  -> Nothing
-  where iterFromString (StringAttr "parallel")  = Just Parallel
-        iterFromString (StringAttr "reduction") = Just Reduction
+  where iterFromString (AsmTextAttr "#vector.iterator_type<parallel>")  = Just Parallel
+        iterFromString (AsmTextAttr "#vector.iterator_type<reduction>") = Just Reduction
         iterFromString _                        = Nothing
 
 pattern IteratorAttrs :: [IteratorType] -> Attribute
 pattern IteratorAttrs iterTypes <- (itersFromAttribute -> Just iterTypes)
-  where IteratorAttrs iterTypes = ArrayAttr $ fmap (StringAttr . showIterator) iterTypes
+  where IteratorAttrs iterTypes = ArrayAttr $ fmap (AsmTextAttr . showIterator) iterTypes
 
 pattern ContractAttrs :: Affine.Map -> Affine.Map -> Affine.Map -> [IteratorType] -> NamedAttributes
 pattern ContractAttrs lhsMap rhsMap accMap iterTypes <-
