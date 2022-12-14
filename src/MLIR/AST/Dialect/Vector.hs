@@ -22,7 +22,7 @@ module MLIR.AST.Dialect.Vector
 import qualified Data.Map.Strict as M
 import qualified Data.ByteString as BS
 
-import MLIR.AST
+import qualified MLIR.AST as AST
 import MLIR.AST.Dialect.Generated.Vector
 import qualified MLIR.AST.Dialect.Affine as Affine
 
@@ -32,38 +32,38 @@ showIterator :: IteratorType -> BS.ByteString
 showIterator Parallel  = "#vector.iterator_type<parallel>"
 showIterator Reduction = "#vector.iterator_type<reduction>"
 
-itersFromAttribute :: Attribute -> Maybe [IteratorType]
+itersFromAttribute :: AST.Attribute -> Maybe [IteratorType]
 itersFromAttribute attr = case attr of
-  ArrayAttr subAttrs -> traverse iterFromString subAttrs
+  AST.ArrayAttr subAttrs -> traverse iterFromString subAttrs
   _                  -> Nothing
-  where iterFromString (AsmTextAttr "#vector.iterator_type<parallel>")  = Just Parallel
-        iterFromString (AsmTextAttr "#vector.iterator_type<reduction>") = Just Reduction
+  where iterFromString (AST.AsmTextAttr "#vector.iterator_type<parallel>")  = Just Parallel
+        iterFromString (AST.AsmTextAttr "#vector.iterator_type<reduction>") = Just Reduction
         iterFromString _                        = Nothing
 
-pattern IteratorAttrs :: [IteratorType] -> Attribute
+pattern IteratorAttrs :: [IteratorType] -> AST.Attribute
 pattern IteratorAttrs iterTypes <- (itersFromAttribute -> Just iterTypes)
-  where IteratorAttrs iterTypes = ArrayAttr $ fmap (AsmTextAttr . showIterator) iterTypes
+  where IteratorAttrs iterTypes = AST.ArrayAttr $ fmap (AST.AsmTextAttr . showIterator) iterTypes
 
-pattern ContractAttrs :: Affine.Map -> Affine.Map -> Affine.Map -> [IteratorType] -> NamedAttributes
+pattern ContractAttrs :: Affine.Map -> Affine.Map -> Affine.Map -> [IteratorType] -> AST.NamedAttributes
 pattern ContractAttrs lhsMap rhsMap accMap iterTypes <-
   ((\m -> (M.lookup "indexing_maps" m, M.lookup "iterator_types" m)) ->
-     (Just (ArrayAttr [AffineMapAttr lhsMap, AffineMapAttr rhsMap, AffineMapAttr accMap]),
+     (Just (AST.ArrayAttr [AST.AffineMapAttr lhsMap, AST.AffineMapAttr rhsMap, AST.AffineMapAttr accMap]),
       Just (IteratorAttrs iterTypes)))
   where ContractAttrs lhsMap rhsMap accMap iterTypes = M.fromList
-          [ ("indexing_maps", ArrayAttr [ AffineMapAttr lhsMap
-                                        , AffineMapAttr rhsMap
-                                        , AffineMapAttr accMap])
+          [ ("indexing_maps", AST.ArrayAttr [ AST.AffineMapAttr lhsMap
+                                            , AST.AffineMapAttr rhsMap
+                                            , AST.AffineMapAttr accMap])
           , ("iterator_types", IteratorAttrs iterTypes)
           ]
 
 
-pattern Contract :: Location -> Type -> Name -> Name -> Name
+pattern Contract :: AST.Location -> AST.Type -> AST.Name -> AST.Name -> AST.Name
                  -> Affine.Map -> Affine.Map -> Affine.Map -> [IteratorType]
-                 -> Operation
-pattern Contract location resultType lhs rhs acc lhsMap rhsMap accMap iterTypes = Operation
+                 -> AST.Operation
+pattern Contract location resultType lhs rhs acc lhsMap rhsMap accMap iterTypes = AST.Operation
   { opName = "vector.contract"
   , opLocation = location
-  , opResultTypes = Explicit [resultType]
+  , opResultTypes = AST.Explicit [resultType]
   , opOperands = [lhs, rhs, acc]
   , opRegions = []
   , opSuccessors = []
