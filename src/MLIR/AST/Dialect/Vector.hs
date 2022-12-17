@@ -19,54 +19,84 @@ module MLIR.AST.Dialect.Vector
   , module MLIR.AST.Dialect.Generated.Vector
   ) where
 
+import Data.Typeable
 import qualified Data.Map.Strict as M
 import qualified Data.ByteString as BS
+import qualified Language.C.Inline as C
 
-import qualified MLIR.AST as AST
 import MLIR.AST.Dialect.Generated.Vector
+import qualified MLIR.AST                as AST
+import qualified MLIR.AST.Serialize      as AST
 import qualified MLIR.AST.Dialect.Affine as Affine
+import qualified MLIR.Native             as Native
+import qualified MLIR.Native.FFI         as Native
 
-data IteratorType = Parallel | Reduction
+data IteratorKind = Parallel | Reduction
+          deriving (Eq, Show)
 
-showIterator :: IteratorType -> BS.ByteString
+data Attribute = IteratorAttr IteratorKind
+          deriving (Eq, Show)
+
+castVectorAttr :: AST.Attribute -> Maybe Attribute
+castVectorAttr ty = case ty of
+  AST.DialectAttr dty -> cast dty
+  _                   -> Nothing
+
+showIterator :: IteratorKind -> BS.ByteString
 showIterator Parallel  = "#vector.iterator_type<parallel>"
 showIterator Reduction = "#vector.iterator_type<reduction>"
 
-itersFromAttribute :: AST.Attribute -> Maybe [IteratorType]
+C.context $ C.baseCtx <> Native.mlirCtx
+
+C.include "mlir-c/IR.h"
+
+instance AST.FromAST Attribute Native.Attribute where
+  fromAST ctx _ ty = case ty of
+    IteratorAttr t -> do
+      let value = showIterator t
+      Native.withStringRef value \(Native.StringRef ptr len) ->
+        [C.exp| MlirAttribute {
+          mlirAttributeParseGet($(MlirContext ctx), (MlirStringRef){$(char* ptr), $(size_t len)})
+        } |]
+
+iterFromAttribute :: AST.Attribute -> Maybe IteratorKind
+iterFromAttribute attr = case attr of
+  AST.DialectAttr subAttr -> case cast subAttr of
+    Just (IteratorAttr kind) -> Just kind
+    _ -> Nothing
+  _ -> Nothing
+
+itersFromAttribute :: AST.Attribute -> Maybe [IteratorKind]
 itersFromAttribute attr = case attr of
-  AST.ArrayAttr subAttrs -> traverse iterFromString subAttrs
-  _                  -> Nothing
-  where iterFromString (AST.AsmTextAttr "#vector.iterator_type<parallel>")  = Just Parallel
-        iterFromString (AST.AsmTextAttr "#vector.iterator_type<reduction>") = Just Reduction
-        iterFromString _                        = Nothing
+  AST.ArrayAttr subAttrs -> traverse iterFromAttribute subAttrs
+  _                      -> Nothing
 
-pattern IteratorAttrs :: [IteratorType] -> AST.Attribute
+pattern IteratorAttrs :: [IteratorKind] -> AST.Attribute
 pattern IteratorAttrs iterTypes <- (itersFromAttribute -> Just iterTypes)
-  where IteratorAttrs iterTypes = AST.ArrayAttr $ fmap (AST.AsmTextAttr . showIterator) iterTypes
+  where IteratorAttrs iterTypes = AST.ArrayAttr $ fmap (AST.DialectAttr . IteratorAttr) iterTypes
 
-pattern ContractAttrs :: Affine.Map -> Affine.Map -> Affine.Map -> [IteratorType] -> AST.NamedAttributes
-pattern ContractAttrs lhsMap rhsMap accMap iterTypes <-
+pattern ContractAttrs :: Affine.Map -> Affine.Map -> Affine.Map -> [IteratorKind] -> AST.NamedAttributes
+pattern ContractAttrs lhsMap rhsMap accMap iterKinds <-
   ((\m -> (M.lookup "indexing_maps" m, M.lookup "iterator_types" m)) ->
      (Just (AST.ArrayAttr [AST.AffineMapAttr lhsMap, AST.AffineMapAttr rhsMap, AST.AffineMapAttr accMap]),
-      Just (IteratorAttrs iterTypes)))
-  where ContractAttrs lhsMap rhsMap accMap iterTypes = M.fromList
+      Just (IteratorAttrs iterKinds)))
+  where ContractAttrs lhsMap rhsMap accMap iterKinds = M.fromList
           [ ("indexing_maps", AST.ArrayAttr [ AST.AffineMapAttr lhsMap
                                             , AST.AffineMapAttr rhsMap
                                             , AST.AffineMapAttr accMap])
-          , ("iterator_types", IteratorAttrs iterTypes)
+          , ("iterator_types", IteratorAttrs iterKinds)
           ]
 
-
 pattern Contract :: AST.Location -> AST.Type -> AST.Name -> AST.Name -> AST.Name
-                 -> Affine.Map -> Affine.Map -> Affine.Map -> [IteratorType]
+                 -> Affine.Map -> Affine.Map -> Affine.Map -> [IteratorKind]
                  -> AST.Operation
-pattern Contract location resultType lhs rhs acc lhsMap rhsMap accMap iterTypes = AST.Operation
+pattern Contract location resultType lhs rhs acc lhsMap rhsMap accMap iterKinds = AST.Operation
   { opName = "vector.contract"
   , opLocation = location
   , opResultTypes = AST.Explicit [resultType]
   , opOperands = [lhs, rhs, acc]
   , opRegions = []
   , opSuccessors = []
-  , opAttributes = ContractAttrs lhsMap rhsMap accMap iterTypes
+  , opAttributes = ContractAttrs lhsMap rhsMap accMap iterKinds
   }
 
