@@ -683,7 +683,7 @@ insert_strided_slice :: () => MonadBlockBuilder m => Type -> Value -> Value -> [
 load :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> m Value
 
 -- | A builder for <tt>vector.mask</tt>.
-mask :: () => MonadBlockBuilder m => Maybe Type -> Value -> Maybe Value -> RegionBuilderT m () -> m Value
+mask :: () => MonadBlockBuilder m => [Type] -> Value -> Maybe Value -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>vector.maskedload</tt>.
 maskedload :: () => MonadBlockBuilder m => Type -> Value -> [Value] -> Value -> Value -> m Value
@@ -932,9 +932,6 @@ pattern FromExtents :: () => () => Location -> Type -> [operand] -> AbstractOper
 -- | A builder for <tt>shape.from_extents</tt>.
 from_extents :: () => MonadBlockBuilder m => Type -> [Value] -> m Value
 
--- | A builder for <tt>shape.function_library</tt>.
-function_library :: () => MonadBlockBuilder m => Map Name Attribute -> RegionBuilderT m () -> m ()
-
 -- | A pattern for <tt>shape.get_extent</tt>.
 pattern GetExtent :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
 
@@ -1069,6 +1066,9 @@ yield :: () => MonadBlockBuilder m => [Value] -> m EndOfBlock
 -- | A builder for <tt>linalg.batch_matmul</tt>.
 batch_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A builder for <tt>linalg.batch_matmul_transpose_b</tt>.
+batch_matmul_transpose_b :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A builder for <tt>linalg.batch_matvec</tt>.
 batch_matvec :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1104,6 +1104,9 @@ conv_2d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBu
 
 -- | A builder for <tt>linalg.conv_3d_ndhwc_dhwcf</tt>.
 conv_3d_ndhwc_dhwcf :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.conv_3d_ndhwc_dhwcf_q</tt>.
+conv_3d_ndhwc_dhwcf_q :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.conv_3d</tt>.
 conv_3d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1159,6 +1162,9 @@ map :: () => MonadBlockBuilder m => [Type] -> [Value] -> Value -> RegionBuilderT
 -- | A builder for <tt>linalg.matmul</tt>.
 matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A builder for <tt>linalg.matmul_transpose_b</tt>.
+matmul_transpose_b :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A builder for <tt>linalg.matmul_unsigned</tt>.
 matmul_unsigned :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1173,6 +1179,12 @@ pooling_nchw_max :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] ->
 
 -- | A builder for <tt>linalg.pooling_nchw_sum</tt>.
 pooling_nchw_sum :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.pooling_ncw_max</tt>.
+pooling_ncw_max :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.pooling_ncw_sum</tt>.
+pooling_ncw_sum :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.pooling_ndhwc_max</tt>.
 pooling_ndhwc_max :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1197,6 +1209,21 @@ pooling_nhwc_min_unsigned :: () => MonadBlockBuilder m => [Type] -> [Value] -> [
 
 -- | A builder for <tt>linalg.pooling_nhwc_sum</tt>.
 pooling_nhwc_sum :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.pooling_nwc_max</tt>.
+pooling_nwc_max :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.pooling_nwc_max_unsigned</tt>.
+pooling_nwc_max_unsigned :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.pooling_nwc_min</tt>.
+pooling_nwc_min :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.pooling_nwc_min_unsigned</tt>.
+pooling_nwc_min_unsigned :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.pooling_nwc_sum</tt>.
+pooling_nwc_sum :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.quantized_batch_matmul</tt>.
 quantized_batch_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1533,11 +1560,11 @@ pattern AddI :: () => () => Location -> Type -> operand -> operand -> AbstractOp
 -- | A builder for <tt>arith.addi</tt>.
 addi :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
--- | A pattern for <tt>arith.addui_carry</tt>.
-pattern AddUICarry :: () => () => Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
+-- | A pattern for <tt>arith.addui_extended</tt>.
+pattern AddUIExtended :: () => () => Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
 
--- | A builder for <tt>arith.addui_carry</tt>.
-addui_carry :: () => MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
+-- | A builder for <tt>arith.addui_extended</tt>.
+addui_extended :: () => MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
 
 -- | A pattern for <tt>arith.andi</tt>.
 pattern AndI :: () => () => Location -> Type -> operand -> operand -> AbstractOperation operand
@@ -1683,6 +1710,18 @@ pattern MulI :: () => () => Location -> Type -> operand -> operand -> AbstractOp
 -- | A builder for <tt>arith.muli</tt>.
 muli :: () => MonadBlockBuilder m => Value -> Value -> m Value
 
+-- | A pattern for <tt>arith.mulsi_extended</tt>.
+pattern MulSIExtended :: () => () => Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.mulsi_extended</tt>.
+mulsi_extended :: () => MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
+
+-- | A pattern for <tt>arith.mului_extended</tt>.
+pattern MulUIExtended :: () => () => Location -> Type -> Type -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>arith.mului_extended</tt>.
+mului_extended :: () => MonadBlockBuilder m => Type -> Type -> Value -> Value -> m [Value]
+
 -- | A pattern for <tt>arith.negf</tt>.
 pattern NegF :: () => () => Location -> Type -> operand -> AbstractOperation operand
 
@@ -1789,17 +1828,17 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679427366 :: Context -> IO PassManager
+inline_c_ffi_6989586621679439147 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679427375 :: PassManager -> IO ()
+inline_c_ffi_6989586621679439156 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Module -> IO LogicalResult
-inline_c_ffi_6989586621679427388 :: PassManager -> Module -> IO LogicalResult
+inline_c_ffi_6989586621679439169 :: PassManager -> Module -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679427397 :: PassManager -> IO ()
+inline_c_ffi_6989586621679439178 :: PassManager -> IO ()
 addConvertFuncToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679427406 :: PassManager -> IO ()
+inline_c_ffi_6989586621679439187 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679427415 :: PassManager -> IO ()
+inline_c_ffi_6989586621679439196 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679427424 :: PassManager -> IO ()
+inline_c_ffi_6989586621679439205 :: PassManager -> IO ()

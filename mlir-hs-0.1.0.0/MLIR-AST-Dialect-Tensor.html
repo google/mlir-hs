@@ -193,14 +193,14 @@
  divisible dimensions. Padding is optional:
  - If absent, it is UB if the tile does not perfectly divide the dimension.
  - If present, it will pad along high dimensions (high-padding) to make the
-   tile complete.</p><p>Example NC_to_NCnc:</p><pre>tensor.pack %source inner_dims_pos = [0, 1]
+   tile complete.</p><p>Example NC_to_NCnc:</p><pre>%0 = tensor.pack %source inner_dims_pos = [0, 1]
   inner_tiles = [8, 32] into %dest : tensor&lt;128x256xf32&gt; -&gt; tensor&lt;16x8x8x32xf32&gt;
-</pre><p>Example CK to KCck</p><pre>tensor.pack %source outer_dims_perm = [1, 0] inner_dims_pos = [0, 1]
+</pre><p>Example CK to KCck</p><pre>%0 = tensor.pack %source outer_dims_perm = [1, 0] inner_dims_pos = [0, 1]
   inner_tiles = [8, 32] into %dest : tensor&lt;128x256xf32&gt; -&gt; tensor&lt;8x16x8x32xf32&gt;
 </pre><p>In all cases, dimension at position 0 in the input tensor (128) is tiled
  with a factor of 8, while dimension at position 1 (256) is tiled with a factor
  of 32. In the second example, the outer data dimensions are interchanged
- according to <code>outer_dims_perm</code>.</p><p>Example NC_to_NCnc with padding:</p><pre>tensor.pack %arg padding_value(%pad : f32) inner_dims_pos = [0, 1]
+ according to <code>outer_dims_perm</code>.</p><p>Example NC_to_NCnc with padding:</p><pre>%0 = tensor.pack %arg padding_value(%pad : f32) inner_dims_pos = [0, 1]
   inner_tiles = [8, 2] into %arg1 : tensor&lt;13x15xf32&gt; -&gt; tensor&lt;2x8x8x2xf32&gt;
 </pre></div><a href="#g:14" id="g:14"><h1>pad</h1></a><div class="doc"><p><code>tensor.pad</code> is an operation that pads the <code>source</code> tensor
  with given <code>low</code> and <code>high</code> padding config.</p><p>The PadOp operation supports the following arguments:</p><ul><li>source: the &quot;base&quot; tensor on which to pad.</li><li>low: A list contains the padding along the start of each
@@ -362,9 +362,9 @@
  <code>inner_dims_pos</code> specifies a permutation for the inner data dimensions, while
  <code>inner_tiles</code> is the tiling factor. The attribute <code>outer_dims_perm</code> has the
  exact behavior as the one described in <code>pack</code>. In <code>unpack</code>, it is UB if the
- tile does not perfectly divide the dimension.</p><p>Example NCnc_to_NC:</p><pre>tensor.unpack %source inner_dims_pos = [0, 1]
+ tile does not perfectly divide the dimension.</p><p>Example NCnc_to_NC:</p><pre>%0 = tensor.unpack %source inner_dims_pos = [0, 1]
   inner_tiles = [8, 32] into %dest : tensor&lt;16x8x8x32xf32&gt; -&gt; tensor&lt;128x256xf32&gt;
-</pre><p>Example CK to KCck:</p><pre>tensor.unapck %source outer_dims_perm = [1, 0] inner_dims_pos = [0, 1]
+</pre><p>Example CK to KCck:</p><pre>%0 = tensor.unapck %source outer_dims_perm = [1, 0] inner_dims_pos = [0, 1]
   inner_tiles = [8, 32] into %dest : tensor&lt;8x16x8x32xf32&gt; -&gt; tensor&lt;128x256xf32&gt;
 </pre></div><a href="#g:21" id="g:21"><h1>yield</h1></a><div class="doc"><p>This operation is used to yield a single value from a within a region. It
  is used to create dynamically sized tensors
