@@ -88,13 +88,14 @@ shouldImplementMatmul op = evalContT $ do
   ctx <- ContT $ MLIR.withContext
   m <- liftIO $ do
     MLIR.registerAllDialects ctx
-    Just m <- MLIR.moduleFromOperation =<< fromAST ctx (mempty, mempty) op
+    o <- fromAST ctx (mempty, mempty) op
+    Just m <- MLIR.moduleFromOperation o -- fromAST ctx (mempty, mempty) op
     MLIR.withPassManager ctx \pm -> do
       MLIR.addConvertMemRefToLLVMPass   pm
       MLIR.addConvertVectorToLLVMPass   pm
       MLIR.addConvertFuncToLLVMPass pm
       MLIR.addConvertReconcileUnrealizedCastsPass pm
-      result <- MLIR.runPasses pm m
+      result <- MLIR.runPasses pm o
       result `shouldBe` MLIR.Success
     return m
   (a, _   ) <- withMemrefArg0 $ V.unsafeThaw $ V.iterateN  64 (+1.0) (1.0 :: AlignedStorable Float)

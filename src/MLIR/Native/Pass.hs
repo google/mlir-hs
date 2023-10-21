@@ -42,9 +42,9 @@ destroyPassManager pm =
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 withPassManager ctx = bracket (createPassManager ctx) destroyPassManager
 
-runPasses :: PassManager -> Module -> IO LogicalResult
-runPasses pm m =
-  [C.exp| MlirLogicalResult { mlirPassManagerRun($(MlirPassManager pm), $(MlirModule m)) } |]
+runPasses :: PassManager -> Operation -> IO LogicalResult
+runPasses pm op =
+  [C.exp| MlirLogicalResult { mlirPassManagerRunOnOp($(MlirPassManager pm), $(MlirOperation op)) } |]
 
 --------------------------------------------------------------------------------
 -- Transform passes
@@ -61,13 +61,13 @@ addConvertMemRefToLLVMPass pm =
 addConvertFuncToLLVMPass :: PassManager -> IO ()
 addConvertFuncToLLVMPass pm =
   [C.exp| void {
-    mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionConvertFuncToLLVM())
+    mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionConvertFuncToLLVMPass())
   } |]
 
 addConvertVectorToLLVMPass :: PassManager -> IO ()
 addConvertVectorToLLVMPass pm =
   [C.exp| void {
-    mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionConvertVectorToLLVM())
+    mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionConvertVectorToLLVMPass())
   } |]
 
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()

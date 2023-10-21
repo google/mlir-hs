@@ -134,10 +134,11 @@ spec = do
         lowerToLLVM :: MLIR.Module -> IO ()
         lowerToLLVM m = do
           ctx <- MLIR.getContext m
+          o <- MLIR.moduleAsOperation m
           MLIR.withPassManager ctx \pm -> do
             MLIR.addConvertFuncToLLVMPass pm
             MLIR.addConvertReconcileUnrealizedCastsPass pm
-            result <- MLIR.runPasses pm m
+            result <- MLIR.runPasses pm o
             when (result == MLIR.Failure) $ error "Failed to lower to LLVM!"
 
         run :: forall result. Storable result
