@@ -26,8 +26,8 @@
  they are internally represented as &#8220;block arguments&#8221; to the first block in
  the region.</p><p>Only dialect attribute names may be specified in the attribute dictionaries
  for function arguments, results, or the function itself.</p><p>Example:</p><pre>// External function definitions.
-func.func @abort()
-func.func @scribble(i32, i64, memref&lt;? x 128 x f32, #layout_map0&gt;) -&gt; f64
+func.func private @abort()
+func.func private @scribble(i32, i64, memref&lt;? x 128 x f32, #layout_map0&gt;) -&gt; f64
 
 // A function that returns its argument twice:
 func.func @count(%x: i64) -&gt; (i64, i64)
@@ -36,13 +36,13 @@ func.func @count(%x: i64) -&gt; (i64, i64)
 }
 
 // A function with an argument attribute
-func.func @example_fn_arg(%x: i32 {swift.self = unit})
+func.func private @example_fn_arg(%x: i32 {swift.self = unit})
 
 // A function with a result attribute
-func.func @example_fn_result() -&gt; (f64 {dialectName.attrName = 0 : i64})
+func.func private @example_fn_result() -&gt; (f64 {dialectName.attrName = 0 : i64})
 
 // A function with an attribute
-func.func @example_fn_attr() attributes {dialectName.attrName = false}
+func.func private @example_fn_attr() attributes {dialectName.attrName = false}
 </pre></div><a href="#g:5" id="g:5"><h1>return</h1></a><div class="doc"><p>The <code>func.return</code> operation represents a return operation within a function.
  The operation takes variable number of operands and produces no results.
  The operand number and types must match the signature of the function
