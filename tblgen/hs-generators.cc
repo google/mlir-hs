@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <functional>
+#include <optional>
 #include <regex>
 
-#include "llvm/ADT/Optional.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/Sequence.h"
 #include "llvm/ADT/StringExtras.h"

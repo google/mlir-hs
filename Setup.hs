@@ -34,7 +34,7 @@ import Control.Lens.Setter
 import Control.Lens.Operators ((&))
 
 llvmVersion :: Version
-llvmVersion = mkVersion [17]
+llvmVersion = mkVersion [18]
 
 llvmConfigProgram :: Program
 llvmConfigProgram = (simpleProgram "llvm-config")
