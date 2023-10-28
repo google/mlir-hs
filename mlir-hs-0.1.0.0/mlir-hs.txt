@@ -1092,6 +1092,9 @@ batch_mmt4d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> Regi
 -- | A builder for <tt>linalg.batch_reduce_matmul</tt>.
 batch_reduce_matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A builder for <tt>linalg.batch_vecmat</tt>.
+batch_vecmat :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A builder for <tt>linalg.ceil</tt>.
 ceil :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1917,17 +1920,17 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679466646 :: Context -> IO PassManager
+inline_c_ffi_6989586621679467700 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679466655 :: PassManager -> IO ()
+inline_c_ffi_6989586621679467709 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Operation -> IO LogicalResult
-inline_c_ffi_6989586621679466668 :: PassManager -> Operation -> IO LogicalResult
+inline_c_ffi_6989586621679467722 :: PassManager -> Operation -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679466677 :: PassManager -> IO ()
+inline_c_ffi_6989586621679467731 :: PassManager -> IO ()
 addConvertFuncToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679466686 :: PassManager -> IO ()
+inline_c_ffi_6989586621679467740 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679466695 :: PassManager -> IO ()
+inline_c_ffi_6989586621679467749 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679466704 :: PassManager -> IO ()
+inline_c_ffi_6989586621679467758 :: PassManager -> IO ()

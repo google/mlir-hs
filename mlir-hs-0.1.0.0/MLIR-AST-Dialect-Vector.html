@@ -465,6 +465,8 @@ vector.print %v : vector&lt;4xf32&gt;
  after instead do:</p><pre>vector.print %v : vector&lt;4xf32&gt; punctuation &lt;comma&gt;
 </pre><p>Note that it is possible to use the punctuation attribute alone. The
  following will print a single newline:</p><pre>vector.print punctuation &lt;newline&gt;
+</pre><p>Additionally, to aid with debugging and testing <code>vector.print</code> can also
+ print constant strings:</p><pre>vector.print str &quot;Hello, World!&quot;
 </pre></div><div class="top"><p class="src"><a id="v:print" class="def">print</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="../base-4.14.1.0/Data-Maybe.html#t:Maybe" title="Data.Maybe">Maybe</a> <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m () <a href="src/MLIR.AST.Dialect.Generated.Vector.html#print" class="link">Source</a> <a href="#v:print" class="selflink">#</a></p><div class="doc"><p>A builder for <code>vector.print</code>.</p></div></div><a href="#g:26" id="g:26"><h1>reduction</h1></a><div class="doc"><p>Reduces an 1-D vector &quot;horizontally&quot; into a scalar using the given
  operation (add<em>mul</em>min<em>max for int</em>fp and and<em>or</em>xor for int only).
  Reductions also allow an optional fused accumulator.</p><p>Note that these operations are restricted to 1-D vectors to remain
