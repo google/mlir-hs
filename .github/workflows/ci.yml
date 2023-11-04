@@ -20,6 +20,7 @@ jobs:
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
 
     - name: Setup Haskell Stack
+      id: setup-haskell
       uses: haskell-actions/setup@f7d8a55550ba6c8e4fdba2f1e56e14f595218dd9 # v2.5.1
       with:
         enable-stack: true
