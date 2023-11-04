@@ -16,23 +16,30 @@ jobs:
 
     steps:
     - name: Checkout the repository
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
 
     - name: Setup Haskell Stack
-      uses: actions/setup-haskell@v1
+      uses: haskell-actions/setup@f7d8a55550ba6c8e4fdba2f1e56e14f595218dd9 # v2.5.1
       with:
         enable-stack: true
         stack-no-global: true
         stack-version: 'latest'
 
-    - name: Cache
-      uses: actions/cache@70655ec8323daeeaa7ef06d7c56e1b9191396cbe
+    - name: Cache .stack-work
+      uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
       with:
-        path: |
-          ~/.stack
-          $GITHUB_WORKSPACE/.stack-work
-        key: ${{ runner.os }}-${{ hashFiles('**/*.cabal', 'stack*.yaml') }}
-        restore-keys: ${{ runner.os }}-
+        path: .stack-work
+        key: stack-work-${{ runner.os }}-${{ hashFiles('stack.yaml', '**/*.cabal') }}-${{ hashFiles('src/*', 'tblgen/*', 'test/*') }}
+        restore-keys: |
+          stack-work-${{ runner.os }}-${{ hashFiles('stack.yaml', '**/*.cabal') }}-
+          stack-work-${{ runner.os }}-
+
+    - name: Cache ~/.stack
+      uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+      with:
+        path: ${{ steps.setup-haskell.outputs.stack-root }}
+        key: stack-root-${{ runner.os }}-${{ hashFiles('stack.yaml', '**/*.cabal') }}
+        restore-keys: stack-root-${{ runner.os }}-
 
     - name: Install zstd
       run: sudo apt install libzstd-dev
@@ -66,14 +73,14 @@ jobs:
 
     - name: Install dependencies (Haskell)
       run: |
-        stack build --test --only-dependencies
+        stack build --only-dependencies --test --no-run-tests
 
     - name: Build mlir-hs
       run: |
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/mlir_shared/lib
-        stack build --test --ghc-options "-Wall -Werror -fforce-recomp"
+        stack build --ghc-options "-Wall -Werror -fforce-recomp" --test --no-run-tests
 
     - name: Run mlir-hs tests
       run: |
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/mlir_shared/lib
-        stack test
+        stack test --ghc-options "-Wall -Werror -fforce-recomp"
