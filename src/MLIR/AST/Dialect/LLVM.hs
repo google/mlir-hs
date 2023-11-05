@@ -15,7 +15,6 @@
 module MLIR.AST.Dialect.LLVM (
   -- * Types
     Type(..)
-  , pattern Ptr
   , pattern Array
   , pattern Void
   , pattern LiteralStruct
