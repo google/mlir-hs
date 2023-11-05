@@ -47,9 +47,7 @@ data Type = PointerType AST.Type
 
 instance AST.FromAST Type Native.Type where
   fromAST ctx env ty = case ty of
-    PointerType t -> do
-      nt <- AST.fromAST ctx env t
-      [C.exp| MlirType { mlirLLVMPointerTypeGet($(MlirType nt), 0) } |]
+    PointerType t -> [C.exp| MlirType { mlirLLVMPointerTypeGet($(MlirContext ctx), 0) } |]
     ArrayType size t -> do
       nt <- AST.fromAST ctx env t
       let nsize = fromIntegral size
