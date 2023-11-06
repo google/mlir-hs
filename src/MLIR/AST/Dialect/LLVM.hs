@@ -15,7 +15,6 @@
 module MLIR.AST.Dialect.LLVM (
   -- * Types
     Type(..)
-  , pattern Ptr
   , pattern Array
   , pattern Void
   , pattern LiteralStruct
@@ -38,8 +37,7 @@ import qualified MLIR.Native.FFI    as Native
 C.context $ C.baseCtx <> Native.mlirCtx
 C.include "mlir-c/Dialect/LLVM.h"
 
-data Type = PointerType AST.Type
-          | ArrayType Int AST.Type
+data Type = ArrayType Int AST.Type
           | VoidType
           | LiteralStructType [AST.Type]
           -- TODO(apaszke): Structures, functions, vectors, etc.
@@ -47,9 +45,6 @@ data Type = PointerType AST.Type
 
 instance AST.FromAST Type Native.Type where
   fromAST ctx env ty = case ty of
-    PointerType t -> do
-      nt <- AST.fromAST ctx env t
-      [C.exp| MlirType { mlirLLVMPointerTypeGet($(MlirType nt), 0) } |]
     ArrayType size t -> do
       nt <- AST.fromAST ctx env t
       let nsize = fromIntegral size
@@ -67,10 +62,6 @@ castLLVMType :: AST.Type -> Maybe Type
 castLLVMType ty = case ty of
   AST.DialectType dty -> cast dty
   _                   -> Nothing
-
-pattern Ptr :: AST.Type -> AST.Type
-pattern Ptr t <- (castLLVMType -> Just (PointerType t))
-  where Ptr t = AST.DialectType (PointerType t)
 
 pattern Array :: Int -> AST.Type -> AST.Type
 pattern Array n t <- (castLLVMType -> Just (ArrayType n t))
