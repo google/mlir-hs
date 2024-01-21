@@ -16,6 +16,7 @@ import Data.Char
 import Data.List
 import Data.Maybe
 
+import System.Info
 import System.Directory
 import System.FilePath
 
@@ -84,9 +85,10 @@ buildTblgen confFlags = do
   cppFlags   <- words <$> llvmConfig ["--cppflags"]
   includeDir <- trim  <$> llvmConfig ["--includedir"]
   cc <- getCC confFlags
+  let windowsLLVMVersion = "-" ++ (show $ head $ versionNumbers llvmVersion)
   ensureDirectory $ cwd </> ".bin"
   cc $ sources ++ cxxFlags ++ ldFlags ++
-        [ "-lMLIR", "-lLLVM", "-lMLIRTableGen", "-lLLVMTableGen"
+        [ "-lMLIR", if os == "mingw32" then "-lLLVM" ++ windowsLLVMVersion else "-lLLVM", "-lMLIRTableGen", "-lLLVMTableGen"
         , "-o", cwd </> ".bin/mlir-hs-tblgen"]
   let tblgenProgram = ConfiguredProgram
         { programId           = "mlir-hs-tblgen"
