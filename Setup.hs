@@ -89,7 +89,7 @@ buildTblgen confFlags = do
   ensureDirectory $ cwd </> ".bin"
   cc $ sources ++ cxxFlags ++ ldFlags ++
         [ "-lMLIR", if os == "mingw32" then "-lLLVM" ++ windowsLLVMVersion else "-lLLVM", "-lMLIRTableGen", "-lLLVMTableGen"
-        , "-o", cwd </> ".bin/mlir-hs-tblgen"]
+        , "-lLLVMCore", "-o", cwd </> ".bin/mlir-hs-tblgen"]
   let tblgenProgram = ConfiguredProgram
         { programId           = "mlir-hs-tblgen"
         , programVersion      = Nothing
