@@ -54,12 +54,17 @@
  with a <code>tensor.empty</code> destination.</p><p>Note: This op can be lowered to a <code>bufferization.alloc_tensor</code>, at which
  point it turns into an explicit buffer allocation.</p></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Empty" class="def">Empty</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [operand] -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Tensor.html#Empty" class="link">Source</a> <a href="#v:Empty" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>tensor.empty</code>.</p></div></div><div class="top"><p class="src"><a id="v:empty" class="def">empty</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; [<a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a>] -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Tensor.html#empty" class="link">Source</a> <a href="#v:empty" class="selflink">#</a></p><div class="doc"><p>A builder for <code>tensor.empty</code>.</p></div></div><a href="#g:7" id="g:7"><h1>expand_shape</h1></a><div class="doc"><p>The <code>tensor.expand_shape</code> op produces a tensor of higher (or equal)
  rank than the operand <code>src</code> whose dimension sizes are a reassociation of
- <code>src</code>.</p><p>A reassociation is defined as a continuous grouping of dimensions. It is
- represented with an array of DenseI64ArrayAttr attribute. Entries in the
- array are referred to as reassociation maps.</p><p>The reassociation maps are applied to the result shape to obtain the operand
- shape.</p><p>Example:</p><pre>// Dimension expansion i -&gt; (i', j') and (k) -&gt; (k')
-%b = tensor.expand_shape %a [[0, 1], [2]]
-    : tensor&lt;?x?xf32&gt; into tensor&lt;?x?x?xf32&gt;
+ <code>src</code>.</p><p>A reassociation is defined as a continuous grouping of dimensions and is
+ represented with an array of DenseI64ArrayAttr attribute.  The reassociation
+ maps applied to the result tensor with the higher rank must result in the
+ operand tensor with the smaller rank.</p><p>The representation for the output shape supports a partially-static
+ specification via attributes specified through the <code>static_output_shape</code>
+ argument.  A special sentinel value <code>ShapedType::kDynamic</code> encodes that the
+ corresponding entry has a dynamic value.  There must be exactly as many SSA
+ inputs in <code>output_shape</code> as there are <code>ShapedType::kDynamic</code> entries in
+ <code>static_output_shape</code>.</p><p>Example:</p><pre>// Dimension expansion i -&gt; (i', j') and (k) -&gt; (k')
+%b = tensor.expand_shape %a [[0, 1], [2]] output_shape [%sz0, %sz1, 32]
+    : tensor&lt;?x32xf32&gt; into tensor&lt;?x?x32xf32&gt;
 </pre></div><a href="#g:8" id="g:8"><h1>extract</h1></a><div class="doc"><p>The <code>tensor.extract</code> op reads a ranked tensor and returns one element as
  specified by the given indices. The result of the op is a value with the
  same type as the elements of the tensor. The arity of indices must match

@@ -25,11 +25,12 @@ llvm.mlir.global @const(42 : i32) : i32
  start with a function name (<code>@</code>-prefixed) and indirect calls start with an
  SSA value (<code>%</code>-prefixed). The direct callee, if present, is stored as a
  function attribute <code>callee</code>. For indirect calls, the callee is of <code>!llvm.ptr</code> type
- and is stored as the first value in <code>callee_operands</code>. If the callee is a variadic
- function, then the <code>callee_type</code> attribute must carry the function type. The
- trailing type list contains the optional indirect callee type and the MLIR
- function type, which differs from the LLVM function type that uses a explicit
- void type to model functions that do not return a value.</p><p>Examples:</p><pre>// Direct call without arguments and with one result.
+ and is stored as the first value in <code>callee_operands</code>. If and only if the
+ callee is a variadic function, the <code>var_callee_type</code> attribute must carry
+ the variadic LLVM function type. The trailing type list contains the
+ optional indirect callee type and the MLIR function type, which differs from
+ the LLVM function type that uses an explicit void type to model functions
+ that do not return a value.</p><p>Examples:</p><pre>// Direct call without arguments and with one result.
 %0 = llvm.call @foo() : () -&gt; (f32)
 
 // Direct call with arguments and without a result.
@@ -62,10 +63,13 @@ llvm.call %1(%0) vararg(!llvm.func&lt;void (...)&gt;) : !llvm.ptr, (i32) -&gt; (
  vectors. It has a mandatory <code>value</code> attribute, which may be an integer,
  floating point attribute; dense or sparse attribute containing integers or
  floats. The type of the attribute is one of the corresponding MLIR builtin
- types. It may be omitted for <code>i64</code> and <code>f64</code> types that are implied. The
- operation produces a new SSA value of the specified LLVM IR dialect type.
- The type of that value _must_ correspond to the attribute type converted to
- LLVM IR.</p><p>Examples:</p><pre>// Integer constant, internal i32 is mandatory
+ types. It may be omitted for <code>i64</code> and <code>f64</code> types that are implied.</p><p>The operation produces a new SSA value of the specified LLVM IR dialect
+ type. Certain builtin types such as integer, float and vector types are
+ also allowed. The result type _must_ correspond to the attribute type
+ converted to LLVM IR. In particular, the number of elements of a container
+ type must match the number of elements in the attribute. If the type is or
+ contains a scalable vector type, the attribute must be a splat elements
+ attribute.</p><p>Examples:</p><pre>// Integer constant, internal i32 is mandatory
 %0 = llvm.mlir.constant(42 : i32) : i32
 
 // It's okay to omit i64.

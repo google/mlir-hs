@@ -2,7 +2,7 @@
  message attribute.
  If the argument is <code>true</code> this operation has no effect. Otherwise, the
  program execution will abort. The provided error message may be used by a
- runtime to propagate the error to the user.</p><p>Example:</p><pre>assert %b, &quot;Expected ... to be true&quot;
+ runtime to propagate the error to the user.</p><p>Example:</p><pre>cf.assert %b, &quot;Expected ... to be true&quot;
 </pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Assert" class="def">Assert</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; operand -&gt; <a href="../bytestring-0.10.12.0/Data-ByteString.html#t:ByteString" title="Data.ByteString">ByteString</a> -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.ControlFlow.html#Assert" class="link">Source</a> <a href="#v:Assert" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>cf.assert</code>.</p></div></div><div class="top"><p class="src"><a id="v:assert" class="def">assert</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="../bytestring-0.10.12.0/Data-ByteString.html#t:ByteString" title="Data.ByteString">ByteString</a> -&gt; m () <a href="src/MLIR.AST.Dialect.Generated.ControlFlow.html#assert" class="link">Source</a> <a href="#v:assert" class="selflink">#</a></p><div class="doc"><p>A builder for <code>cf.assert</code>.</p></div></div><a href="#g:2" id="g:2"><h1>br</h1></a><div class="doc"><p>The <code>cf.br</code> operation represents a direct branch operation to a given
  block. The operands of this operation are forwarded to the successor block,
  and the number and type of the operands must match the arguments of the
@@ -10,7 +10,7 @@
   %2 = call @someFn()
   cf.br ^bb3(%2 : tensor&lt;*xf32&gt;)
 ^bb3(%3: tensor&lt;*xf32&gt;):
-</pre></div><a href="#g:3" id="g:3"><h1>cond_br</h1></a><div class="doc"><p>The <code>cond_br</code> terminator operation represents a conditional branch on a
+</pre></div><a href="#g:3" id="g:3"><h1>cond_br</h1></a><div class="doc"><p>The <code>cf.cond_br</code> terminator operation represents a conditional branch on a
  boolean (1-bit integer) value. If the bit is set, then the first destination
  is jumped to; if it is false, the second destination is chosen. The count
  and types of operands must align with the arguments in the corresponding
@@ -19,16 +19,16 @@
  are allowed to be the same.</p><p>The following example illustrates a function with a conditional branch
  operation that targets the same block.</p><p>Example:</p><pre>func.func @select(%a: i32, %b: i32, %flag: i1) -&gt; i32 {
   // Both targets are the same, operands differ
-  cond_br %flag, ^bb1(%a : i32), ^bb1(%b : i32)
+  cf.cond_br %flag, ^bb1(%a : i32), ^bb1(%b : i32)
 
 ^bb1(%x : i32) :
   return %x : i32
 }
-</pre></div><a href="#g:4" id="g:4"><h1>switch</h1></a><div class="doc"><p>The <code>switch</code> terminator operation represents a switch on a signless integer
+</pre></div><a href="#g:4" id="g:4"><h1>switch</h1></a><div class="doc"><p>The <code>cf.switch</code> terminator operation represents a switch on a signless integer
  value. If the flag matches one of the specified cases, then the
  corresponding destination is jumped to. If the flag does not match any of
  the cases, the default destination is jumped to. The count and types of
- operands must align with the arguments in the corresponding target blocks.</p><p>Example:</p><pre>switch %flag : i32, [
+ operands must align with the arguments in the corresponding target blocks.</p><p>Example:</p><pre>cf.switch %flag : i32, [
   default: ^bb1(%a : i32),
   42: ^bb1(%b : i32),
   43: ^bb3(%c : i32)
