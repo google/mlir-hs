@@ -673,8 +673,8 @@ void emitPattern(const llvm::Record* def, const OpAttrPattern& attr_pattern,
   if (op.getNumVariableLengthResults() != 0) return fail("variadic results");
   if (op.getNumRegions() != 0) return fail("regions");
   if (op.getNumSuccessors() != 0) return fail("successors");
-  if (!def->getName().endswith("Op")) return fail("unsupported name format");
-  if (!def->getName().startswith(StripOpPrefix)) return fail("missing prefix");
+  if (!def->getName().ends_with("Op")) return fail("unsupported name format");
+  if (!def->getName().starts_with(StripOpPrefix)) return fail("missing prefix");
 
   // Drop the stripped prefix and "Op" from the end.
   llvm::StringRef pattern_name =
