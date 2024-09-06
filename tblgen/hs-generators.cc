@@ -766,7 +766,7 @@ std::string formatDescription(mlir::tblgen::Operator op) {
 
 bool emitOpTableDefs(const llvm::RecordKeeper& recordKeeper,
                      llvm::raw_ostream& os) {
-  std::vector<llvm::Record*> defs = recordKeeper.getAllDerivedDefinitions("Op");
+  auto defs = recordKeeper.getAllDerivedDefinitions("Op");
 
   if (defs.empty()) return true;
   // TODO(apaszke): Emit a module header to avoid leaking internal definitions.
@@ -817,7 +817,7 @@ import qualified MLIR.AST.Dialect.Affine as Affine
 
 bool emitTestTableDefs(const llvm::RecordKeeper& recordKeeper,
                        llvm::raw_ostream& os) {
-  std::vector<llvm::Record*> defs = recordKeeper.getAllDerivedDefinitions("Op");
+  auto defs = recordKeeper.getAllDerivedDefinitions("Op");
   if (defs.empty()) return true;
 
   auto dialect_name = getDialectName(defs);
