@@ -266,10 +266,10 @@ const std::string sanitizeName(llvm::StringRef name, std::optional<int> idx = st
   }
 }
 
-std::string getDialectName(llvm::ArrayRef<llvm::Record*> op_defs) {
+std::string getDialectName(llvm::ArrayRef<const llvm::Record*> op_defs) {
   mlir::tblgen::Operator any_op(op_defs.front());
-  assert(
-      std::all_of(op_defs.begin(), op_defs.end(), [&any_op](llvm::Record* op) {
+  assert(std::all_of(
+    op_defs.begin(), op_defs.end(), [&any_op](const llvm::Record* op) {
         return mlir::tblgen::Operator(op).getDialectName() ==
                any_op.getDialectName();
       }));
