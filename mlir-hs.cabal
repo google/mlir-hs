@@ -76,17 +76,19 @@ library
     , MLIR.Native.ExecutionEngine
     , MLIR.Native.FFI
     , MLIR.Native.Pass
-  other-modules:
-      MLIR.AST.Dialect.Generated.Arith
-    , MLIR.AST.Dialect.Generated.ControlFlow
-    , MLIR.AST.Dialect.Generated.Func
-    , MLIR.AST.Dialect.Generated.LLVM
-    , MLIR.AST.Dialect.Generated.Linalg
-    , MLIR.AST.Dialect.Generated.LinalgStructured
-    , MLIR.AST.Dialect.Generated.Shape
-    , MLIR.AST.Dialect.Generated.Tensor
-    , MLIR.AST.Dialect.Generated.Vector
-    , MLIR.AST.Dialect.Generated.X86Vector
+  when:
+  - condition: false
+    other-modules:
+        MLIR.AST.Dialect.Generated.Arith
+      , MLIR.AST.Dialect.Generated.ControlFlow
+      , MLIR.AST.Dialect.Generated.Func
+      , MLIR.AST.Dialect.Generated.LLVM
+      , MLIR.AST.Dialect.Generated.Linalg
+      , MLIR.AST.Dialect.Generated.LinalgStructured
+      , MLIR.AST.Dialect.Generated.Shape
+      , MLIR.AST.Dialect.Generated.Tensor
+      , MLIR.AST.Dialect.Generated.Vector
+      , MLIR.AST.Dialect.Generated.X86Vector
   build-depends:
       base >=4.7 && <5
     , inline-c
