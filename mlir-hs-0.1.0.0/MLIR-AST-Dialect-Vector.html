@@ -359,9 +359,10 @@ print %1
  based on the element type of the memref. The shape of the result vector
  type determines the shape of the slice read from the start memory address.
  The elements along each dimension of the slice are strided by the memref
- strides. Only unit strides are allowed along the most minor memref
- dimension. These constraints guarantee that elements read along the first
- dimension of the slice are contiguous in memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
+ strides. When loading more than 1 element, only unit strides are allowed
+ along the most minor memref dimension. These constraints guarantee that
+ elements read along the first dimension of the slice are contiguous in
+ memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
  element type is a scalar, it should match the element type of the result
  vector. If the memref element type is vector, it should match the result
  vector type.</p><p>Example: 0-D vector load on a scalar memref.
@@ -643,9 +644,10 @@ vector.scatter %base[%i, %j][%v], %mask, %value
  memref dimension based on the element type of the memref. The shape of the
  vector value to store determines the shape of the slice written from the
  start memory address. The elements along each dimension of the slice are
- strided by the memref strides. Only unit strides are allowed along the most
- minor memref dimension. These constraints guarantee that elements written
- along the first dimension of the slice are contiguous in memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
+ strided by the memref strides. When storing more than 1 element, only unit
+ strides are allowed along the most minor memref dimension. These constraints
+ guarantee that elements written along the first dimension of the slice are
+ contiguous in memory.</p><p>The memref element type can be a scalar or a vector type. If the memref
  element type is a scalar, it should match the element type of the value
  to store. If the memref element type is vector, it should match the type
  of the value to store.</p><p>Example: 0-D vector store on a scalar memref.
@@ -694,12 +696,12 @@ vector.scatter %base[%i, %j][%v], %mask, %value
  specifies if the transfer is guaranteed to be within the source bounds. If
  set to &quot;false&quot;, accesses (including the starting point) may run
  out-of-bounds along the respective vector dimension as the index increases.
- Non-vector and broadcast dimensions *must* always be in-bounds. The
- <code>in_bounds</code> array length has to be equal to the vector rank. This attribute
- has a default value: <code>false</code> (i.e. &quot;out-of-bounds&quot;). When skipped in the
- textual IR, the default value is assumed. Similarly, the OP printer will
- omit this attribute when all dimensions are out-of-bounds (i.e. the default
- value is used).</p><p>A <code>vector.transfer_read</code> can be lowered to a simple load if all dimensions
+ Non-vector dimensions *must* always be in-bounds. The <code>in_bounds</code> array
+ length has to be equal to the vector rank. This attribute has a default
+ value: <code>false</code> (i.e. &quot;out-of-bounds&quot;). When skipped in the textual IR, the
+ default value is assumed. Similarly, the OP printer will omit this
+ attribute when all dimensions are out-of-bounds (i.e. the default value is
+ used).</p><p>A <code>vector.transfer_read</code> can be lowered to a simple load if all dimensions
  are specified to be within bounds and no <code>mask</code> was specified.</p><p>This operation is called 'read' by opposition to 'load' because the
  super-vector granularity is generally not representable with a single
  hardware register. A <code>vector.transfer_read</code> is thus a mid-level abstraction
@@ -826,12 +828,12 @@ affine.for %i0 = 0 to %0 {
  specifies if the transfer is guaranteed to be within the source bounds. If
  set to &quot;false&quot;, accesses (including the starting point) may run
  out-of-bounds along the respective vector dimension as the index increases.
- Non-vector and broadcast dimensions *must* always be in-bounds. The
- <code>in_bounds</code> array length has to be equal to the vector rank. This attribute
- has a default value: <code>false</code> (i.e. &quot;out-of-bounds&quot;). When skipped in the
- textual IR, the default value is assumed. Similarly, the OP printer will
- omit this attribute when all dimensions are out-of-bounds (i.e. the default
- value is used).</p><p>A <code>vector.transfer_write</code> can be lowered to a simple store if all
+ Non-vector dimensions *must* always be in-bounds. The <code>in_bounds</code> array
+ length has to be equal to the vector rank. This attribute has a default
+ value: <code>false</code> (i.e. &quot;out-of-bounds&quot;). When skipped in the textual IR, the
+ default value is assumed. Similarly, the OP printer will omit this
+ attribute when all dimensions are out-of-bounds (i.e. the default value is
+ used).</p><p>A <code>vector.transfer_write</code> can be lowered to a simple store if all
   dimensions are specified to be within bounds and no <code>mask</code> was specified.</p><p>This operation is called 'write' by opposition to 'store' because the
  super-vector granularity is generally not representable with a single
  hardware register. A <code>vector.transfer_write</code> is thus a
