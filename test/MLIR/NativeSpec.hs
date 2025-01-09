@@ -137,6 +137,7 @@ spec = do
           o <- MLIR.moduleAsOperation m
           MLIR.withPassManager ctx \pm -> do
             MLIR.addConvertFuncToLLVMPass pm
+            MLIR.addConvertArithToLLVMPass pm
             MLIR.addConvertReconcileUnrealizedCastsPass pm
             result <- MLIR.runPasses pm o
             when (result == MLIR.Failure) $ error "Failed to lower to LLVM!"

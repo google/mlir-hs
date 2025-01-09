@@ -58,6 +58,18 @@ addConvertMemRefToLLVMPass pm =
     mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionFinalizeMemRefToLLVMConversionPass())
   } |]
 
+addConvertArithToLLVMPass :: PassManager -> IO ()
+addConvertArithToLLVMPass pm =
+  [C.exp| void {
+    mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionArithToLLVMConversionPass())
+  } |]
+
+addConvertControlFlowToLLVMPass :: PassManager -> IO ()
+addConvertControlFlowToLLVMPass pm =
+  [C.exp| void {
+    mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionConvertControlFlowToLLVMPass())
+  } |]
+
 addConvertFuncToLLVMPass :: PassManager -> IO ()
 addConvertFuncToLLVMPass pm =
   [C.exp| void {
