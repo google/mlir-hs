@@ -593,7 +593,7 @@ pattern Vp2IntersectQIntr :: () => () => Location -> Type -> operand -> operand 
 avx512_intr_vp2intersect_q_512 :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 module MLIR.AST.Dialect.Vector
-inline_c_ffi_6989586621679220868 :: Context -> Ptr CChar -> CSize -> IO Attribute
+inline_c_ffi_6989586621679219977 :: Context -> Ptr CChar -> CSize -> IO Attribute
 data Attribute
 IteratorAttr :: IteratorKind -> Attribute
 data IteratorKind
@@ -750,9 +750,6 @@ pattern TypeCast :: () => () => Location -> Type -> operand -> AbstractOperation
 
 -- | A builder for <tt>vector.type_cast</tt>.
 type_cast :: () => MonadBlockBuilder m => Type -> Value -> m Value
-
--- | A builder for <tt>vector.warp_execute_on_lane_0</tt>.
-warp_execute_on_lane_0 :: () => MonadBlockBuilder m => [Type] -> Value -> [Value] -> Int -> RegionBuilderT m () -> m Value
 
 -- | A pattern for <tt>vector.yield</tt>.
 pattern Yield :: () => () => Location -> [operand] -> AbstractOperation operand
@@ -1128,6 +1125,9 @@ conv_1d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBu
 -- | A builder for <tt>linalg.conv_2d_nchw_fchw</tt>.
 conv_2d_nchw_fchw :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
+-- | A builder for <tt>linalg.conv_2d_nchw_fchw_q</tt>.
+conv_2d_nchw_fchw_q :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
 -- | A builder for <tt>linalg.conv_2d_ngchw_fgchw</tt>.
 conv_2d_ngchw_fgchw :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
@@ -1148,6 +1148,12 @@ conv_2d_nhwc_hwcf :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -
 
 -- | A builder for <tt>linalg.conv_2d_nhwc_hwcf_q</tt>.
 conv_2d_nhwc_hwcf_q :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.conv_2d_nhwgc_gfhwc</tt>.
+conv_2d_nhwgc_gfhwc :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.conv_2d_nhwgc_gfhwc_q</tt>.
+conv_2d_nhwgc_gfhwc_q :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.conv_2d</tt>.
 conv_2d :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1237,7 +1243,7 @@ log :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilde
 map :: () => MonadBlockBuilder m => [Type] -> [Value] -> Value -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matmul</tt>.
-matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+matmul :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> Maybe [Map] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.matmul_transpose_a</tt>.
 matmul_transpose_a :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1390,10 +1396,10 @@ pattern Bitcast :: () => () => Location -> Type -> operand -> AbstractOperation 
 bitcast :: () => MonadBlockBuilder m => Type -> Value -> m Value
 
 -- | A builder for <tt>llvm.call_intrinsic</tt>.
-call_intrinsic :: () => MonadBlockBuilder m => Maybe Type -> [Value] -> [Value] -> ByteString -> [Int] -> m Value
+call_intrinsic :: () => MonadBlockBuilder m => Maybe Type -> [Value] -> [Value] -> ByteString -> [Int] -> Maybe [Attribute] -> m Value
 
 -- | A builder for <tt>llvm.call</tt>.
-call :: () => MonadBlockBuilder m => Maybe Type -> [Value] -> [Value] -> Maybe [Int] -> [Int] -> m Value
+call :: () => MonadBlockBuilder m => Maybe Type -> [Value] -> [Value] -> Maybe [Int] -> [Int] -> Maybe [Attribute] -> m Value
 
 -- | A pattern for <tt>llvm.mlir.constant</tt>.
 pattern Constant :: () => () => Location -> Type -> Attribute -> AbstractOperation operand
@@ -1966,17 +1972,21 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679482163 :: Context -> IO PassManager
+inline_c_ffi_6989586621679486231 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679482172 :: PassManager -> IO ()
+inline_c_ffi_6989586621679486240 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Operation -> IO LogicalResult
-inline_c_ffi_6989586621679482185 :: PassManager -> Operation -> IO LogicalResult
+inline_c_ffi_6989586621679486253 :: PassManager -> Operation -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679482194 :: PassManager -> IO ()
+inline_c_ffi_6989586621679486262 :: PassManager -> IO ()
+addConvertArithToLLVMPass :: PassManager -> IO ()
+inline_c_ffi_6989586621679486271 :: PassManager -> IO ()
+addConvertControlFlowToLLVMPass :: PassManager -> IO ()
+inline_c_ffi_6989586621679486280 :: PassManager -> IO ()
 addConvertFuncToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679482203 :: PassManager -> IO ()
+inline_c_ffi_6989586621679486289 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679482212 :: PassManager -> IO ()
+inline_c_ffi_6989586621679486298 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679482221 :: PassManager -> IO ()
+inline_c_ffi_6989586621679486307 :: PassManager -> IO ()

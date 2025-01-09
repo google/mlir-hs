@@ -31,7 +31,7 @@ func.func private @scribble(i32, i64, memref&lt;? x 128 x f32, #layout_map0&gt;)
 
 // A function that returns its argument twice:
 func.func @count(%x: i64) -&gt; (i64, i64)
-  attributes {fruit: &quot;banana&quot;} {
+  attributes {fruit = &quot;banana&quot;} {
   return %x, %x: i64, i64
 }
 
@@ -46,7 +46,7 @@ func.func private @example_fn_attr() attributes {dialectName.attrName = false}
 </pre></div><a href="#g:5" id="g:5"><h1>return</h1></a><div class="doc"><p>The <code>func.return</code> operation represents a return operation within a function.
  The operation takes variable number of operands and produces no results.
  The operand number and types must match the signature of the function
- that contains the operation.</p><p>Example:</p><pre>func.func @foo() : (i32, f8) {
+ that contains the operation.</p><p>Example:</p><pre>func.func @foo() -&gt; (i32, f8) {
   ...
   return %0, %1 : i32, f8
 }

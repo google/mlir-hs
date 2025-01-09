@@ -40,11 +40,11 @@
 
 // Return the dynamic dimension of %A.
 %c1 = arith.constant 1 : index
-%y = tensor.dim %A, %c1 : memref&lt;4x?xf32&gt;
+%y = tensor.dim %A, %c1 : tensor&lt;4x?xf32&gt;
 
 // Equivalent generic form:
-%x = &quot;tensor.dim&quot;(%A, %c0) : (memref&lt;4x?xf32&gt;, index) -&gt; index
-%y = &quot;tensor.dim&quot;(%A, %c1) : (memref&lt;4x?xf32&gt;, index) -&gt; index
+%x = &quot;tensor.dim&quot;(%A, %c0) : (tensor&lt;4x?xf32&gt;, index) -&gt; index
+%y = &quot;tensor.dim&quot;(%A, %c1) : (tensor&lt;4x?xf32&gt;, index) -&gt; index
 </pre></div><div class="top"><p class="src"><span class="keyword">pattern</span> <a id="v:Dim" class="def">Dim</a> :: <a href="MLIR-AST.html#t:Location" title="MLIR.AST">Location</a> -&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; operand -&gt; operand -&gt; <a href="MLIR-AST.html#t:AbstractOperation" title="MLIR.AST">AbstractOperation</a> operand <a href="src/MLIR.AST.Dialect.Generated.Tensor.html#Dim" class="link">Source</a> <a href="#v:Dim" class="selflink">#</a></p><div class="doc"><p>A pattern for <code>tensor.dim</code>.</p></div></div><div class="top"><p class="src"><a id="v:dim" class="def">dim</a> :: <a href="MLIR-AST-Builder.html#t:MonadBlockBuilder" title="MLIR.AST.Builder">MonadBlockBuilder</a> m =&gt; <a href="MLIR-AST.html#t:Type" title="MLIR.AST">Type</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> -&gt; m <a href="MLIR-AST-Builder.html#t:Value" title="MLIR.AST.Builder">Value</a> <a href="src/MLIR.AST.Dialect.Generated.Tensor.html#dim" class="link">Source</a> <a href="#v:dim" class="selflink">#</a></p><div class="doc"><p>A builder for <code>tensor.dim</code>.</p></div></div><a href="#g:6" id="g:6"><h1>empty</h1></a><div class="doc"><p><code>tensor.empty</code> is an operation that defines a tensor of a particular shape.
  The shape could be dynamic or static. The contents of the tensor are
  unspecified and the only purpose of the op result is to materialize the
@@ -146,7 +146,7 @@
  tensor ops (e.g. tensor.extract_slice). This is to avoid a slippery slope of
  complexity that would make the op unusable in practice.</p><p>At the tensor-level, the index tensor is specified in an AoS form (i.e.
  coordinate tuple is the most minor). It is the responsibility of further
- lowerings and bufferiation to implement various concrete layouts.</p><p>Note: As currently specified, the operation must lower to an abstraction that
+ lowerings and bufferization to implement various concrete layouts.</p><p>Note: As currently specified, the operation must lower to an abstraction that
  performs copies to the output tensor. This is because the buffer type system
  is currently not rich enough to allow multiple non-contiguous views in the
  same type. This is visible more clearly in a notional buffer version of the
@@ -372,7 +372,7 @@
  source tensor has size <code>1</code>.
  I.e. if the dest type is <code>axbxcxd</code> and the coordinates are [1, 3], then
  the source type suffix is <code>ax1xcx1</code>.
- Sactter also allows rank-reducing semantics where the shape <code>ax1xcx1</code> can be
+ Scatter also allows rank-reducing semantics where the shape <code>ax1xcx1</code> can be
  further simplified to <code>axc</code>.</p><p>The elemental type of the indices tensor can be any integer type.
  In the absence of target-specific or problem specific information the default
  type one should use is <code>index</code>.</p><p>This operation does not support unranked tensors.</p><p>A <code>unique</code> unit attribute must be be specified to indicate that the
@@ -382,7 +382,7 @@
  tensor ops (e.g. tensor.insert_slice). This is to avoid a slippery slope of
  complexity that would make the op unusable in practice.</p><p>At the tensor-level, the index tensor is specified in an AoS form (i.e.
  coordinate tuple is the most minor). It is the responsibility of further
- lowerings and bufferiation to implement various concrete layouts.</p><p>Note: As currently specified, the operation must lower to an abstraction that
+ lowerings and bufferization to implement various concrete layouts.</p><p>Note: As currently specified, the operation must lower to an abstraction that
  performs copies to the output tensor. This is because the buffer type system
  is currently not rich enough to allow multiple non-contiguous views in the
  same type. This is visible more clearly in a notional buffer version of the
