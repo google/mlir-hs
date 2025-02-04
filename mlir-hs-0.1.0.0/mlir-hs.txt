@@ -505,6 +505,30 @@ applyClosedOpRewriteT :: MonadFix m => OpRewriteM m -> Operation -> m Operation
 
 module MLIR.AST.Dialect.X86Vector
 
+-- | A pattern for <tt>x86vector.avx512.dot</tt>.
+pattern DotBF16 :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>x86vector.avx512.dot</tt>.
+avx512_dot :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>x86vector.avx512.intr.dpbf16ps.128</tt>.
+pattern DotBF16Ps128Intr :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>x86vector.avx512.intr.dpbf16ps.128</tt>.
+avx512_intr_dpbf16ps_128 :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>x86vector.avx512.intr.dpbf16ps.256</tt>.
+pattern DotBF16Ps256Intr :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>x86vector.avx512.intr.dpbf16ps.256</tt>.
+avx512_intr_dpbf16ps_256 :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+
+-- | A pattern for <tt>x86vector.avx512.intr.dpbf16ps.512</tt>.
+pattern DotBF16Ps512Intr :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
+
+-- | A builder for <tt>x86vector.avx512.intr.dpbf16ps.512</tt>.
+avx512_intr_dpbf16ps_512 :: () => MonadBlockBuilder m => Type -> Value -> Value -> Value -> m Value
+
 -- | A pattern for <tt>x86vector.avx.intr.dp.ps.256</tt>.
 pattern DotIntr :: () => () => Location -> Type -> operand -> operand -> operand -> AbstractOperation operand
 
@@ -593,7 +617,7 @@ pattern Vp2IntersectQIntr :: () => () => Location -> Type -> operand -> operand 
 avx512_intr_vp2intersect_q_512 :: () => MonadBlockBuilder m => Type -> Value -> Value -> m Value
 
 module MLIR.AST.Dialect.Vector
-inline_c_ffi_6989586621679219977 :: Context -> Ptr CChar -> CSize -> IO Attribute
+inline_c_ffi_6989586621679224297 :: Context -> Ptr CChar -> CSize -> IO Attribute
 data Attribute
 IteratorAttr :: IteratorKind -> Attribute
 data IteratorKind
@@ -1112,6 +1136,9 @@ batch_vecmat :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> Reg
 
 -- | A builder for <tt>linalg.ceil</tt>.
 ceil :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
+
+-- | A builder for <tt>linalg.contract</tt>.
+contract :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> [Map] -> RegionBuilderT m () -> m Value
 
 -- | A builder for <tt>linalg.conv_1d_ncw_fcw</tt>.
 conv_1d_ncw_fcw :: () => MonadBlockBuilder m => [Type] -> [Value] -> [Value] -> RegionBuilderT m () -> m Value
@@ -1972,21 +1999,21 @@ assert :: () => MonadBlockBuilder m => Value -> ByteString -> m ()
 
 module MLIR.Native.Pass
 createPassManager :: Context -> IO PassManager
-inline_c_ffi_6989586621679486231 :: Context -> IO PassManager
+inline_c_ffi_6989586621679492018 :: Context -> IO PassManager
 destroyPassManager :: PassManager -> IO ()
-inline_c_ffi_6989586621679486240 :: PassManager -> IO ()
+inline_c_ffi_6989586621679492027 :: PassManager -> IO ()
 withPassManager :: Context -> (PassManager -> IO a) -> IO a
 runPasses :: PassManager -> Operation -> IO LogicalResult
-inline_c_ffi_6989586621679486253 :: PassManager -> Operation -> IO LogicalResult
+inline_c_ffi_6989586621679492040 :: PassManager -> Operation -> IO LogicalResult
 addConvertMemRefToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679486262 :: PassManager -> IO ()
+inline_c_ffi_6989586621679492049 :: PassManager -> IO ()
 addConvertArithToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679486271 :: PassManager -> IO ()
+inline_c_ffi_6989586621679492058 :: PassManager -> IO ()
 addConvertControlFlowToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679486280 :: PassManager -> IO ()
+inline_c_ffi_6989586621679492067 :: PassManager -> IO ()
 addConvertFuncToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679486289 :: PassManager -> IO ()
+inline_c_ffi_6989586621679492076 :: PassManager -> IO ()
 addConvertVectorToLLVMPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679486298 :: PassManager -> IO ()
+inline_c_ffi_6989586621679492085 :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
-inline_c_ffi_6989586621679486307 :: PassManager -> IO ()
+inline_c_ffi_6989586621679492094 :: PassManager -> IO ()
