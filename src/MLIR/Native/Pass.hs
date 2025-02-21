@@ -85,5 +85,5 @@ addConvertVectorToLLVMPass pm =
 addConvertReconcileUnrealizedCastsPass :: PassManager -> IO ()
 addConvertReconcileUnrealizedCastsPass pm =
   [C.exp| void {
-    mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionReconcileUnrealizedCasts())
+    mlirPassManagerAddOwnedPass($(MlirPassManager pm), mlirCreateConversionReconcileUnrealizedCastsPass())
   } |]
