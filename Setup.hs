@@ -35,7 +35,7 @@ import Control.Lens.Setter
 import Control.Lens.Operators ((&))
 
 llvmVersion :: Version
-llvmVersion = mkVersion [21]
+llvmVersion = mkVersion [22]
 
 llvmConfigProgram :: Program
 llvmConfigProgram = (simpleProgram "llvm-config")
@@ -179,5 +179,3 @@ main = defaultMainWithHooks simpleUserHooks
             }
       confHook simpleUserHooks (newGenericPackageDesc, hookedBuildInfo) confFlags
   }
-
-
