@@ -22,7 +22,7 @@ jobs:
         stack-version: 'latest'
 
     - name: Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: ~/.stack
         key: ${{ runner.os }}-docs-${{ hashFiles('**/*.cabal', 'stack*.yaml') }}
