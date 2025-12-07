@@ -35,7 +35,7 @@ import Control.Lens.Setter
 import Control.Lens.Operators ((&))
 
 llvmVersion :: Version
-llvmVersion = mkVersion [21]
+llvmVersion = mkVersion [22]
 
 llvmConfigProgram :: Program
 llvmConfigProgram = (simpleProgram "llvm-config")
@@ -138,6 +138,7 @@ main = defaultMainWithHooks simpleUserHooks
             , ("Linalg"          , "mlir/Dialect/Linalg/IR/LinalgOps.td", [])
             , ("LinalgStructured", "mlir/Dialect/Linalg/IR/LinalgStructuredOps.td", ["-dialect-name", "LinalgStructured"])
             , ("Tensor"          , "mlir/Dialect/Tensor/IR/TensorOps.td", ["-strip-prefix", "Tensor_"])
+            , ("UB"              , "mlir/Dialect/UB/IR/UB.td", ["-dialect-name", "UB"])
             , ("X86Vector"       , "mlir/Dialect/X86Vector/X86Vector.td", ["-dialect-name", "X86Vector"])
             ]
       ensureDirectory "src/MLIR/AST/Dialect/Generated"

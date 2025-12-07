@@ -31,7 +31,6 @@ import Control.Monad.IO.Class
 
 import MLIR.AST
 import MLIR.AST.Serialize
-import qualified MLIR.AST.Dialect.Arith  as Arith
 import qualified MLIR.AST.Dialect.Func   as Func
 import qualified MLIR.AST.Dialect.MemRef as MemRef
 import qualified MLIR.AST.Dialect.Affine as Affine
@@ -94,6 +93,7 @@ shouldImplementMatmul op = evalContT $ do
       MLIR.addConvertMemRefToLLVMPass   pm
       MLIR.addConvertVectorToLLVMPass   pm
       MLIR.addConvertFuncToLLVMPass pm
+      MLIR.addConvertUBToLLVMPass pm
       MLIR.addConvertArithToLLVMPass pm
       MLIR.addConvertControlFlowToLLVMPass pm
       MLIR.addConvertReconcileUnrealizedCastsPass pm
@@ -167,38 +167,6 @@ spec = do
         #loc = loc("first")
         #loc1 = loc("last")
         #loc2 = loc(fused[#loc, #loc1])|]
-
-    it "Can construct a matmul via vector.matrix_multiply" $ do
-      let v64Ty = VectorType [64] Float32Type
-      let v64refTy = MemRefType { memrefTypeShape = []
-                                , memrefTypeElement = v64Ty
-                                , memrefTypeLayout = Nothing
-                                , memrefTypeMemorySpace = Nothing }
-      let m = ModuleOp $ Block "0" [] [
-                Do $ emitted $ FuncOp UnknownLocation "matmul8x8x8" (FunctionType [v64refTy, v64refTy, v64refTy] []) $ Region [
-                  Block "0" [("arg0", v64refTy), ("arg1", v64refTy), ("arg2", v64refTy)]
-                    [ "0" := MemRef.Load v64Ty "arg0" []
-                    , "1" := MemRef.Load v64Ty "arg1" []
-                    , "2" := Vector.Matmul UnknownLocation v64Ty "0" "1" 8 8 8
-                    , "3" := MemRef.Load v64Ty "arg2" []
-                    , "4" := Arith.AddF UnknownLocation v64Ty "3" "2"
-                    , Do $ MemRef.Store "4" "arg2" []
-                    , Do $ Func.Return UnknownLocation []
-                    ]
-                ]
-              ]
-      m `shouldShowAs` [r|
-        module {
-          func.func @matmul8x8x8(%arg0: memref<vector<64xf32>>, %arg1: memref<vector<64xf32>>, %arg2: memref<vector<64xf32>>) attributes {llvm.emit_c_interface} {
-            %0 = memref.load %arg0[] : memref<vector<64xf32>>
-            %1 = memref.load %arg1[] : memref<vector<64xf32>>
-            %2 = vector.matrix_multiply %0, %1 {lhs_columns = 8 : i32, lhs_rows = 8 : i32, rhs_columns = 8 : i32} : (vector<64xf32>, vector<64xf32>) -> vector<64xf32>
-            %3 = memref.load %arg2[] : memref<vector<64xf32>>
-            %4 = arith.addf %3, %2 : vector<64xf32>
-            memref.store %4, %arg2[] : memref<vector<64xf32>>
-            return
-          }
-        }|]
 
     it "Can translate matmul via vector.contract" $ do
       let v8x8Ty = VectorType [8, 8] Float32Type
