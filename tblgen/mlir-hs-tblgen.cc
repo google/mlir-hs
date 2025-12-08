@@ -43,9 +43,10 @@ static std::array<GeneratorInfo, 2> generators {{
 
 generator_function* generator;
 
+static llvm::cl::opt<std::string> generatorOpt("generator", llvm::cl::desc("Generator to run"), cl::Required);
+
 int main(int argc, char **argv) {
   llvm::InitLLVM y(argc, argv);
-  llvm::cl::opt<std::string> generatorOpt("generator", llvm::cl::desc("Generator to run"), cl::Required);
   cl::ParseCommandLineOptions(argc, argv);
   for (const auto& spec : generators) {
     if (generatorOpt == spec.name) {
