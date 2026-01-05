@@ -68,6 +68,7 @@ library
     , MLIR.AST.Dialect.Tensor
     , MLIR.AST.Dialect.Vector
     , MLIR.AST.Dialect.X86Vector
+    , MLIR.AST.Dialect.UB
     , MLIR.AST.IStorableArray
     , MLIR.AST.PatternUtil
     , MLIR.AST.Rewrite
