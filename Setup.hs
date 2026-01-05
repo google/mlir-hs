@@ -93,7 +93,7 @@ buildTblgen confFlags = do
   let tblgenProgram = ConfiguredProgram
         { programId           = "mlir-hs-tblgen"
         , programVersion      = Nothing
-        , programDefaultArgs  = ("-I" <> includeDir) : cppFlags
+        , programDefaultArgs  = ["-I" <> includeDir]
         , programOverrideArgs = []
         , programOverrideEnv  = []
         , programProperties   = mempty
@@ -138,7 +138,7 @@ main = defaultMainWithHooks simpleUserHooks
             , ("Linalg"          , "mlir/Dialect/Linalg/IR/LinalgOps.td", [])
             , ("LinalgStructured", "mlir/Dialect/Linalg/IR/LinalgStructuredOps.td", ["-dialect-name", "LinalgStructured"])
             , ("Tensor"          , "mlir/Dialect/Tensor/IR/TensorOps.td", ["-strip-prefix", "Tensor_"])
-            , ("UB"              , "mlir/Dialect/UB/IR/UB.td", ["-dialect-name", "UB"])
+            , ("UB"              , "mlir/Dialect/UB/IR/UBOps.td", ["-dialect-name", "UB"])
             , ("X86Vector"       , "mlir/Dialect/X86Vector/X86Vector.td", ["-dialect-name", "X86Vector"])
             ]
       ensureDirectory "src/MLIR/AST/Dialect/Generated"
