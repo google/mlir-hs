@@ -180,5 +180,3 @@ main = defaultMainWithHooks simpleUserHooks
             }
       confHook simpleUserHooks (newGenericPackageDesc, hookedBuildInfo) confFlags
   }
-
-
