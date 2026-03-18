@@ -58,6 +58,8 @@ jobs:
 
     - name: Ccache for C++ compilation
       uses: hendrikmuhs/ccache-action@6d1841ec156c39a52b1b23a810da917ab98da1f4 # v1.2.10
+      with:
+        key: ${{ runner.os }}-ccache
 
     - name: Install dependencies (LLVM & MLIR)
       run: |

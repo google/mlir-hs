@@ -12,8 +12,8 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-module MLIR.AST.Dialect.X86Vector
-  ( module MLIR.AST.Dialect.Generated.X86Vector
+module MLIR.AST.Dialect.X86
+  ( module MLIR.AST.Dialect.Generated.X86
   ) where
 
-import MLIR.AST.Dialect.Generated.X86Vector
+import MLIR.AST.Dialect.Generated.X86
