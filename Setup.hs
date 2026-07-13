@@ -139,7 +139,7 @@ main = defaultMainWithHooks simpleUserHooks
             , ("LinalgStructured", "mlir/Dialect/Linalg/IR/LinalgStructuredOps.td", ["-dialect-name", "LinalgStructured"])
             , ("Tensor"          , "mlir/Dialect/Tensor/IR/TensorOps.td", ["-strip-prefix", "Tensor_"])
             , ("UB"              , "mlir/Dialect/UB/IR/UBOps.td", ["-dialect-name", "UB"])
-            , ("X86"             , "mlir/Dialect/X86/X86.td", ["-dialect-name", "x86"])
+            , ("X86"             , "mlir/Dialect/X86/X86.td", ["-dialect-name", "X86"])
             ]
       ensureDirectory "src/MLIR/AST/Dialect/Generated"
       generatedModules <- forM dialects $ \(dialect, tdPath, opts) -> do
